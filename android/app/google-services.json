@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1044540078572",
+    "project_id": "office-51b56",
+    "storage_bucket": "office-51b56.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1044540078572:android:c1612a37958e77339fe8c9",
+        "android_client_info": {
+          "package_name": "com.aarvytech.office"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCphVsbH5StnW4Ig7Y6vbPu2DaQgfnt990"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
