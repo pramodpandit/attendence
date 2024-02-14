@@ -1,7 +1,6 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
@@ -9,11 +8,9 @@ import 'package:office/bloc/holiday_bloc.dart';
 import 'package:office/data/model/holiday_model.dart';
 import 'package:office/data/repository/holiday_repo.dart';
 import 'package:office/ui/attendance/attendancePolicy.dart';
-import 'package:office/ui/widget/app_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/url_launcher_string.dart';
+
 
 class AttendanceScreen extends StatefulWidget {
   const AttendanceScreen({super.key});
@@ -25,6 +22,8 @@ class AttendanceScreen extends StatefulWidget {
 class _AttendanceScreenState extends State<AttendanceScreen> {
   late HolidayEventBloc holidayBloc;
   int month = DateTime.now().month;
+  var value;
+  var condition;
 
   @override
   void initState() {
@@ -107,10 +106,83 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           ),
           Column(
             children: [
-              const SizedBox(height: 100,),
+              const SizedBox(height: 110,),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  InkWell(
+                    onTap: (){
+                      setState(() {
+                        condition = '2';
+                      });
+                    },
+                    child: Container(
+                        height: 40,
+                        width: 40,
+                        child: Image.asset('images/img.png',fit: BoxFit.cover,)),
+                  ),
+                  InkWell(
+                    onTap: (){
+                      setState(() {
+                        condition = '1';
+                      });
+                    },
+                    child: Container(
+                        height: 22,
+                        width: 22,
+                        child: Image.asset('images/img_1.png',height: 30,width: 30,)),
+                  ),
+                  SizedBox(width: 20,)
+                ],
+              ),
+
               Expanded(
                 child: Column(
                   children: [
+                    condition =='1'?
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SizedBox(
+                        child: DropdownButtonFormField<String>(
+                          icon: const Icon(
+                            Icons.keyboard_arrow_down_sharp,
+                            color: Colors.grey,
+                          ),
+                          iconSize: 24,
+                          elevation: 16,
+                          style: const TextStyle(color: Colors.black, fontSize: 15),
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.grey[200],
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(color: Color(0xffF4F5F7)),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(color: Color(0xffF2F2F2)),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 10),
+                            hintText: "${DateFormat.MMMM().format(DateTime.now())}",
+                            hintStyle: TextStyle(color: Colors.black.withOpacity(0.6), fontSize: 15,fontWeight: FontWeight.w500),
+                          ),
+                          onChanged: (String? data) {
+                            var year = DateTime.now().year;
+                            print("helo$data");
+                            print(year);
+                            holidayBloc.holidayList(data!, year.toString());
+
+                          },
+                          items: holidayBloc.months.map<DropdownMenuItem<String>>((value) {
+                            return DropdownMenuItem<String>(
+                              value: value['value'].toString(),
+                              child: Text(value['month'].toString(),style: const TextStyle(color: Colors.black,fontWeight: FontWeight.w500),),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ):condition =='2'?
                     ValueListenableBuilder(
                       valueListenable: holidayBloc.calendar,
                       builder: (context, calendarFormatValue, child) {
@@ -157,8 +229,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                 }
                               },
                              onDaySelected: (selectedDay, focusedDay) {
-
-                               print("Selected Day: $selectedDay");
+                                print("Selected Day: $selectedDay");
                                setState(() {
                                  holidayBloc.focusDay = selectedDay;
                                });
@@ -171,15 +242,74 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                           },
                         );
                       },
+                    ):
+                    ValueListenableBuilder(
+                      valueListenable: holidayBloc.calendar,
+                      builder: (context, calendarFormatValue, child) {
+                        return ValueListenableBuilder(
+                          valueListenable: holidayBloc.holidayData,
+                          builder: (BuildContext context, List<Holiday> value, Widget? child) {
+                            Map<DateTime, List<dynamic>> eventsList = {};
+                            final events = LinkedHashMap(
+                              equals: isSameDay,
+                            )..addAll(eventsList);
+                            List _getEventsForDay(DateTime day) {
+                              return events[day] ?? [];
+                            }
+                            print("focusDay1 ${holidayBloc.focusDay}");
+                            return TableCalendar(
+                              eventLoader: (day) {
+                                return _getEventsForDay(day);
+                              },
+                              firstDay: DateTime.utc(DateTime.now().year, 01, 01),
+                              lastDay: DateTime.utc(DateTime.now().year, 12, 31),
+                              focusedDay: holidayBloc.focusDay,
+                              currentDay: holidayBloc.focusDay/*DateTime.now()*/,
+                              headerStyle: const HeaderStyle(
+                                formatButtonVisible: false,
+                              ),
+                              calendarStyle: const CalendarStyle(
+                                weekendTextStyle: TextStyle(color: Colors.red),
+                              ),
+                              daysOfWeekStyle: const DaysOfWeekStyle(
+                                weekendStyle: TextStyle(color: Colors.red),
+                              ),
+                              startingDayOfWeek: StartingDayOfWeek.monday,
+                              calendarFormat: calendarFormatValue,
+                              onPageChanged: (focusedDay) {
+                                if(focusedDay.month != month){
+                                  print(holidayBloc.focusDay);
+                                  month = focusedDay.month;
+                                  holidayBloc.focusDay = focusedDay;
+                                }
+                              },
+                              onFormatChanged: (format) {
+                                if (value != format) {
+                                  holidayBloc.calendar.value = format;
+                                }
+                              },
+                              onDaySelected: (selectedDay, focusedDay) {
+                                print("Selected Day: $selectedDay");
+                                setState(() {
+                                  holidayBloc.focusDay = selectedDay;
+                                });
+                              },
+                              availableCalendarFormats: const {
+                                CalendarFormat.month: 'Month',
+                                CalendarFormat.week: 'Weeks',
+                              },
+                            );
+                          },
+                        );
+                      },
                     ),
                     SizedBox(height: 20,),
-
                     Expanded(
-                              child: Container(
+                              child:
+                              Container(
                                 padding: const EdgeInsets.only(bottom: 20),
                                 color: Colors.grey.shade100.withOpacity(0.5),
-
-                                    child: ValueListenableBuilder(
+                                child: ValueListenableBuilder(
                                       valueListenable: holidayBloc.isAttendanceLoading,
                                       builder: (BuildContext context, bool isLoading,
                                           Widget? child) {

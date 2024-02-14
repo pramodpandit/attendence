@@ -52,8 +52,8 @@ class User {
   Null? baskitAlliance;
   Null? varible;
   String? allowChats;
-  Null? otherDepartmentChat;
-  Null? groupDepartmentChat;
+  String? otherDepartmentChat;
+  String? groupDepartmentChat;
   String? marketPerson;
   String? targetStatus;
   Null? minimumTarget;
@@ -79,6 +79,8 @@ class User {
   String? bloodGroup;
   String? status;
   String? lastLogin;
+  Null? leaveType;
+  Null? leaves;
   String? accessType;
   Null? access;
   String? createdDate;
@@ -180,6 +182,8 @@ class User {
         this.bloodGroup,
         this.status,
         this.lastLogin,
+        this.leaveType,
+        this.leaves,
         this.accessType,
         this.access,
         this.createdDate,
@@ -281,6 +285,8 @@ class User {
     bloodGroup = json['blood_group'];
     status = json['status'];
     lastLogin = json['last_login'];
+    leaveType = json['leave_type'];
+    leaves = json['leaves'];
     accessType = json['access_type'];
     access = json['access'];
     createdDate = json['created_date'];
@@ -391,6 +397,8 @@ class User {
     data['blood_group'] = this.bloodGroup;
     data['status'] = this.status;
     data['last_login'] = this.lastLogin;
+    data['leave_type'] = this.leaveType;
+    data['leaves'] = this.leaves;
     data['access_type'] = this.accessType;
     data['access'] = this.access;
     data['created_date'] = this.createdDate;

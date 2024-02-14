@@ -25,6 +25,7 @@ class EventScreen extends StatefulWidget {
 class _EventScreenState extends State<EventScreen> {
   late HolidayEventBloc holidayBloc;
   int month = DateTime.now().month;
+  var condition;
 
   @override
   void initState() {
@@ -53,6 +54,7 @@ class _EventScreenState extends State<EventScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(height: 56,),
+
                 Text(
                   "Events",
                   textAlign: TextAlign.center,
@@ -100,9 +102,137 @@ class _EventScreenState extends State<EventScreen> {
           Column(
             children: [
               const SizedBox(height: 100,),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  InkWell(
+                    onTap: (){
+                      setState(() {
+                        condition = '2';
+                      });
+                    },
+                    child: Container(
+                        height: 40,
+                        width: 40,
+                        child: Image.asset('images/img.png',fit: BoxFit.cover,)),
+                  ),
+                  InkWell(
+                    onTap: (){
+                      setState(() {
+                        condition = '1';
+                      });
+                    },
+                    child: Container(
+                        height: 22,
+                        width: 22,
+                        child: Image.asset('images/img_1.png',height: 30,width: 30,)),
+                  ),
+                  SizedBox(width: 20,)
+                ],
+              ),
+
               Expanded(
                 child: Column(
                   children: [
+                    condition=='1'?
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SizedBox(
+                        child: DropdownButtonFormField<String>(
+                          icon: const Icon(
+                            Icons.keyboard_arrow_down_sharp,
+                            color: Colors.grey,
+                          ),
+                          iconSize: 24,
+                          elevation: 16,
+                          style: const TextStyle(color: Colors.black, fontSize: 15),
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.grey[200],
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(color: Color(0xffF4F5F7)),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(color: Color(0xffF2F2F2)),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 10),
+                            hintText: "${DateFormat.MMMM().format(DateTime.now())}",
+                            hintStyle: TextStyle(color: Colors.black.withOpacity(0.6), fontSize: 15,fontWeight: FontWeight.w500),
+                          ),
+                          onChanged: (String? data) {
+                            var year = DateTime.now().year;
+                            holidayBloc.eventsList(data!, year.toString());
+                          },
+                          items: holidayBloc.months.map<DropdownMenuItem<String>>((value) {
+                            return DropdownMenuItem<String>(
+                              value: value['value'].toString(),
+                              child: Text(value['month'].toString(),style: const TextStyle(color: Colors.black,fontWeight: FontWeight.w500),),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ):condition =='2'?
+                    ValueListenableBuilder(
+                      valueListenable: holidayBloc.calendar,
+                      builder: (context, calendarFormatValue, child) {
+                        return ValueListenableBuilder(
+                          valueListenable: holidayBloc.holidayData,
+                          builder:
+                              (BuildContext context, List<Holiday> value, Widget? child) {
+                            Map<DateTime, List<dynamic>> eventsList = {};
+                            final events = LinkedHashMap(
+                              equals: isSameDay,
+                              // hashCode: getHashCode,
+                            )..addAll(eventsList);
+                            List _getEventsForDay(DateTime day) {
+                              return events[day] ?? [];
+                            }
+
+                            return TableCalendar(
+                              eventLoader: (day) {
+                                return _getEventsForDay(day);
+                              },
+                              firstDay: DateTime.utc(DateTime.now().year, 01, 01),
+                              lastDay: DateTime.utc(DateTime.now().year, 12, 31),
+                              focusedDay: holidayBloc.focusDay,
+                              currentDay: DateTime.now(),
+                              headerStyle: const HeaderStyle(
+                                formatButtonVisible: false,
+                              ),
+                              calendarStyle: const CalendarStyle(
+                                weekendTextStyle: TextStyle(color: Colors.red),
+                              ),
+                              daysOfWeekStyle: const DaysOfWeekStyle(
+                                weekendStyle: TextStyle(color: Colors.red),
+                              ),
+                              startingDayOfWeek: StartingDayOfWeek.monday,
+                              calendarFormat: calendarFormatValue,
+                              onPageChanged: (focusedDay) {
+                                if (focusedDay.month != month) {
+                                  print(holidayBloc.focusDay);
+                                  month = focusedDay.month;
+                                  holidayBloc.focusDay = focusedDay;
+                                  holidayBloc.eventsList("${holidayBloc.focusDay.month}",
+                                      "${holidayBloc.focusDay.year}");
+                                }
+                              },
+                              onFormatChanged: (format) {
+                                if (value != format) {
+                                  holidayBloc.calendar.value = format;
+                                }
+                              },
+                              availableCalendarFormats: const {
+                                CalendarFormat.month: 'Month',
+                                CalendarFormat.week: 'Weeks'
+                              },
+                            );
+                          },
+                        );
+                      },
+                    ):
                     ValueListenableBuilder(
                       valueListenable: holidayBloc.calendar,
                       builder: (context, calendarFormatValue, child) {
