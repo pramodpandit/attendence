@@ -120,6 +120,9 @@ dependencies:
   fast_contacts: ^3.0.3
   syncfusion_flutter_pdfviewer: any
   open_settings: ^2.0.2
+  nb_utils: ^6.1.2
+#  audioplayers: ^5.2.1
+  audio_waveforms: ^1.0.4
 
 
 dev_dependencies:

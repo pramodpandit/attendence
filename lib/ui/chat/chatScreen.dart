@@ -1,9 +1,15 @@
+import 'dart:async';
 import 'dart:io';
 
+import 'package:audio_waveforms/audio_waveforms.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:office/data/model/user.dart';
 import 'package:office/ui/community/communityProfile.dart';
 import 'package:office/ui/widget/more_sheet.dart';
@@ -23,12 +29,19 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   TextEditingController sendmessage = TextEditingController();
   File? galleryFile;
+  PlayerController playerController = PlayerController();
+  // var waveFormData;
+  FilePickerResult? filePickerResult;
+  final Completer<GoogleMapController> _completer = Completer();
+  Position? position;
   late ProfileBloc profileBloc;
   List<String> messageType = ["r", "s", "s", "r", "s", "s", "r", "s"];
-  Future<void> _openGallery() async {
+
+  Future<void> _openImagePicker(ImageSource source) async {
+    Navigator.of(context).pop();
     print("Opening Image Picker");
     final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    final pickedFile = await picker.pickImage(source: source);
 
     if (pickedFile != null) {
       setState(() {
@@ -38,10 +51,50 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  Future<void> openFilePicker() async{
+    filePickerResult = await FilePicker.platform.pickFiles(
+      type: FileType.audio,
+    );
+    File audioFile = File(filePickerResult!.files.single.path!);
+    // waveFormData = await playerController.extractWaveformData(
+    //   path: filePickerResult.paths,
+    //   // noOfSamples: 100,
+    // );
+    setState(() { });
+// Or directly extract from preparePlayer and initialise audio player
+    await playerController.preparePlayer(
+      path: audioFile.path,
+      shouldExtractWaveform: true,
+      noOfSamples: 100,
+      volume: 1.0,
+    );
+    // AudioPlayer audioPlayer = AudioPlayer();
+    // audioPlayer.play(DeviceFileSource(audioFile.path));
+  }
+
   @override
   void initState() {
     profileBloc=ProfileBloc(context.read<ProfileRepository>());
     super.initState();
+  }
+
+  Future<void> getLocation() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if(permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+        getLocation();
+      }else{
+        Position currentPosition = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+        print(currentPosition);
+      }
+    }else{
+      Position currentPosition = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      print(currentPosition);
+      setState(() {
+        position = currentPosition;
+      });
+    }
   }
 
   @override
@@ -73,6 +126,66 @@ class _ChatScreenState extends State<ChatScreen> {
               onPressed: () {
                 setState(() {
                   galleryFile = null;
+                });
+              },
+              icon: Icon(Icons.highlight_remove)),
+        )
+      ]);
+    }
+    if (position != null) {
+      imageView = Stack(children: [
+        SizedBox(
+            height: heightScreen / 2,
+            width: widthScreen,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: GoogleMap(
+                myLocationButtonEnabled: true,
+                initialCameraPosition: CameraPosition(
+                    target: LatLng(position!.latitude, position!.longitude),
+                    zoom: 16,),
+                mapType: MapType.terrain,
+                markers: Set.of([Marker(markerId: MarkerId("1"),position: LatLng(position!.latitude,position!.longitude),icon: BitmapDescriptor.defaultMarker)]),
+                onMapCreated: (controller) {
+                  _completer.complete(controller);
+                },
+                buildingsEnabled: true,
+                  ),
+            )),
+        Align(
+          alignment: Alignment.topRight,
+          child: IconButton(
+              onPressed: () {
+                setState(() {
+                  position = null;
+                });
+              },
+              icon: Icon(Icons.highlight_remove)),
+        )
+      ]);
+    }
+    if (filePickerResult != null) {
+      imageView = Stack(children: [
+        //image container:::
+        Text("ui"),
+        AudioFileWaveforms(
+            size: Size(MediaQuery.of(context).size.width,100.0),
+            playerController: playerController,
+          waveformType: WaveformType.long,
+          waveformData: const [10.0,20.0],
+          playerWaveStyle: const PlayerWaveStyle(
+              fixedWaveColor: Colors.white54,
+              liveWaveColor: Colors.blueAccent,
+              spacing: 6,
+          ),
+        ),
+        //cross::::
+        Align(
+          alignment: Alignment.topRight,
+          child: IconButton(
+              onPressed: () {
+                setState(() {
+                  filePickerResult = null;
                 });
               },
               icon: Icon(Icons.highlight_remove)),
@@ -311,7 +424,44 @@ class _ChatScreenState extends State<ChatScreen> {
                         ),
                         InkWell(
                             onTap: (){
-                              _openGallery();
+                              showModalBottomSheet(context: context, builder: (context) {
+                                return Container(
+                                  color: Colors.white,
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      ListTile(
+                                        onTap : () {
+                                          _openImagePicker(ImageSource.camera);
+                                        },
+                                        title: Text("Camera"),
+                                        leading: Icon(PhosphorIcons.camera),
+                                      ),
+                                      ListTile(
+                                        onTap : () {
+                                          _openImagePicker(ImageSource.gallery);
+                                        },
+                                        title: Text("Gallery"),
+                                        leading: Icon(Icons.browse_gallery),
+                                      ),
+                                      ListTile(
+                                        onTap : () {
+                                          openFilePicker();
+                                        },
+                                        title: Text("Audio"),
+                                        leading: Icon(PhosphorIcons.file_audio),
+                                      ),
+                                      ListTile(
+                                        onTap : () {
+                                          getLocation();
+                                        },
+                                        title: Text("Location"),
+                                        leading: Icon(Icons.location_on),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },);
                             },
                             child: const Icon(Icons.attach_file)),
                         const SizedBox(

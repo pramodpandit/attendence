@@ -34,6 +34,7 @@ class AuthBloc extends Bloc {
         _pref.setString('name', "${uData["first_name"]} ${uData["last_name"]}");
         _pref.setString('email', uData['email'].toString());
         _pref.setString('phone', uData['phone'].toString());
+        _pref.setString("allow_chats", uData["allow_chats"].toString());
         /*sharedPreferences.setString('fullname', uData['fullname'].toString());
       sharedPreferences.setString('employment_id', uData['employment_id'].toString());
       sharedPreferences.setString('mobile', uData['mobile'].toString());

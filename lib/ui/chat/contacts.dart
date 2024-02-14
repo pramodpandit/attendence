@@ -156,7 +156,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                             ),
                                 // Expanded(
                                 //   child: FutureBuilder(
-                                //     future: getContact(),
+                                //     future: profileBloc.allUserDetail,
                                 //     builder: (context, snapshot){
                                 //       if(snapshot.data ==  null){
                                 //         return Center(child: CircularProgressIndicator());

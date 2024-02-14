@@ -9,13 +9,14 @@
     <uses-permission android:name="android.hardware.camera.autofocus"/>
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-Z
 
 
     <application
         android:label="Aarvy Office"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <meta-data android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyA0r0oRC03tITR0FNYVfKT-SlXEvf_FDp0"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"

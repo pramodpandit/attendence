@@ -2,11 +2,15 @@
 import 'package:container_tab_indicator/container_tab_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:nb_utils/nb_utils.dart';
+import 'package:office/bloc/profile_bloc.dart';
+import 'package:office/data/repository/profile_repo.dart';
 import 'package:office/ui/chat/chatScreen.dart';
 import 'package:office/ui/chat/contacts.dart';
 import 'package:office/ui/widget/app_bar.dart';
 import 'package:office/ui/widget/more_sheet.dart';
 import 'package:office/utils/constants.dart';
+import 'package:provider/provider.dart';
 
 import '../../data/model/user.dart';
 
@@ -19,12 +23,25 @@ class ChatListScreen extends StatefulWidget {
 
 class _ChatListScreenState extends State<ChatListScreen> {
   List<String> tabTittle = ["Chats", "Groups"];
+  String allowChats = "yes";
   ValueNotifier<int> tabIndex = ValueNotifier(0);
   ValueNotifier<bool> isSearchClicked = ValueNotifier(false);
   @override
   void initState() {
     super.initState();
+    getUserAllowChat();
   }
+
+void getUserAllowChat()async{
+  SharedPreferences _pref = await SharedPreferences.getInstance();
+
+  if(_pref.getString("allow_chats")!=null){
+    setState(() {
+      allowChats = _pref.getString("allow_chats").toString();
+    });
+    // tabTittle = _pref.getString("allow_chats")=="no"? ["Chats", "Groups"]:["Groups"];
+  }
+}
 
   @override
   Widget build(BuildContext context) {

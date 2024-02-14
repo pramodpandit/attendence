@@ -5,6 +5,7 @@ import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:open_settings/open_settings.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -29,10 +30,13 @@ class _AttendancePunchingState extends State<AttendancePunching> {
   String notificationPermissionStatus = '';
   DateTime? punchInTime;
   DateTime? punchOutTime;
+  double distance = 0.0;
+  var targetLatitude = "28.4875647";
+  var targetLongitude = "77.0646938";
 
-  // var currentLatitude = "";
-  // var currentLongitude = "";
-  //
+  var currentLatitude = "";
+  var currentLongitude = "";
+
   @override
   void initState() {
     bloc = ProfileBloc(context.read<ProfileRepository>());
@@ -121,7 +125,14 @@ class _AttendancePunchingState extends State<AttendancePunching> {
         Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high,
         );
-
+        setState(() {
+          currentLatitude = position.latitude.toString();
+          currentLongitude = position.longitude.toString();
+        });
+        var calculatedDistance = Geolocator.distanceBetween(position.latitude, position.longitude, targetLatitude.toDouble(), targetLongitude.toDouble());
+        setState(() {
+          distance = calculatedDistance;
+        });
         getAddress(position.latitude, position.longitude);
       } else {
         setState(() {
@@ -207,6 +218,7 @@ class _AttendancePunchingState extends State<AttendancePunching> {
       return "----";
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -371,8 +383,10 @@ class _AttendancePunchingState extends State<AttendancePunching> {
                                         // });
                                         if(location ==''){
                                           getLocation();
+                                        }else if(distance > 300.0){
+                                          toast("You are not in our location range");
                                         }else{
-                                          // showPunchConfirmationDialog();
+                                          showPunchConfirmationDialog();
                                         }
                                         },
                                       child: Image.asset(
