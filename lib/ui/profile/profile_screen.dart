@@ -27,7 +27,6 @@ class _ProfilePageState extends State<ProfilePage> {
       AppMessageHandler().showSnackBar(context, event);
     });
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -207,8 +206,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 )
                               ],
                             );
-                          });
-                    }
+                          });}
                 ),
               ),
               Expanded(

@@ -24,6 +24,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   int month = DateTime.now().month;
   var value;
   var condition;
+  int? selectedYear;
 
   @override
   void initState() {
@@ -140,49 +141,243 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                 child: Column(
                   children: [
                     condition =='1'?
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: SizedBox(
-                        child: DropdownButtonFormField<String>(
-                          icon: const Icon(
-                            Icons.keyboard_arrow_down_sharp,
-                            color: Colors.grey,
-                          ),
-                          iconSize: 24,
-                          elevation: 16,
-                          style: const TextStyle(color: Colors.black, fontSize: 15),
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.grey[200],
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(color: Color(0xffF4F5F7)),
-                              borderRadius: BorderRadius.circular(8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 5),
+                              child: Text(
+                                "Select Year",
+                                style: const TextStyle(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                             ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(color: Color(0xffF2F2F2)),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 12, horizontal: 10),
-                            hintText: "${DateFormat.MMMM().format(DateTime.now())}",
-                            hintStyle: TextStyle(color: Colors.black.withOpacity(0.6), fontSize: 15,fontWeight: FontWeight.w500),
-                          ),
-                          onChanged: (String? data) {
-                            var year = DateTime.now().year;
-                            print("helo$data");
-                            print(year);
-                            holidayBloc.holidayList(data!, year.toString());
+                            ValueListenableBuilder(
+                                valueListenable: holidayBloc.startYear,
+                                builder: (context, DateTime? date, _) {
+                                  return InkWell(
+                                    // onTap: () async {
+                                    //   DateTime? dt = await showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime.now().subtract(Duration(days: 15)), lastDate:  DateTime.now().add(Duration(days: 30)),);
+                                    //   if(dt!=null) {
+                                    //     await holidayBloc.updateStartYear(dt);
+                                    //   }
+                                    // },
+                                    onTap: () async {
+                                      int? selectedYear = await showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title:
+                                            const Text("Select Year"),
+                                            content: DropdownButton<int>(
+                                              value: date?.year ??
+                                                  DateTime.now().year,
+                                              items: List.generate(30,
+                                                      (index) {
+                                                    return DropdownMenuItem<
+                                                        int>(
+                                                      value:
+                                                      DateTime.now().year -
+                                                          15 +
+                                                          index,
+                                                      child: Text(
+                                                          (DateTime.now().year -
+                                                              15 +
+                                                              index)
+                                                              .toString()),
+                                                    );
+                                                  }),
+                                              onChanged: (int? value) {
+                                                Navigator.pop(
+                                                    context, value);
+                                              },
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Text('Cancel'),
+                                              ),
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(
+                                                      context,
+                                                      date?.year ??
+                                                          DateTime.now()
+                                                              .year);
+                                                },
+                                                child: Text('Select'),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
 
-                          },
-                          items: holidayBloc.months.map<DropdownMenuItem<String>>((value) {
-                            return DropdownMenuItem<String>(
-                              value: value['value'].toString(),
-                              child: Text(value['month'].toString(),style: const TextStyle(color: Colors.black,fontWeight: FontWeight.w500),),
-                            );
-                          }).toList(),
+                                      if (selectedYear != null) {
+                                        DateTime selectedDate =
+                                        DateTime(selectedYear);
+                                        await holidayBloc.updateStartYear(selectedDate);
+                                        await holidayBloc.holidayList();
+                                        print("$selectedDate");
+                                      }
+                                    },
+
+                                    child: Container(
+                                      height: 50,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[200],
+                                        borderRadius:
+                                        BorderRadius.circular(5),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          const Icon(PhosphorIcons.clock),
+                                          const SizedBox(width: 15),
+                                          Text(
+                                            date == null
+                                                ? DateFormat('yyyy')
+                                                .format(DateTime.now())
+                                                : DateFormat('yyyy')
+                                                .format(date),
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                }),
+                          ],
                         ),
-                      ),
-                    ):condition =='2'?
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 5),
+                              child: Text(
+                                "Select Month",
+                                style: const TextStyle(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            ValueListenableBuilder(
+                              valueListenable: holidayBloc.startmonth,
+                              builder: (context, DateTime? monthDate, _) {
+                                return InkWell(
+                                  onTap: () async {
+                                    int? selectedMonth = await showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: const Text("Select Month"),
+                                          content: DropdownButton<int>(
+                                            value: monthDate?.month ??
+                                                DateTime.now().month,
+                                            items:
+                                            List.generate(12, (index) {
+                                              return DropdownMenuItem<int>(
+                                                value: index + 1,
+                                                child: Text(
+                                                  DateFormat('MMMM').format(
+                                                      DateTime(
+                                                          DateTime.now()
+                                                              .year,
+                                                          index + 1,
+                                                          1)),
+                                                ),
+                                              );
+                                            }),
+                                            onChanged: (int? value) {
+                                              Navigator.pop(context, value);
+                                            },
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text('Cancel'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(
+                                                    context,
+                                                    monthDate?.month ??
+                                                        DateTime.now()
+                                                            .month);
+                                              },
+                                              child: Text('Select'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+
+                                    if (selectedMonth != null) {
+                                      DateTime selectedDate = DateTime(
+                                        holidayBloc.year.value?.year ??
+                                            DateTime.now().year,
+                                        selectedMonth,
+                                      );
+                                      await holidayBloc.updateStartMonth(selectedDate);
+                                      await holidayBloc.holidayList();
+                                      print("$selectedDate");
+                                    }
+                                  },
+                                  child: Container(
+                                    height: 50,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[200],
+                                      borderRadius:
+                                      BorderRadius.circular(5),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        const Icon(PhosphorIcons.calendar),
+                                        const SizedBox(width: 15),
+                                        Text(
+                                          monthDate == null
+                                              ? DateFormat('MMMM').format(
+                                              DateTime(
+                                                  DateTime.now().year,
+                                                  DateTime.now().month,
+                                                  1))
+                                              : DateFormat('MMMM').format(
+                                              DateTime(
+                                                  DateTime.now().year,
+                                                  monthDate.month,
+                                                  1)),
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    )
+                        :condition =='2'?
                     ValueListenableBuilder(
                       valueListenable: holidayBloc.calendar,
                       builder: (context, calendarFormatValue, child) {

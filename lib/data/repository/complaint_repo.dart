@@ -10,7 +10,7 @@ class ComplaintRepository {
 
   ComplaintRepository(this.prefs, this._api);
 
-  Future<ApiResponse2<List<ComplaintList>>> fetchComplaintList(
+  Future<ApiResponse4<List<ComplaintList>>> fetchComplaintList(
       String status,{String? getComplaint}) async {
     var response = await _api.getRequest("complaint", data: {
       "user_id": prefs.getString('uid'),
@@ -21,7 +21,7 @@ class ComplaintRepository {
     if (response == null) {
       throw ApiException.fromString("response null");
     }
-    return ApiResponse2.fromJson(response,List.from((response['data'] ?? []).map((e) => ComplaintList.fromJson(e))));
+    return ApiResponse4.fromJson(response,List.from((response['data'] ?? []).map((e) => ComplaintList.fromJson(e))));
   }
 
   Future<ApiResponse2> addComplaint(String title,String description, String complainTo) async {
