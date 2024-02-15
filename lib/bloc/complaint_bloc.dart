@@ -25,7 +25,6 @@ class ComplaintBloc extends Bloc {
     await complaintList('resolve');
     print(reviewedList.length);
   }
-
   initEmployee() async {
     await complaintList('inprocess',getComplaint: "1");
     print(progressList.length);
@@ -37,7 +36,7 @@ class ComplaintBloc extends Bloc {
     try{
       isListLoading.value = true;
       var result = await _repo.fetchComplaintList(status,getComplaint: getComplaint);
-      if(result.status && result.data != null){
+      if(result.status == true && result.data != null){
         if(status == 'resolve'){
           reviewedList = [];
           reviewedList = result.data!.reversed.toList();

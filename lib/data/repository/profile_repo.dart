@@ -7,6 +7,7 @@ import 'package:office/data/model/user.dart';
 import 'package:office/data/model/warning_model.dart';
 import 'package:office/data/network/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../model/Assets_model.dart';
 import '../model/document.dart';
 import '../network/api_exception.dart';
 
@@ -42,7 +43,7 @@ class ProfileRepository {
     if (response == null) {
       throw ApiException.fromString("response null");
     }
-    List<dynamic> list = response["data"] ?? [];
+    List<dynamic> list = response['data1'] ?? [];
     print('response profile ${list}');
 
     List<User> user =
@@ -86,6 +87,20 @@ class ProfileRepository {
         .toList();
     return bankDetails;
   }
+  Future<ApiResponse4<List<UserAssets>>> userAssetDetail() async {
+    SharedPreferences _pref = await SharedPreferences.getInstance();
+    var response = await _api.getRequest("user/user_assets", data: {
+      "user_id": 531,
+    });
+    if (response == null) {
+      throw ApiException.fromString("response null");
+    }
+    List<dynamic> list = response['data'] ?? [];
+    List<UserAssets> warning =
+    list.map<UserAssets>((e) => UserAssets.fromJson(e)).toList();
+    return ApiResponse4<List<UserAssets>>.fromJson(response, warning);
+  }
+
 
   Future<ApiResponse<List<LinksModel>>> userLinks() async {
     SharedPreferences _pref = await SharedPreferences.getInstance();

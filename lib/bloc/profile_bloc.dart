@@ -16,6 +16,7 @@ import 'package:office/ui/profile/menus/guardian_details.dart';
 import 'package:office/ui/profile/menus/links.dart';
 import 'package:office/ui/profile/menus/official_details.dart';
 import 'package:office/ui/profile/menus/warning.dart';
+import '../data/model/Assets_model.dart';
 import '../data/model/user.dart';
 import 'bloc.dart';
 
@@ -52,6 +53,7 @@ class ProfileBloc extends Bloc {
   ValueNotifier<List<Guardian>?> userGuardian = ValueNotifier([]);
   ValueNotifier<List<BankDetailsModel>?> userBankDetails = ValueNotifier([]);
   ValueNotifier<List<WarningModel>?> userWarnings=ValueNotifier([]);
+  ValueNotifier<List<UserAssets>?> assetsUser=ValueNotifier([]);
   ValueNotifier<List<LinksModel>?> userLinks=ValueNotifier([]);
   ValueNotifier<bool> isUserDetailLoad = ValueNotifier(false);
   ValueNotifier<bool> isEmployeeDetailLoad = ValueNotifier(false);
@@ -60,6 +62,7 @@ class ProfileBloc extends Bloc {
   ValueNotifier<bool> isBankDetailsLoad = ValueNotifier(false);
   ValueNotifier<bool> isLinksLoad = ValueNotifier(false);
   ValueNotifier<bool> isWarningsLoad=ValueNotifier(false);
+  ValueNotifier<bool> isAssetsLoad=ValueNotifier(false);
   ValueNotifier<bool> isAllUserDetailLoad = ValueNotifier(false);
   ValueNotifier<List<User>?> allUserDetail = ValueNotifier([]);
 
@@ -103,9 +106,6 @@ class ProfileBloc extends Bloc {
       isEmployeeDetailLoad.value = false;
     }
   }
-
-
-
   ValueNotifier<String?> allUser = ValueNotifier(null);
   fetchAllUserDetail() async{
     try{
@@ -196,16 +196,31 @@ class ProfileBloc extends Bloc {
     }
   }
 
-  fetchTodayWorkingDetail()async{
-    try{
+  fetchTodayWorkingDetail()async {
+    try {
       ApiResponse2 result = await _repo.todayWorking();
       print("the result is : ${result.data}");
-      if(result.status){
+      if (result.status) {
         todayWorkingDetail.value = result.data;
       }
-    }catch (e, s) {
+    } catch (e, s) {
       print(e);
       print(s);
+    }
+  }
+
+  fetchUserAssets() async{
+    try{
+      isAssetsLoad.value=true;
+      var result=await _repo.userAssetDetail();
+      if(result!=null){
+        assetsUser.value = result.data;
+      }
+    }catch(e,s){
+      print(e);
+      print(s);
+    }finally{
+      isAssetsLoad.value=false;
     }
   }
 }

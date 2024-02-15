@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import '../../../bloc/profile_bloc.dart';
+import '../../../data/repository/profile_repo.dart';
 
 class Assets extends StatefulWidget {
   const Assets({Key? key}) : super(key: key);
-
   @override
   State<Assets> createState() => _AssetsState();
 }
 
 class _AssetsState extends State<Assets> {
+  late ProfileBloc bloc;
+  @override
+  void initState() {
+    bloc = ProfileBloc(context.read<ProfileRepository>());
+    super.initState();
+    bloc.fetchUserAssets();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

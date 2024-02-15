@@ -72,8 +72,7 @@ class _WarningState extends State<Warning> {
                                               value: bloc,
                                               child:  WarningDetails(data: data),
                                             ),
-
-                                    )
+                                        )
                                     );
                                   },
                                   child: Container(

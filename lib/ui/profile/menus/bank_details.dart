@@ -29,7 +29,6 @@ class _BankDetailsState extends State<BankDetails> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-
             ValueListenableBuilder(
                 valueListenable: bloc.isBankDetailsLoad,
                 builder: (context, bool loading, __) {
@@ -44,8 +43,7 @@ class _BankDetailsState extends State<BankDetails> {
                     );
                   }
                   return Padding(
-                    padding:
-                        const EdgeInsets.only(left: 25, right: 25, bottom: 10),
+                    padding: const EdgeInsets.only(left: 25, right: 25, bottom: 10),
                     child: Column(
                       children: [
                         ValueListenableBuilder(
