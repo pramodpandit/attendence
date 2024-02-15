@@ -168,4 +168,22 @@ class ProfileRepository {
         response['data'] == null ? null : User.fromJson(response['data']));
   }
 
+  Future<ApiResponse2> todayWorking() async {
+    SharedPreferences _pref = await SharedPreferences.getInstance();
+    var response = await _api.getRequest(
+      "today_working_details",
+      data: {
+        // 'emp_id': _pref.getString('uid'),
+        // 'date' : "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}",
+
+        'emp_id': 95,
+        'date' : "2024-02-14",
+      },
+    );
+    if (response == null) {
+      throw ApiException.fromString("response null");
+    }
+    return ApiResponse2.fromJson(response,response['data']);
+  }
+
 }

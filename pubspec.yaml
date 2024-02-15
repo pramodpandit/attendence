@@ -123,6 +123,7 @@ dependencies:
   nb_utils: ^6.1.2
 #  audioplayers: ^5.2.1
   audio_waveforms: ^1.0.4
+  google_fonts: ^6.1.0
 
 
 dev_dependencies:

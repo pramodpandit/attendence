@@ -29,11 +29,10 @@ class AuthBloc extends Bloc {
           fcmToken: token);
       if (response['status']) {
         Map<String, dynamic> uData = response['data'];
-        _pref.setString('uid', uData['id'].toString());
-        _pref.setString('name', "${uData["first_name"]} ${uData["last_name"]}");
-        _pref.setString('email', uData['email'].toString());
-        _pref.setString('phone', uData['phone'].toString());
-        _pref.setString("allow_chats", uData["allow_chats"].toString());
+        await _pref.setString('uid', uData['id'].toString());
+        await _pref.setString('name', "${uData["first_name"]} ${uData["last_name"]}");
+        await _pref.setString('email', uData['email'].toString());
+        await _pref.setString('phone', uData['phone'].toString());
         /*sharedPreferences.setString('fullname', uData['fullname'].toString());
       sharedPreferences.setString('employment_id', uData['employment_id'].toString());
       sharedPreferences.setString('mobile', uData['mobile'].toString());
