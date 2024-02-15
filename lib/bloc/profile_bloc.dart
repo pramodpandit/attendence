@@ -16,6 +16,7 @@ import 'package:office/ui/profile/menus/guardian_details.dart';
 import 'package:office/ui/profile/menus/links.dart';
 import 'package:office/ui/profile/menus/official_details.dart';
 import 'package:office/ui/profile/menus/warning.dart';
+import '../data/model/Assets_Detail_modal.dart';
 import '../data/model/Assets_model.dart';
 import '../data/model/user.dart';
 import 'bloc.dart';
@@ -52,7 +53,8 @@ class ProfileBloc extends Bloc {
   ValueNotifier<List<Guardian>?> userGuardian = ValueNotifier([]);
   ValueNotifier<List<BankDetailsModel>?> userBankDetails = ValueNotifier([]);
   ValueNotifier<List<WarningModel>?> userWarnings=ValueNotifier([]);
-  ValueNotifier<List<UserAssets>?> assetsUser=ValueNotifier([]);
+  ValueNotifier<List<UserAssets>?>assetsUser=ValueNotifier([]);
+  ValueNotifier<List<UserAssetDetail>?>assetsUserDetail=ValueNotifier([]);
   ValueNotifier<List<LinksModel>?> userLinks=ValueNotifier([]);
   ValueNotifier<bool> isUserDetailLoad = ValueNotifier(false);
   ValueNotifier<bool> isEmployeeDetailLoad = ValueNotifier(false);
@@ -62,6 +64,7 @@ class ProfileBloc extends Bloc {
   ValueNotifier<bool> isLinksLoad = ValueNotifier(false);
   ValueNotifier<bool> isWarningsLoad=ValueNotifier(false);
   ValueNotifier<bool> isAssetsLoad=ValueNotifier(false);
+  ValueNotifier<bool> isAssetsLoadDetail=ValueNotifier(false);
   ValueNotifier<bool> isAllUserDetailLoad = ValueNotifier(false);
   ValueNotifier<List<User>?> allUserDetail = ValueNotifier([]);
 
@@ -198,8 +201,8 @@ class ProfileBloc extends Bloc {
   fetchUserAssets() async{
     try{
       isAssetsLoad.value=true;
-      var result=await _repo.userAssetDetail();
-      if(result!=null){
+      var result=await _repo.userAsset();
+      if(result.status == true && result!=null){
         assetsUser.value = result.data;
       }
     }catch(e,s){
@@ -207,6 +210,20 @@ class ProfileBloc extends Bloc {
       print(s);
     }finally{
       isAssetsLoad.value=false;
+    }
+  }
+  fetchUserAssetsDetail(int id) async{
+    try{
+      isAssetsLoadDetail.value=true;
+      var result=await _repo.userAssetDetail(id);
+      if(result.status == true && result!=null){
+        assetsUserDetail.value = result.data;
+      }
+    }catch(e,s){
+      print(e);
+      print(s);
+    }finally{
+      isAssetsLoadDetail.value=false;
     }
   }
 }
