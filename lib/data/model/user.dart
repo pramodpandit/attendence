@@ -57,7 +57,7 @@ class User {
   String? marketPerson;
   String? targetStatus;
   String? minimumTarget;
-  String? targetDuration;
+  int? targetDuration;
   String? penaltyStatus;
   String? penaltyType;
   String? penaltyVal;
