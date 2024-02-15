@@ -22,26 +22,18 @@ class ChatListScreen extends StatefulWidget {
 }
 
 class _ChatListScreenState extends State<ChatListScreen> {
+  late ProfileBloc bloc;
   List<String> tabTittle = ["Chats", "Groups"];
-  String allowChats = "yes";
   ValueNotifier<int> tabIndex = ValueNotifier(0);
   ValueNotifier<bool> isSearchClicked = ValueNotifier(false);
+
   @override
   void initState() {
     super.initState();
-    getUserAllowChat();
+    bloc = ProfileBloc(context.read<ProfileRepository>());
+    bloc.fetchUserDetail();
   }
 
-void getUserAllowChat()async{
-  SharedPreferences _pref = await SharedPreferences.getInstance();
-
-  if(_pref.getString("allow_chats")!=null){
-    setState(() {
-      allowChats = _pref.getString("allow_chats").toString();
-    });
-    // tabTittle = _pref.getString("allow_chats")=="no"? ["Chats", "Groups"]:["Groups"];
-  }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -131,17 +123,24 @@ void getUserAllowChat()async{
           const SizedBox(
             height: 20,
           ),
-          Expanded(
-            child: DefaultTabController(
-              length: 2,
-              initialIndex: 0,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 10, left: 10),
-                    child: Container(
-                      color: Colors.white,
+          ValueListenableBuilder(
+            valueListenable: bloc.userDetail,
+            builder: (context, value, child) {
+              if(value == null){
+                return Expanded(
+                    child: Center(child: CircularProgressIndicator()));
+              }
+            return Expanded(
+              child: DefaultTabController(
+                length: 2,
+                initialIndex: 0,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 10, left: 10),
+                      child: Container(
+                        color: Colors.white,
                         child: TabBar(
                           onTap: (value) {
                             tabIndex.value = value;
@@ -156,21 +155,22 @@ void getUserAllowChat()async{
                           indicatorWeight: 0,
                           indicatorPadding: EdgeInsets.symmetric(horizontal: 20),
                           tabs: [
-                            ValueListenableBuilder(
-                              valueListenable: tabIndex,
-                              builder: (BuildContext context, int value, Widget? child) {
-                                return Tab(
-                                  child: Text('Chats',
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: value == 0
-                                              ? Colors.white
-                                              : Colors.black,
-                                          fontFamily: 'Poppins')),
-                                );
-                              },
-                            ),
+                            if(value.allowChats == "yes" )
+                              ValueListenableBuilder(
+                                valueListenable: tabIndex,
+                                builder: (BuildContext context, int value, Widget? child) {
+                                  return Tab(
+                                    child: Text('Chats',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: value == 0
+                                                ? Colors.white
+                                                : Colors.black,
+                                            fontFamily: 'Poppins')),
+                                  );
+                                },
+                              ),
                             ValueListenableBuilder(
                               valueListenable: tabIndex,
                               builder: (BuildContext context, int value, Widget? child) {
@@ -188,123 +188,125 @@ void getUserAllowChat()async{
                             ),
                           ],
                         ),
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    child: TabBarView(
-                        physics: const NeverScrollableScrollPhysics(),
-                        children: [
-                          Stack(
-                            children: [
-                              RefreshIndicator(
-                                displacement: 100,
-                                backgroundColor: Colors.white,
-                                color: K.themeColorPrimary,
-                                strokeWidth: 3,
-                                triggerMode:
+                    Expanded(
+                      child: TabBarView(
+                          physics: const NeverScrollableScrollPhysics(),
+                          children: [
+                            if(value.allowChats == "yes")
+                              Stack(
+                                children: [
+                                  RefreshIndicator(
+                                    displacement: 100,
+                                    backgroundColor: Colors.white,
+                                    color: K.themeColorPrimary,
+                                    strokeWidth: 3,
+                                    triggerMode:
                                     RefreshIndicatorTriggerMode.onEdge,
-                                onRefresh: () async {
-                                  await Future.delayed(
-                                      Duration(milliseconds: 1200));
-                                },
-                                child: InkWell(
-                                  onTap: () {
-                                    Navigator.of(context).push(
-                                        PageRouteBuilder(
+                                    onRefresh: () async {
+                                      await Future.delayed(
+                                          Duration(milliseconds: 1200));
+                                    },
+                                    child: InkWell(
+                                      onTap: () {
+                                        Navigator.of(context).push(
+                                          PageRouteBuilder(
                                             pageBuilder: (context, animation, secondaryAnimation) {
-                                            return ChatScreen(User(firstName: "Aditya"));
-                                  },),);
-                                  },
-                                  child: ListView.builder(
-                                    itemCount: 15,
-                                    shrinkWrap: true,
-                                    itemBuilder: (context, index) {
-                                      return const SingleChat();
-                                    },
+                                              return ChatScreen(User(firstName: "Aditya"));
+                                            },),);
+                                      },
+                                      child: ListView.builder(
+                                        itemCount: 15,
+                                        shrinkWrap: true,
+                                        itemBuilder: (context, index) {
+                                          return const SingleChat();
+                                        },
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 110,
-                                right: 10,
-                                child: FloatingActionButton.extended(
-                                    onPressed: () {
-                                      Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  ContactsScreen()));
-                                    },
-                                    backgroundColor: const Color(0xFF253772),
-                                    label: AnimatedSwitcher(
-                                      duration: const Duration(seconds: 1),
-                                      transitionBuilder: (Widget child,
+                                  Positioned(
+                                    bottom: 110,
+                                    right: 10,
+                                    child: FloatingActionButton.extended(
+                                        onPressed: () {
+                                          Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ContactsScreen()));
+                                        },
+                                        backgroundColor: const Color(0xFF253772),
+                                        label: AnimatedSwitcher(
+                                          duration: const Duration(seconds: 1),
+                                          transitionBuilder: (Widget child,
                                               Animation<double> animation) =>
-                                          FadeTransition(
-                                            opacity: animation,
-                                            child: SizeTransition(
-                                            sizeFactor: animation,
-                                            axis: Axis.horizontal,
-                                            child: child,
-                                        ),
-                                      ),
-                                      child: Icon(
-                                        Icons.add,
-                                        color: Colors.white,
-                                      ),
-                                    )),
+                                              FadeTransition(
+                                                opacity: animation,
+                                                child: SizeTransition(
+                                                  sizeFactor: animation,
+                                                  axis: Axis.horizontal,
+                                                  child: child,
+                                                ),
+                                              ),
+                                          child: Icon(
+                                            Icons.add,
+                                            color: Colors.white,
+                                          ),
+                                        )),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          Stack(
-                            children: [
-                              RefreshIndicator(
-                                  displacement: 200,
-                                  backgroundColor: Colors.white,
-                                  color: K.themeColorPrimary,
-                                  strokeWidth: 3,
-                                  triggerMode:
-                                      RefreshIndicatorTriggerMode.onEdge,
-                                  onRefresh: () async {
-                                    await Future.delayed(
-                                        const Duration(milliseconds: 1500));
-                                  },
-                                  child: Container()),
-                              Positioned(
-                                bottom: 110,
-                                right: 10,
-                                child: FloatingActionButton.extended(
-                                    onPressed: () {
-                                      Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  ContactsScreen()));
+                            Stack(
+                              children: [
+                                RefreshIndicator(
+                                    displacement: 200,
+                                    backgroundColor: Colors.white,
+                                    color: K.themeColorPrimary,
+                                    strokeWidth: 3,
+                                    triggerMode:
+                                    RefreshIndicatorTriggerMode.onEdge,
+                                    onRefresh: () async {
+                                      await Future.delayed(
+                                          const Duration(milliseconds: 1500));
                                     },
-                                    backgroundColor: const Color(0xFF253772),
-                                    label: AnimatedSwitcher(
-                                      duration: const Duration(seconds: 1),
-                                      transitionBuilder: (Widget child, Animation<double> animation) =>
-                                          FadeTransition(
-                                          opacity: animation,
-                                          child: SizeTransition(
-                                          sizeFactor: animation,
-                                          axis: Axis.horizontal,
-                                          child: child,
+                                    child: Container()),
+                                Positioned(
+                                  bottom: 110,
+                                  right: 10,
+                                  child: FloatingActionButton.extended(
+                                      onPressed: () {
+                                        Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ContactsScreen()));
+                                      },
+                                      backgroundColor: const Color(0xFF253772),
+                                      label: AnimatedSwitcher(
+                                        duration: const Duration(seconds: 1),
+                                        transitionBuilder: (Widget child, Animation<double> animation) =>
+                                            FadeTransition(
+                                              opacity: animation,
+                                              child: SizeTransition(
+                                                sizeFactor: animation,
+                                                axis: Axis.horizontal,
+                                                child: child,
+                                              ),
+                                            ),
+                                        child: Icon(
+                                          Icons.add,
+                                          color: Colors.white,
                                         ),
-                                      ),
-                                      child: Icon(
-                                        Icons.add,
-                                        color: Colors.white,
-                                      ),
-                                    )),
-                              ),
-                            ],
-                          ),
-                        ]),
-                  ),
-                ],
+                                      )),
+                                ),
+                              ],
+                            ),
+                          ]),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ),
+            );
+          },)
 
         /*  Container(
             // width: 240,

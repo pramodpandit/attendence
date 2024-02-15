@@ -37,6 +37,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
     profileBloc=ProfileBloc(context.read<ProfileRepository>());
     super.initState();
     profileBloc.fetchAllUserDetail();
+    print("the all user details is : ${profileBloc.allUserDetail.value}");
   }
   @override
   Widget build(BuildContext context) {

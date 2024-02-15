@@ -46,6 +46,7 @@ class ProfileBloc extends Bloc {
     const Assets(),
   ];
   ValueNotifier<User?> userDetail = ValueNotifier(null);
+  ValueNotifier todayWorkingDetail = ValueNotifier(null);
   ValueNotifier<User?> employeeDetail = ValueNotifier(null);
   ValueNotifier<List<Document>?> userDocuments = ValueNotifier([]);
   ValueNotifier<List<Guardian>?> userGuardian = ValueNotifier([]);
@@ -114,7 +115,6 @@ class ProfileBloc extends Bloc {
         allUserDetail.value = result.data;
       }
     }catch (e, s) {
-      print(e);
       print(s);
     }finally{
       isAllUserDetailLoad.value = false;
@@ -193,6 +193,19 @@ class ProfileBloc extends Bloc {
       print(s);
     }finally{
       isWarningsLoad.value=false;
+    }
+  }
+
+  fetchTodayWorkingDetail()async{
+    try{
+      ApiResponse2 result = await _repo.todayWorking();
+      print("the result is : ${result.data}");
+      if(result.status){
+        todayWorkingDetail.value = result.data;
+      }
+    }catch (e, s) {
+      print(e);
+      print(s);
     }
   }
 }
