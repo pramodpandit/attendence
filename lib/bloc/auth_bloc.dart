@@ -27,7 +27,6 @@ class AuthBloc extends Bloc {
       response = await _repo.userLoginWithEmail(
           emailController.text, passwordController.text,
           fcmToken: token);
-
       if (response['status']) {
         Map<String, dynamic> uData = response['data'];
         _pref.setString('uid', uData['id'].toString());

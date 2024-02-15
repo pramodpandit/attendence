@@ -68,7 +68,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               builder: (context, user, _) {
                 var department =
                     user!.departmentaccess;
-
                 if (user == null) {
                   return Column(
                     children: [
@@ -99,7 +98,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                             InkWell(
                               onTap: (){
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>sallary()));
+                                // Navigator.push(context, MaterialPageRoute(builder: (context)=>sallary()));
                               },
                               child: Text(
                                 "Profile",
@@ -387,7 +386,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   builder: (context) => const ContactsScreen()));
                             },
                           ),
-                          if (bloc.hasAccess(department, 26,'1'))BoxContainer(
+                          if (bloc.hasAccess(department, 24,'1'))BoxContainer(
                             heading: "Logout",
                             image: "images/logout.png",
                             onTap: () async {

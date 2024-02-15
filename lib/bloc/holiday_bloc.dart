@@ -22,6 +22,7 @@ class HolidayEventBloc extends Bloc {
   holidayList(String month,String year) async {
      try{
       isHolidayLoading.value = true;
+      print('date$month  and year$year');
       var result = await _repo.holidayList(month,year);
       if(result != null && result.isNotEmpty){
         holidayData.value = [];
@@ -36,8 +37,6 @@ class HolidayEventBloc extends Bloc {
       isHolidayLoading.value = false;
     }
   }
-
-  
   ValueNotifier<List<Events>> eventsData = ValueNotifier(<Events>[]);
   ValueNotifier<bool> isEventLoading = ValueNotifier(false);
   eventsList(String month,String year) async {
@@ -57,6 +56,57 @@ class HolidayEventBloc extends Bloc {
       isEventLoading.value = false;
     }
   }
+  List  months = [
+    {
+      "month":"January",
+      "value":"1"
+    },
+    {
+      "month":"Febuary",
+      "value":"2"
+    },
+    {
+      "month":"March",
+      "value":"3"
+    },
+    {
+      "month":"April",
+      "value":"4"
+    },
+    {
+      "month":"May",
+      "value":"5"
+    },
+    {
+      "month":"June",
+      "value":"6"
+    },
+    {
+      "month":"July",
+      "value":"7"
+    },
+    {
+      "month":"August",
+      "value":"8"
+    },
+    {
+      "month":"September",
+      "value":"9"
+    },
+    {
+      "month":"October",
+      "value":"10"
+    },
+    {
+      "month":"November",
+      "value":"11"
+    },
+    {
+      "month":"December",
+      "value":"12"
+    },
+  ];
+
 
   ValueNotifier<List> attendanceData = ValueNotifier(<Events>[]);
   ValueNotifier<bool> isAttendanceLoading = ValueNotifier(false);
