@@ -24,12 +24,14 @@ class taskBloc extends Bloc{
   ];
   ValueNotifier<bool> isUserDetailLoad = ValueNotifier(false);
   List<TaskData> feedbackData = [];
+  List<TaskData> ongoing = [];
   fetchTaskData() async{
     try{
       isUserDetailLoad.value = true;
       var result = await _repo.getTaskData();
       if(result.status && result.data != null){
         feedbackData = result.data!.reversed.toList();
+
       }
     }catch (e, s) {
       print(e);

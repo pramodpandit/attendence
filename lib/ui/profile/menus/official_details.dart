@@ -156,7 +156,7 @@ class _OfficialDetailsState extends State<OfficialDetails> {
                                   isHtml: false,
                                   title: "${user.startTime?.substring(0,5)??"---"} to ${user.endTime?.substring(0,5)??"---"}",
                                   // title: '${details["shift_title"]!=null?details["shift_title"]:"--"}',
-                                  heading: "Working Hour"),
+                                  heading: "Shift Time"),
                               Dash(
                                 dashColor: Colors.grey.withOpacity(0.3),
                                 dashGap: 3,

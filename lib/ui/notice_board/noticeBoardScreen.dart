@@ -127,16 +127,16 @@ class _NoticeBoardScreenState extends State<NoticeBoardScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                Flexible(
-                                  child: Text(
-                                    "To ${noticeBoards[index].forEmployee??""}",
-                                    style: const TextStyle(
-                                        color: Colors.black54,
-                                        fontSize: 12,
-                                      fontWeight: FontWeight.w500
-                                    ),
-                                  ),
-                                )
+                                // Flexible(
+                                //   child: Text(
+                                //     "To ${noticeBoards[index].forEmployee??""}",
+                                //     style: const TextStyle(
+                                //         color: Colors.black54,
+                                //         fontSize: 12,
+                                //       fontWeight: FontWeight.w500
+                                //     ),
+                                //   ),
+                                // )
                               ],
                             ),
                             const SizedBox(
