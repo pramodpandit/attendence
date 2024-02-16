@@ -1,13 +1,25 @@
 import 'package:dashed_circular_progress_bar/dashed_circular_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:intl/intl.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:office/ui/leave/leaves_page.dart';
 import 'package:office/ui/notification/notification_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
+import '../../bloc/notice_bloc.dart';
 import '../../bloc/profile_bloc.dart';
+import '../../bloc/task_bloc.dart';
+import '../../data/model/notice_board.dart';
+import '../../data/repository/notice_repo.dart';
 import '../../data/repository/profile_repo.dart';
+import '../../data/repository/task_repo.dart';
+import '../notice_board/noticeBoardScreen.dart';
+import '../notice_board/notice_board_details.dart';
+import '../task/task_details.dart';
+import '../task/task_screen.dart';
 
 class DashBoard extends StatefulWidget {
   const DashBoard({Key? key}) : super(key: key);
@@ -18,11 +30,18 @@ class DashBoard extends StatefulWidget {
 
 class _DashBoardState extends State<DashBoard> {
   late ProfileBloc bloc;
+  late NoticeBloc blocnotice;
+  late taskBloc ongoingbloc;
+
   @override
   void initState() {
     bloc = ProfileBloc(context.read<ProfileRepository>());
+    blocnotice = NoticeBloc(context.read<NoticeRepository>());
+    ongoingbloc = taskBloc(context.read<TaskRepositary>(), );
     super.initState();
     bloc.fetchUserDetail();
+    blocnotice.fetchNoticeBoards();
+    ongoingbloc.fetchTaskData();
   }
 
   @override
@@ -405,7 +424,9 @@ class _DashBoardState extends State<DashBoard> {
                                     ),
                                     const Spacer(),
                                     GestureDetector(
-                                      onTap: () {},
+                                      onTap: () {
+                                        Navigator.push(context, MaterialPageRoute(builder: (context)=>TaskScreen()));
+                                      },
                                       child: const Text(
                                         "See Details",
                                         style: TextStyle(
@@ -419,80 +440,133 @@ class _DashBoardState extends State<DashBoard> {
                                 const SizedBox(
                                   height: 10,
                                 ),
-                                SizedBox(
-                                  height: 120,
-                                  child: PageView.builder(
-                                    itemCount: 2,
-                                    itemBuilder: (context, index) {
-                                      return Container(
-                                        margin: EdgeInsets.all(5),
-                                  padding: const EdgeInsets.symmetric(
-                                            horizontal: 15, vertical: 10),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.white,
-                                      boxShadow: [
-                                        BoxShadow(
-                                            spreadRadius: 0,
-                                            blurRadius: 3,
-                                            color: Colors.black.withOpacity(0.2))
-                                      ]),
-                                  child: const Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Icon(Icons.computer),
-                                          SizedBox(
-                                            width: 10,
-                                          ),
-                                          Flexible(
-                                            child: Text(
-                                              "UI/Ux Team Huddle",
-                                              style: TextStyle(
-                                                  fontSize: 14,
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.w500),
-                                            ),
-                                          ),
-                                          Spacer(),
-                                          DashedCircularProgressBar.square(
-                                            dimensions: 50,
-                                            progress: 60,
-                                            startAngle: 0,
-                                            sweepAngle: 360,
-                                            foregroundColor: Color(0xff4BCD36),
-                                            backgroundColor: Color(0xffeeeeee),
-                                            foregroundStrokeWidth: 5,
-                                            backgroundStrokeWidth: 5,
-                                            animation: true,
-                                            seekSize: 4,
-                                            seekColor: Colors.white,
-                                            child: Center(
-                                                child: Text(
-                                              '65%',
-                                              style: TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w600),
-                                            )),
-                                          ),
-                                        ],
-                                      ),
-                                      Text(
-                                        'Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi.Neque porro ',
-                                        maxLines: 2,
-                                        style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.grey,
-                                            overflow: TextOverflow.ellipsis),
-                                      ),
-                                    ],
-                                  ),
-                                      );
-                                    },
+
+                                Container(
+                                  child: ValueListenableBuilder(
+                                    valueListenable: ongoingbloc.isUserDetailLoad,
+                                    builder: (BuildContext context,bool isLoading,Widget? child){
+                                      if(isLoading){
+                                        return const Center(
+                                          child: CircularProgressIndicator(),
+                                        );
+                                      }
+                                      return  CarouselSlider.builder(
+                                          itemCount: ongoingbloc.feedbackData.length,
+                                          itemBuilder: (context,index, realindex){
+                                            var data = ongoingbloc.feedbackData[index];
+                                            if(data.status =='doing'){
+                                              return GestureDetector(
+                                                  onTap: () {
+                                                    Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const TaskDetails()));
+                                                  },
+                                                  child:  SizedBox(
+                                                    height: 120,
+                                                    child: PageView.builder(
+
+                                                      itemBuilder: (context, index) {
+                                                        return Container(
+                                                          margin: EdgeInsets.all(5),
+                                                          padding: const EdgeInsets.symmetric(
+                                                              horizontal: 15, vertical: 10),
+                                                          decoration: BoxDecoration(
+                                                              borderRadius: BorderRadius.circular(10),
+                                                              color: Colors.white,
+                                                              boxShadow: [
+                                                                BoxShadow(
+                                                                    spreadRadius: 0,
+                                                                    blurRadius: 3,
+                                                                    color: Colors.black.withOpacity(0.2))
+                                                              ]),
+                                                          child:  Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: [
+                                                              Row(
+                                                                children: [
+                                                                  Icon(Icons.computer),
+                                                                  SizedBox(
+                                                                    width: 10,
+                                                                  ),
+                                                                  Flexible(
+                                                                    child: Text(
+                                                                      "${data.title}",
+                                                                      style: TextStyle(
+                                                                          fontSize: 14,
+                                                                          color: Colors.black,
+                                                                          fontWeight: FontWeight.w500),
+                                                                    ),
+                                                                  ),
+                                                                  Spacer(),
+                                                                  const DashedCircularProgressBar.square(
+                                                                    dimensions: 50,
+                                                                    progress: 60,
+                                                                    startAngle: 0,
+                                                                    sweepAngle: 360,
+                                                                    foregroundColor: Color(0xff4BCD36),
+                                                                    backgroundColor: Color(0xffeeeeee),
+                                                                    foregroundStrokeWidth: 5,
+                                                                    backgroundStrokeWidth: 5,
+                                                                    animation: true,
+                                                                    seekSize: 4,
+                                                                    seekColor: Colors.white,
+                                                                    child: Center(
+                                                                        child: Text(
+                                                                          '65%',
+                                                                          style: TextStyle(
+                                                                              fontSize: 12,
+                                                                              fontWeight: FontWeight.w600),
+                                                                        )),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Container(
+                                                                child: Html(
+                                                                  // data:"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+                                                                  data:
+                                                                  "${data.description}",
+                                                                  style: {
+                                                                    "body": Style(
+                                                                        color: Colors.black,
+                                                                        fontWeight:
+                                                                        FontWeight.w600,
+
+                                                                        display: Display.inline,
+                                                                        fontSize: FontSize(10),
+                                                                        textAlign:
+                                                                        TextAlign.start),
+                                                                    "p": Style(
+                                                                        color: Colors.black,
+
+                                                                        display: Display.inline,
+                                                                        fontSize: FontSize(10),
+                                                                        textAlign:
+                                                                        TextAlign.start),
+                                                                  },
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        );
+                                                      },
+                                                    ),
+                                                  ),
+                                              );
+                                            }
+                                            return Offstage();
+
+                                          },
+                                          options: CarouselOptions(
+                                            autoPlay: false,
+                                            enlargeCenterPage: false,
+                                            aspectRatio: 2.0,
+                                            viewportFraction: 1.0,
+                                            initialPage: 0,
+
+                                          ));
+
+                                        },
                                   ),
                                 ),
+
                                 const SizedBox(
                                   height: 20,
                                 ),
@@ -530,7 +604,7 @@ class _DashBoardState extends State<DashBoard> {
                                         margin: EdgeInsets.all(5),
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 15, vertical: 10),
-                                  decoration: BoxDecoration(
+                                       decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10),
                                       color: Colors.white,
                                       boxShadow: [
@@ -539,7 +613,8 @@ class _DashBoardState extends State<DashBoard> {
                                             blurRadius: 3,
                                             color: Colors.black.withOpacity(0.2))
                                       ]),
-                                  child: Column(children: [
+                                  child: Column(
+                                      children: [
                                     Row(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
@@ -660,7 +735,7 @@ class _DashBoardState extends State<DashBoard> {
                                               style: TextStyle(
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.w600),
-                                            )
+                                            ),
                                           ],
                                         ),
                                         Column(
@@ -709,7 +784,7 @@ class _DashBoardState extends State<DashBoard> {
                                 Row(
                                   children: [
                                     const Text(
-                                      "Announcement",
+                                      "Notice Board",
                                       style: TextStyle(
                                           fontSize: 14,
                                           color: Colors.black,
@@ -717,7 +792,9 @@ class _DashBoardState extends State<DashBoard> {
                                     ),
                                     const Spacer(),
                                     GestureDetector(
-                                      onTap: () {},
+                                      onTap: () {
+                                        Navigator.push(context, MaterialPageRoute(builder: (context)=>NoticeBoardScreen()));
+                                      },
                                       child: const Text(
                                         "See Details",
                                         style: TextStyle(
@@ -728,67 +805,137 @@ class _DashBoardState extends State<DashBoard> {
                                     ),
                                   ],
                                 ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
+                                20.height,
                                 Container(
-                                  padding:
-                                      const EdgeInsets.symmetric(
-                                      horizontal: 15, vertical: 5),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.white,
-                                      boxShadow: [
-                                        BoxShadow(
-                                            spreadRadius: 0,
-                                            blurRadius: 3,
-                                            color: Colors.black.withOpacity(0.2))
-                                      ]),
-                                  child: const Column(
-                                    children: [
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              "Mobile App Design",
-                                              textAlign: TextAlign.left,
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                            ),
-                                          ),
-                                          Text(
-                                            "10-March-2023",
-                                            textAlign: TextAlign.left,
-                                            style: TextStyle(
-                                              color: Colors.black54,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      Text(
-                                        "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi.Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi. Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi.Neque porro quisquam.",
-                                        textAlign: TextAlign.left,
-                                        style: TextStyle(
-                                            color: Colors.black54,
-                                            fontWeight: FontWeight.w500,
-                                            fontFamily: "Poppins",
-                                            fontSize: 11),
-                                      ),
-                                      SizedBox(
-                                        height: 20,
-                                      ),
-                                    ],
+                                  child: ValueListenableBuilder(
+                                    valueListenable: blocnotice.loading,
+                                    builder: (context, bool isLoading, child) {
+                                      return ValueListenableBuilder(
+                                        valueListenable: blocnotice.noticeBoards,
+                                        builder: (context, List<NoticeBoard> noticeBoards, child) {
+                                          if (isLoading) {
+                                            return  Column(
+                                              children: [
+                                                SizedBox(
+                                                  height: MediaQuery.of(context).size.width * 0.8,
+                                                ),
+                                                const Center(child: CircularProgressIndicator()),
+                                              ],
+                                            );
+                                          }
+                                          if(noticeBoards.isEmpty){
+                                            return const Center(child: Text('Data Not Exist!'));
+                                          }
+                                          return
+                                            CarouselSlider.builder(
+                                                itemCount: noticeBoards.length,
+                                                itemBuilder: (context,index, realindex){
+                                                  NoticeBoard data = noticeBoards[index];
+                                                  return GestureDetector(
+                                                    onTap:() {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                Provider.value(
+                                                                  value: blocnotice,
+                                                                  child:  NoticeBoardDetails(data: data),
+                                                                ),
+                                                          )
+                                                      );
+                                                    },
+                                                    child: Container(
+                                                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                                                      margin: const EdgeInsets.only(bottom: 15, left: 8, right: 8),
+                                                      decoration: BoxDecoration(
+                                                          borderRadius: BorderRadius.circular(10),
+                                                          color: Colors.white,
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                              blurRadius: 5,
+                                                              spreadRadius: 1,
+                                                              color: Colors.black.withOpacity(0.1),
+                                                            )
+                                                          ]),
+                                                      child: Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          const SizedBox(
+                                                            height: 10,
+                                                          ),
+                                                          Row(
+                                                            mainAxisAlignment: MainAxisAlignment.end,
+                                                            children: [
+                                                              ],
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 5,
+                                                          ),
+                                                          Text(
+                                                            "${noticeBoards[index].title}",
+                                                            maxLines: 2,
+                                                            overflow: TextOverflow.ellipsis,
+                                                            style: const TextStyle(
+                                                              fontWeight: FontWeight.w600,
+                                                              fontSize: 16,
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            DateFormat.yMMMMd().format(DateTime.parse(
+                                                                "${noticeBoards[index].updateAt}")),
+                                                            style: const TextStyle(
+                                                              fontWeight: FontWeight.w500,
+                                                              fontSize: 10,
+                                                              color: Colors.black45,
+                                                            ),
+                                                          ),
+                                                          if(noticeBoards[index].description != null)const SizedBox(
+                                                            height: 10,
+                                                          ),
+                                                          if(noticeBoards[index].description != null)Html(
+                                                            // data:noticeBoards[index].description!.length>250?"${noticeBoards[index].description!.substring(0,250)}......." :noticeBoards[index].description?? "",
+                                                            // data: "${noticeBoards[index].description}",
+                                                            data: (noticeBoards[index].description != null && noticeBoards[index].description!.length > 250)
+                                                                ? "${noticeBoards[index].description!.substring(0, 100)}..."
+                                                                : noticeBoards[index].description ?? "",
+                                                            style: {
+                                                              "body": Style(
+                                                                color: Colors.black54,
+                                                                fontWeight:
+                                                                FontWeight.w500,
+                                                                fontFamily: "Poppins",
+                                                                display: Display.inline,
+                                                                fontSize: FontSize(14),),
+                                                              "p": Style(
+                                                                color: Colors.black54,
+                                                                padding: HtmlPaddings.zero,
+                                                                margin: Margins.zero,
+                                                                fontWeight:
+                                                                FontWeight.w500,
+                                                                fontFamily: "Poppins",
+                                                                display: Display.inline,
+                                                                fontSize: FontSize(14),),
+                                                            },
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 15,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                                options: CarouselOptions(
+                                                    autoPlay: true,
+                                                    enlargeCenterPage: false,
+                                                    aspectRatio: 2.0,
+                                                    viewportFraction: 1.0,
+                                                    initialPage: 0,
+                                                )
+                                            );
+                                        },
+                                      );
+                                    },
                                   ),
                                 ),
                                 const SizedBox(

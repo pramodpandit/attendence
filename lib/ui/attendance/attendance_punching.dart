@@ -1,6 +1,4 @@
-
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
@@ -10,14 +8,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:nb_utils/nb_utils.dart';
-import 'package:office/bloc/bloc.dart';
-import 'package:office/utils/message_handler.dart';
 import 'package:open_settings/open_settings.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:slide_digital_clock/slide_digital_clock.dart';
-
 import '../../bloc/profile_bloc.dart';
 import '../../data/repository/profile_repo.dart';
 

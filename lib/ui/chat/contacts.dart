@@ -104,7 +104,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                   return ValueListenableBuilder(
                     valueListenable: profileBloc.allUserDetail,
                     builder: (context,List<User>?data,__){
-                      print('htd$data');
+                     // print('htd$data');
                       if(data==null){
                         return Column(
                           children: [
