@@ -16,6 +16,7 @@ import 'package:office/ui/profile/menus/guardian_details.dart';
 import 'package:office/ui/profile/menus/links.dart';
 import 'package:office/ui/profile/menus/official_details.dart';
 import 'package:office/ui/profile/menus/warning.dart';
+import '../data/model/Assets_Detail_modal.dart';
 import '../data/model/Assets_model.dart';
 import '../data/model/user.dart';
 import 'bloc.dart';
@@ -53,7 +54,8 @@ class ProfileBloc extends Bloc {
   ValueNotifier<List<Guardian>?> userGuardian = ValueNotifier([]);
   ValueNotifier<List<BankDetailsModel>?> userBankDetails = ValueNotifier([]);
   ValueNotifier<List<WarningModel>?> userWarnings=ValueNotifier([]);
-  ValueNotifier<List<UserAssets>?> assetsUser=ValueNotifier([]);
+  ValueNotifier<List<UserAssets>?>assetsUser=ValueNotifier([]);
+  ValueNotifier<List<UserAssetDetail>?>assetsUserDetail=ValueNotifier([]);
   ValueNotifier<List<LinksModel>?> userLinks=ValueNotifier([]);
   ValueNotifier<bool> isUserDetailLoad = ValueNotifier(false);
   ValueNotifier<bool> isEmployeeDetailLoad = ValueNotifier(false);
@@ -63,6 +65,7 @@ class ProfileBloc extends Bloc {
   ValueNotifier<bool> isLinksLoad = ValueNotifier(false);
   ValueNotifier<bool> isWarningsLoad=ValueNotifier(false);
   ValueNotifier<bool> isAssetsLoad=ValueNotifier(false);
+  ValueNotifier<bool> isAssetsLoadDetail=ValueNotifier(false);
   ValueNotifier<bool> isAllUserDetailLoad = ValueNotifier(false);
   ValueNotifier<List<User>?> allUserDetail = ValueNotifier([]);
 
@@ -155,7 +158,7 @@ class ProfileBloc extends Bloc {
     try{
       isBankDetailsLoad.value = true;
       var result = await _repo.userBankDetails();
-      if(result !=null){
+      if(result!=null){
         userBankDetails.value = result;
       }
     }catch (e,s) {
@@ -199,6 +202,7 @@ class ProfileBloc extends Bloc {
   fetchTodayWorkingDetail()async {
     try {
       ApiResponse2 result = await _repo.todayWorking();
+      print("the result is : ${result.data}");
       if (result.status) {
         todayWorkingDetail.value = result.data;
       }
@@ -211,8 +215,8 @@ class ProfileBloc extends Bloc {
   fetchUserAssets() async{
     try{
       isAssetsLoad.value=true;
-      var result=await _repo.userAssetDetail();
-      if(result.data !=null){
+      var result=await _repo.userAsset();
+      if(result.status == true && result!=null){
         assetsUser.value = result.data;
       }
     }catch(e,s){
@@ -222,6 +226,21 @@ class ProfileBloc extends Bloc {
       isAssetsLoad.value=false;
     }
   }
+  fetchUserAssetsDetail(int id) async{
+    try{
+      isAssetsLoadDetail.value=true;
+      var result=await _repo.userAssetDetail(id);
+      if(result.status == true && result!=null){
+        assetsUserDetail.value = result.data;
+      }
+    }catch(e,s){
+      print(e);
+      print(s);
+    }finally{
+      isAssetsLoadDetail.value=false;
+    }
+  }
+
 
   markAttendance(List inputData)async{
     List<Map<String,dynamic>> data = [];
@@ -235,6 +254,4 @@ class ProfileBloc extends Bloc {
       print(s);
     }
   }
-
-
 }

@@ -3,7 +3,7 @@ class UserAssets {
   String? userId;
   String? itemId;
   String? stock;
-  Null? totalStock;
+  String? totalStock;
   String? updateAt;
   String? returnable;
   String? itemName;

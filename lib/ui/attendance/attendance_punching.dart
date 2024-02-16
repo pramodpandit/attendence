@@ -269,7 +269,6 @@ class _AttendancePunchingState extends State<AttendancePunching> {
                 // Toggle the state when confirmed
                 setState(() {
                   if (isPunching) {
-
                     bloc.markAttendance([]);
                     punchInTime = DateTime.now();
                     punchOutTime=null;
