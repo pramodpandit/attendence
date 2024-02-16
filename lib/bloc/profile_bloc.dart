@@ -155,7 +155,7 @@ class ProfileBloc extends Bloc {
     try{
       isBankDetailsLoad.value = true;
       var result = await _repo.userBankDetails();
-      if(result!=null){
+      if(result !=null){
         userBankDetails.value = result;
       }
     }catch (e,s) {
@@ -199,7 +199,6 @@ class ProfileBloc extends Bloc {
   fetchTodayWorkingDetail()async {
     try {
       ApiResponse2 result = await _repo.todayWorking();
-      print("the result is : ${result.data}");
       if (result.status) {
         todayWorkingDetail.value = result.data;
       }
@@ -213,7 +212,7 @@ class ProfileBloc extends Bloc {
     try{
       isAssetsLoad.value=true;
       var result=await _repo.userAssetDetail();
-      if(result!=null){
+      if(result.data !=null){
         assetsUser.value = result.data;
       }
     }catch(e,s){
@@ -223,4 +222,19 @@ class ProfileBloc extends Bloc {
       isAssetsLoad.value=false;
     }
   }
+
+  markAttendance(List inputData)async{
+    List<Map<String,dynamic>> data = [];
+    try {
+      ApiResponse2 result = await _repo.todayMarkAttendance();
+      if (result.status) {
+        todayWorkingDetail.value = result.data;
+      }
+    } catch (e, s) {
+      print(e);
+      print(s);
+    }
+  }
+
+
 }

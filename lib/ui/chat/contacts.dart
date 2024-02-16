@@ -1,5 +1,6 @@
 // import 'dart:js_interop';
 
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:fast_contacts/fast_contacts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
@@ -40,6 +41,11 @@ class _ContactsScreenState extends State<ContactsScreen> {
     super.initState();
     profileBloc.fetchAllUserDetail();
   }
+
+  void sendNotifications(){
+    
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -192,8 +198,8 @@ class _ContactsScreenState extends State<ContactsScreen> {
                                                 CircleAvatar(
                                                   radius: 23,
                                                   child: ClipOval(
-                                                    child: searchedUser[index].toJson()["image"] != null?Image.network(
-                                                      "https://freeze.talocare.co.in/public/${searchedUser[index].toJson()['image']}",
+                                                    child: searchedUser[index].image != null?Image.network(
+                                                      "https://freeze.talocare.co.in/public/${searchedUser[index].image}",
                                                       loadingBuilder: (context, child, loadingProgress) {
                                                         if(loadingProgress == null){
                                                           return child;
@@ -222,11 +228,11 @@ class _ContactsScreenState extends State<ContactsScreen> {
                                                     crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
                                                       Text(
-                                                        "${searchedUser[index].toJson()["first_name"]??""} ${searchedUser[index].toJson()["middle_name"]??""} ${searchedUser[index].toJson()["last_name"]??""}",
+                                                        "${searchedUser[index].firstName??""} ${searchedUser[index].middleName??""} ${searchedUser[index].lastName??""}",
                                                         style: const TextStyle(fontWeight: FontWeight.w500,fontSize: 15,),
                                                       ),
                                                       Text(
-                                                        searchedUser[index].toJson()["mobile_no"] ?? "",
+                                                        searchedUser[index].departmentname ?? "",
                                                         style: TextStyle(
                                                             fontSize: 13,
                                                             color: Colors.black.withOpacity(0.8)),
@@ -295,7 +301,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                                                       style: const TextStyle(fontWeight: FontWeight.w500,fontSize: 15,),
                                                     ),
                                                     Text(
-                                                      data[index].mobileNo ?? "",
+                                                      data[index].departmentname ?? "",
                                                       style: TextStyle(
                                                           fontSize: 13,
                                                           color: Colors.black.withOpacity(0.8)),

@@ -236,7 +236,7 @@ class _AttendancePunchingState extends State<AttendancePunching> {
           Navigator.of(context).pop();
         }, child: Text("Cancel")),
         OutlinedButton(onPressed: () {
-          if(imageFile == null){
+          if(bloc.todayWorkingDetail.value["selfi"]== "yes" && imageFile == null){
             toast('Please capture an image',bgColor: Colors.red,textColor: Colors.white);
           }else if(punchWorkController.text.isEmpty){
             toast("Please enter some work",bgColor: Colors.red,textColor: Colors.white);
@@ -249,7 +249,7 @@ class _AttendancePunchingState extends State<AttendancePunching> {
     );
   }
   void showPunchConfirmationDialog() {
-    String punchType = isPunching ? "Punch In" : "Punch Out";
+    String punchType = bloc.todayWorkingDetail.value["checkin"] == "" ? "Punch In" : "Punch Out";
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -269,6 +269,8 @@ class _AttendancePunchingState extends State<AttendancePunching> {
                 // Toggle the state when confirmed
                 setState(() {
                   if (isPunching) {
+
+                    bloc.markAttendance([]);
                     punchInTime = DateTime.now();
                     punchOutTime=null;
                     _saveDateTime('punchInTime', punchInTime);
@@ -471,6 +473,7 @@ class _AttendancePunchingState extends State<AttendancePunching> {
                                             height: 20,
                                           ),
                                           workingDetail["working"]==1?
+                                          workingDetail["checkin"] == "" && workingDetail["checkout"] ==""?
                                           workingDetail["location"] == "yes"?
                                           GestureDetector(
                                             onTap: () {
@@ -498,7 +501,7 @@ class _AttendancePunchingState extends State<AttendancePunching> {
                                             },
                                             child: Image.asset(
                                               // "images/puchin.png",
-                                              isPunching ? "images/puchin.png" : "images/puchout.png",
+                                              workingDetail["checkin"] == "" ? "images/puchin.png" : "images/puchout.png",
                                               height: 230,
                                             ),
                                           ):
@@ -529,7 +532,7 @@ class _AttendancePunchingState extends State<AttendancePunching> {
                                             },
                                             child: Image.asset(
                                               // "images/puchin.png",
-                                              isPunching ? "images/puchin.png" : "images/puchout.png",
+                                              workingDetail["checkin"] == "" ? "images/puchin.png" : "images/puchout.png",
                                               height: 230,
                                             ),
                                           )
@@ -538,151 +541,159 @@ class _AttendancePunchingState extends State<AttendancePunching> {
                                               child: Center(child: Text("You are out of range")))
                                               :SizedBox(
                                               height: 230,
+                                              child: Center(child: Text("You Punched Out Succesfully")))
+                                              :SizedBox(
+                                              height: 230,
                                               child: Center(child: Text("Today is Weekend Day"))),
                                           const SizedBox(
                                             height: 20,
                                           ),
-                                          Text(
-                                            "Location",
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 18),
-                                          ),
-                                          Text(
-                                            // "75C, Sector 18, Gurugram, Haryana 122001",
-                                            location,
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                                color: Colors.black87,
-                                                fontWeight: FontWeight.w400,
-                                                fontSize: 11),
-                                          ),
-                                          const SizedBox(
-                                            height: 30,
-                                          ),
-                                          Row(
-                                            crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                            mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                          workingDetail["working"]==1?
+                                          Column(
                                             children: [
-                                              Column(
-                                                mainAxisAlignment:
-                                                MainAxisAlignment.center,
+                                              Text(
+                                                "Location",
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 18),
+                                              ),
+                                              Text(
+                                                // "75C, Sector 18, Gurugram, Haryana 122001",
+                                                location,
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    color: Colors.black87,
+                                                    fontWeight: FontWeight.w400,
+                                                    fontSize: 11),
+                                              ),
+                                              const SizedBox(
+                                                height: 30,
+                                              ),
+                                              Row(
                                                 crossAxisAlignment:
                                                 CrossAxisAlignment.center,
+                                                mainAxisAlignment:
+                                                MainAxisAlignment.center,
                                                 children: [
-                                                  Row(
+                                                  Column(
+                                                    mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                    crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                    children: [
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                        MainAxisAlignment.center,
+                                                        crossAxisAlignment:
+                                                        CrossAxisAlignment.center,
+                                                        children: [
+                                                          Icon(
+                                                            PhosphorIcons.arrow_up,
+                                                            size: 18,
+                                                            color: Colors.green,
+                                                          ),
+                                                          Icon(
+                                                            PhosphorIcons.clock_bold,
+                                                            size: 25,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      Text(
+                                                        punchInTime != null
+                                                            ? DateFormat("hh:mm:ss").format(punchInTime!)
+                                                            : "-----",
+                                                        style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontWeight: FontWeight.w600,
+                                                            fontSize: 13),
+                                                      ),
+                                                      Text(
+                                                        "Punch-in",
+                                                        style: TextStyle(
+                                                            color: Colors.black54,
+                                                            fontWeight: FontWeight.w500,
+                                                            fontSize: 10),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(
+                                                    width: 20,
+                                                  ),
+                                                  Column(
+                                                    mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                    crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                    children: [
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                        MainAxisAlignment.center,
+                                                        crossAxisAlignment:
+                                                        CrossAxisAlignment.center,
+                                                        children: [
+                                                          Icon(
+                                                            PhosphorIcons.arrow_down,
+                                                            size: 18,
+                                                            color: Colors.red,
+                                                          ),
+                                                          Icon(
+                                                            PhosphorIcons.clock_bold,
+                                                            size: 25,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      Text(
+                                                        punchOutTime  != null
+                                                            ? DateFormat("hh:mm:ss").format(punchOutTime!)
+                                                            : "-----",
+                                                        style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontWeight: FontWeight.w600,
+                                                            fontSize: 13),
+                                                      ),
+                                                      Text(
+                                                        "Punch-out",
+                                                        style: TextStyle(
+                                                            color: Colors.black54,
+                                                            fontWeight: FontWeight.w500,
+                                                            fontSize: 10),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(
+                                                    width: 20,
+                                                  ),
+                                                  Column(
                                                     mainAxisAlignment:
                                                     MainAxisAlignment.center,
                                                     crossAxisAlignment:
                                                     CrossAxisAlignment.center,
                                                     children: [
                                                       Icon(
-                                                        PhosphorIcons.arrow_up,
-                                                        size: 18,
-                                                        color: Colors.green,
-                                                      ),
-                                                      Icon(
                                                         PhosphorIcons.clock_bold,
                                                         size: 25,
                                                       ),
-                                                    ],
-                                                  ),
-                                                  Text(
-                                                    punchInTime != null
-                                                        ? DateFormat("hh:mm:ss").format(punchInTime!)
-                                                        : "-----",
-                                                    style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontWeight: FontWeight.w600,
-                                                        fontSize: 13),
-                                                  ),
-                                                  Text(
-                                                    "Punch-in",
-                                                    style: TextStyle(
-                                                        color: Colors.black54,
-                                                        fontWeight: FontWeight.w500,
-                                                        fontSize: 10),
-                                                  ),
-                                                ],
-                                              ),
-                                              const SizedBox(
-                                                width: 20,
-                                              ),
-                                              Column(
-                                                mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                                crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                    crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                    children: [
-                                                      Icon(
-                                                        PhosphorIcons.arrow_down,
-                                                        size: 18,
-                                                        color: Colors.red,
+                                                      Text(
+                                                        calculateTimeGap()??"-----",
+                                                        style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontWeight: FontWeight.w600,
+                                                            fontSize: 13),
                                                       ),
-                                                      Icon(
-                                                        PhosphorIcons.clock_bold,
-                                                        size: 25,
+                                                      Text(
+                                                        "Working hours",
+                                                        style: TextStyle(
+                                                            color: Colors.black54,
+                                                            fontWeight: FontWeight.w500,
+                                                            fontSize: 10),
                                                       ),
                                                     ],
                                                   ),
-                                                  Text(
-                                                    punchOutTime  != null
-                                                        ? DateFormat("hh:mm:ss").format(punchOutTime!)
-                                                        : "-----",
-                                                    style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontWeight: FontWeight.w600,
-                                                        fontSize: 13),
-                                                  ),
-                                                  Text(
-                                                    "Punch-out",
-                                                    style: TextStyle(
-                                                        color: Colors.black54,
-                                                        fontWeight: FontWeight.w500,
-                                                        fontSize: 10),
-                                                  ),
                                                 ],
-                                              ),
-                                              const SizedBox(
-                                                width: 20,
-                                              ),
-                                              Column(
-                                                mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                                crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                                children: [
-                                                  Icon(
-                                                    PhosphorIcons.clock_bold,
-                                                    size: 25,
-                                                  ),
-                                                  Text(
-                                                    calculateTimeGap()??"-----",
-                                                    style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontWeight: FontWeight.w600,
-                                                        fontSize: 13),
-                                                  ),
-                                                  Text(
-                                                    "Working hours",
-                                                    style: TextStyle(
-                                                        color: Colors.black54,
-                                                        fontWeight: FontWeight.w500,
-                                                        fontSize: 10),
-                                                  ),
-                                                ],
-                                              ),
+                                              )
                                             ],
-                                          )
+                                          ):Offstage(),
                                         ],
                                       ),
                                     )

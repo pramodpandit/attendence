@@ -159,13 +159,28 @@ class ProfileRepository {
     var response = await _api.getRequest(
       "today_working_details",
       data: {
-        // 'emp_id': _pref.getString('uid'),
-        // 'date' : "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}",
-
-        'emp_id': 95,
-        'date' : "2024-02-14",
+        'emp_id': _pref.getString('uid'),
+        'date' : "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}",
       },
     );
+    if (response == null) {
+      throw ApiException.fromString("response null");
+    }
+    return ApiResponse2.fromJson(response,response['data']);
+  }
+
+  Future<ApiResponse2> todayMarkAttendance() async {
+    SharedPreferences _pref = await SharedPreferences.getInstance();
+
+    var response = await _api.postRequest("mark_attendence", {
+      "user_id": _pref.getString('uid'),
+      "date" : "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}",
+      // "check_in" : ,
+      // "check_in_latitude" : ,
+      // "check_in_longitude" : ,
+      // "check_in_worknote" : ,
+      // "check_in_selfi" : ,
+    },withFile: true);
     if (response == null) {
       throw ApiException.fromString("response null");
     }
