@@ -240,4 +240,18 @@ class ProfileBloc extends Bloc {
       isAssetsLoadDetail.value=false;
     }
   }
+
+
+  markAttendance(List inputData)async{
+    List<Map<String,dynamic>> data = [];
+    try {
+      ApiResponse2 result = await _repo.todayMarkAttendance();
+      if (result.status) {
+        todayWorkingDetail.value = result.data;
+      }
+    } catch (e, s) {
+      print(e);
+      print(s);
+    }
+  }
 }
