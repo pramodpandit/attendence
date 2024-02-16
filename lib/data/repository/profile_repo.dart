@@ -1,3 +1,6 @@
+import 'dart:js';
+
+import 'package:office/bloc/profile_bloc.dart';
 import 'package:office/data/model/api_response.dart';
 import 'package:office/data/model/bankDetails_model.dart';
 import 'package:office/data/model/guardianModel.dart';
@@ -183,17 +186,36 @@ class ProfileRepository {
     return ApiResponse2.fromJson(response,response['data']);
   }
 
-  Future<ApiResponse2> todayMarkAttendance() async {
+  Future<ApiResponse2> checkInMarkAttendance() async {
+    SharedPreferences _pref = await SharedPreferences.getInstance();
+    // ProfileBloc bloc = ProfileBloc(ProfileRepository(prefs, _api));
+
+    var response = await _api.postRequest("mark_attendence", {
+      "user_id": _pref.getString('uid'),
+      "date" : "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}",
+      // "check_in" : DateTime.now(),
+      // "check_in_latitude" : bloc.currentLatitude.value,
+      // "check_in_longitude" : bloc.currentLongitude.value,
+      // "check_in_worknote" : bloc.attendanceWorkController.text,
+      // "check_in_selfi" : bloc.attendanceImageFile,
+    },withFile: true);
+    if (response == null) {
+      throw ApiException.fromString("response null");
+    }
+    return ApiResponse2.fromJson(response,response['data']);
+  }
+
+  Future<ApiResponse2> checkOutMarkAttendance() async {
     SharedPreferences _pref = await SharedPreferences.getInstance();
 
     var response = await _api.postRequest("mark_attendence", {
       "user_id": _pref.getString('uid'),
       "date" : "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}",
-      // "check_in" : ,
-      // "check_in_latitude" : ,
-      // "check_in_longitude" : ,
-      // "check_in_worknote" : ,
-      // "check_in_selfi" : ,
+      // "checkout" : ,
+      // "check_out_latitude" : ,
+      // "check_out_longitude" : ,
+      // "check_out_worknote" : ,
+      // "check_out_selfi" : ,
     },withFile: true);
     if (response == null) {
       throw ApiException.fromString("response null");

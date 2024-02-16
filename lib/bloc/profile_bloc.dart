@@ -69,6 +69,11 @@ class ProfileBloc extends Bloc {
   ValueNotifier<bool> isAllUserDetailLoad = ValueNotifier(false);
   ValueNotifier<List<User>?> allUserDetail = ValueNotifier([]);
 
+  // ValueNotifier<File?> attendanceImageFile = ValueNotifier(null);
+  // TextEditingController attendanceWorkController = TextEditingController();
+  // ValueNotifier<String?> currentLatitude = ValueNotifier(null);
+  // ValueNotifier<String?> currentLongitude = ValueNotifier(null);
+
   selectMenu(int index){
     selectedMenuIndex.value =index;
   }
@@ -242,16 +247,31 @@ class ProfileBloc extends Bloc {
   }
 
 
-  markAttendance(List inputData)async{
-    List<Map<String,dynamic>> data = [];
+  markCheckInAttendance()async{
     try {
-      ApiResponse2 result = await _repo.todayMarkAttendance();
+      ApiResponse2 result = await _repo.checkInMarkAttendance();
       if (result.status) {
-        todayWorkingDetail.value = result.data;
+        // todayWorkingDetail.value = result.data;
       }
     } catch (e, s) {
       print(e);
       print(s);
     }
   }
+
+  // markCheckOutAttendance()async{
+  //   List<Map<String,dynamic>> data = [];
+  //   data.add({
+  //
+  //   });
+  //   try {
+  //     ApiResponse2 result = await _repo.checkOutMarkAttendance();
+  //     if (result.status) {
+  //       // todayWorkingDetail.value = result.data;
+  //     }
+  //   } catch (e, s) {
+  //     print(e);
+  //     print(s);
+  //   }
+  // }
 }
