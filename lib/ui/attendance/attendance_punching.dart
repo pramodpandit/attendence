@@ -35,8 +35,8 @@ class _AttendancePunchingState extends State<AttendancePunching> {
   var targetLatitude = "28.4875647";
   var targetLongitude = "77.0646938";
 
-  var currentLatitude = "";
-  var currentLongitude = "";
+  // var currentLatitude = "";
+  // var currentLongitude = "";
 
   @override
   void initState() {
@@ -127,10 +127,10 @@ class _AttendancePunchingState extends State<AttendancePunching> {
         Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high,
         );
-        setState(() {
-          currentLatitude = position.latitude.toString();
-          currentLongitude = position.longitude.toString();
-        });
+        // setState(() {
+          bloc.currentLatitude.value = position.latitude.toString();
+          bloc.currentLongitude.value = position.longitude.toString();
+        // });
         var calculatedDistance = Geolocator.distanceBetween(position.latitude, position.longitude, targetLatitude.toDouble(), targetLongitude.toDouble());
         setState(() {
           distance = calculatedDistance;
@@ -170,7 +170,7 @@ class _AttendancePunchingState extends State<AttendancePunching> {
     }
   }
 
-  File? imageFile;
+  // File? imageFile;
   TextEditingController punchWorkController = TextEditingController();
 
   void showDailyWorkDialog(){
@@ -188,9 +188,9 @@ class _AttendancePunchingState extends State<AttendancePunching> {
                 onTap: () async{
                   final ImagePicker picker = ImagePicker();
                   XFile? image = await picker.pickImage(source: ImageSource.camera);
-                  setState(() {
-                    imageFile = File(image!.path);
-                  });
+                  // setState(() {
+                    bloc.imageFile.value = File(image!.path);
+                  // });
                   Navigator.of(context).pop();
                   showDailyWorkDialog();
                 },
@@ -200,12 +200,12 @@ class _AttendancePunchingState extends State<AttendancePunching> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                      border: Border.all(width: 1,color: Colors.grey),
-                     image: imageFile==null ?
+                     image: bloc.imageFile.value==null ?
                          const DecorationImage(image: AssetImage("images/user_icon.png"),scale: 3):
                     DecorationImage(
                       fit: BoxFit.fill,
                       image: FileImage(
-                        imageFile!,
+                        bloc.imageFile.value!,
                       )
                     )
                   ),
@@ -231,7 +231,7 @@ class _AttendancePunchingState extends State<AttendancePunching> {
           Navigator.of(context).pop();
         }, child: Text("Cancel")),
         OutlinedButton(onPressed: () {
-          if(bloc.todayWorkingDetail.value["selfi"]== "yes" && imageFile == null){
+          if(bloc.todayWorkingDetail.value["selfi"]== "yes" && bloc.imageFile.value == null){
             toast('Please capture an image',bgColor: Colors.red,textColor: Colors.white);
           }else if(punchWorkController.text.isEmpty){
             toast("Please enter some work",bgColor: Colors.red,textColor: Colors.white);
@@ -263,17 +263,19 @@ class _AttendancePunchingState extends State<AttendancePunching> {
               onPressed: () {
                 // Toggle the state when confirmed
                 setState(() {
-                  if (isPunching) {
-
-                    bloc.markCheckInAttendance();
+                  // if (isPunching) {
+                    bloc.markCheckInAttendance(punchWorkController.text);
                     punchInTime = DateTime.now();
                     punchOutTime=null;
                     _saveDateTime('punchInTime', punchInTime);
-                  } else {
-                    punchOutTime = DateTime.now();
-                    _saveDateTime('punchOutTime', punchOutTime);
-                  }
+                  // } else {
+                  //   bloc.markCheckOutAttendance(punchWorkController.text);
+                  //   punchOutTime = DateTime.now();
+                  //   _saveDateTime('punchOutTime', punchOutTime);
+                  // }
                   isPunching = !isPunching;
+                  bloc.imageFile.value = null;
+                  punchWorkController.text = "";
                 });
                 Navigator.of(context).pop();
               },
@@ -595,8 +597,8 @@ class _AttendancePunchingState extends State<AttendancePunching> {
                                                         ],
                                                       ),
                                                       Text(
-                                                        punchInTime != null
-                                                            ? DateFormat("hh:mm:ss").format(punchInTime!)
+                                                        workingDetail["checkin"] != ""
+                                                            ? workingDetail["checkin"]
                                                             : "-----",
                                                         style: TextStyle(
                                                             color: Colors.black,
@@ -639,8 +641,8 @@ class _AttendancePunchingState extends State<AttendancePunching> {
                                                         ],
                                                       ),
                                                       Text(
-                                                        punchOutTime  != null
-                                                            ? DateFormat("hh:mm:ss").format(punchOutTime!)
+                                                        workingDetail["checkout"] != ""
+                                                            ? workingDetail["checkout"]
                                                             : "-----",
                                                         style: TextStyle(
                                                             color: Colors.black,

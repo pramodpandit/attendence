@@ -2,6 +2,7 @@ import 'package:dashed_circular_progress_bar/dashed_circular_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 import 'package:office/ui/project/menus/project_comment.dart';
 import 'package:office/ui/project/menus/project_credentials.dart';
 import 'package:office/ui/project/menus/project_files.dart';
@@ -12,11 +13,15 @@ import 'package:office/ui/project/menus/project_overview.dart';
 import 'package:office/ui/project/menus/project_task.dart';
 import 'package:office/ui/project/menus/project_timesheet.dart';
 import 'package:office/ui/project/projectScreen.dart';
+import 'package:provider/provider.dart';
 
+import '../../bloc/project_bloc.dart';
+import '../../data/repository/project_repo.dart';
 import '../widget/stack_user_list.dart';
 
 class ProjectDetails extends StatefulWidget {
-  const ProjectDetails({Key? key}) : super(key: key);
+  final  data;
+  const ProjectDetails({Key? key, this.data}) : super(key: key);
 
   @override
   State<ProjectDetails> createState() => _ProjectDetailsState();
@@ -49,6 +54,15 @@ class _ProjectDetailsState extends State<ProjectDetails> {
 
   selectMenu(int index){
     selectedMenuIndex.value =index;
+  }
+  late ProjectBloc bloc;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    bloc = ProjectBloc(context.read<ProjectRepository>());
+    bloc.fetchProjectsDetails(widget.data['project_id'].toString());
   }
   @override
   Widget build(BuildContext context) {
@@ -126,7 +140,7 @@ class _ProjectDetailsState extends State<ProjectDetails> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('Aarvy Office',
+                                  Text('${widget.data['name']}',
                                     style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w500,
@@ -138,7 +152,7 @@ class _ProjectDetailsState extends State<ProjectDetails> {
                                       const SizedBox(
                                         width: 10,
                                       ),
-                                      Text('In Process',style: TextStyle(fontSize: 11,color: Colors.green.shade400),)
+                                      Text('${widget.data['status']}',style: TextStyle(fontSize: 11,color: Colors.green.shade400),)
                                     ],
                                   ),
                                   const SizedBox(height: 5,),
@@ -148,7 +162,7 @@ class _ProjectDetailsState extends State<ProjectDetails> {
                                       const SizedBox(
                                         width: 10,
                                       ),
-                                      Text('April 25, 2024',style: TextStyle(fontSize: 11,color: Colors.redAccent.withOpacity(0.9)),)
+                                      Text('${DateFormat.yMMMM().format(DateTime.parse(widget.data['created_date']))}',style: TextStyle(fontSize: 11,color: Colors.redAccent.withOpacity(0.9)),)
                                     ],
                                   ),
                                   const SizedBox(height: 8,),
@@ -162,10 +176,10 @@ class _ProjectDetailsState extends State<ProjectDetails> {
                                   )
                                 ],
                               ),
-                              const Spacer(),
-                              const DashedCircularProgressBar.square(
+                              Spacer(),
+                              DashedCircularProgressBar.square(
                                 dimensions: 80,
-                                progress: 60,
+                                progress: double.parse(widget.data["progress"].toString()),
                                 startAngle: 225,
                                 sweepAngle: 270,
                                 foregroundColor: Colors.blue,
@@ -175,7 +189,7 @@ class _ProjectDetailsState extends State<ProjectDetails> {
                                 animation: true,
                                 seekSize: 8,
                                 seekColor: Colors.white,
-                                child: Center(child: Text('60%',
+                                child: Center(child: Text("${widget.data['progress']}%",
                                   style: TextStyle(fontSize: 16,fontWeight: FontWeight.w600),)),
                               ),
                             ],

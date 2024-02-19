@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:office/data/model/api_response.dart';
 import 'package:office/data/model/bankDetails_model.dart';
 import 'package:office/data/model/document.dart';
@@ -69,10 +70,9 @@ class ProfileBloc extends Bloc {
   ValueNotifier<bool> isAllUserDetailLoad = ValueNotifier(false);
   ValueNotifier<List<User>?> allUserDetail = ValueNotifier([]);
 
-  // ValueNotifier<File?> attendanceImageFile = ValueNotifier(null);
-  // TextEditingController attendanceWorkController = TextEditingController();
-  // ValueNotifier<String?> currentLatitude = ValueNotifier(null);
-  // ValueNotifier<String?> currentLongitude = ValueNotifier(null);
+  ValueNotifier<String?> currentLatitude = ValueNotifier(null);
+  ValueNotifier<String?> currentLongitude = ValueNotifier(null);
+  ValueNotifier<File?> imageFile = ValueNotifier(null);
 
   selectMenu(int index){
     selectedMenuIndex.value =index;
@@ -247,31 +247,26 @@ class ProfileBloc extends Bloc {
   }
 
 
-  markCheckInAttendance()async{
+  markCheckInAttendance(String work)async{
     try {
-      ApiResponse2 result = await _repo.checkInMarkAttendance();
+      ApiResponse2 result = await _repo.checkInAttendance(work, imageFile.value!,currentLatitude.value!,currentLongitude.value!);
       if (result.status) {
-        // todayWorkingDetail.value = result.data;
+        toast("Attendance checked in");
       }
     } catch (e, s) {
       print(e);
       print(s);
     }
   }
-
-  // markCheckOutAttendance()async{
-  //   List<Map<String,dynamic>> data = [];
-  //   data.add({
-  //
-  //   });
-  //   try {
-  //     ApiResponse2 result = await _repo.checkOutMarkAttendance();
-  //     if (result.status) {
-  //       // todayWorkingDetail.value = result.data;
-  //     }
-  //   } catch (e, s) {
-  //     print(e);
-  //     print(s);
-  //   }
-  // }
+  markCheckOutAttendance(String work)async{
+    try {
+      ApiResponse2 result = await _repo.checkOutAttendance(work, imageFile.value!, currentLatitude.value!, currentLongitude.value!);
+      if (result.status) {
+        toast("Attendance checked out");
+      }
+    } catch (e, s) {
+      print(e);
+      print(s);
+    }
+  }
 }

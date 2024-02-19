@@ -112,10 +112,11 @@ class _ProjectScreenState extends State<ProjectScreen> {
                   child: ListView.builder(
                     itemCount: projectData.length,
                     itemBuilder: (context, index) {
+                      var data = projectData[index];
                       return GestureDetector(
                         onTap: () {
                           Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => const ProjectDetails()));
+                              builder: (context) =>  ProjectDetails(data: data,)));
                         },
                         child: Container(
                           margin: const EdgeInsets.only(left: 25,right: 25,bottom: 25),
