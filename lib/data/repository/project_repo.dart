@@ -22,4 +22,17 @@ class ProjectRepository {
     }
     return ApiResponse2.fromJson(response,response);
   }
+  Future<ApiResponse2> fetchAllProjectsDetail(int id) async {
+
+    var response = await _api.postRequest("project/details", {
+      "project_id": id,
+      // "user_id": 95,
+    });
+   // print('data api${response}');
+    if (response == null) {
+      ApiException.fromString("response null");
+    }
+    return ApiResponse2.fromJson(response,response);
+  }
+
 }
