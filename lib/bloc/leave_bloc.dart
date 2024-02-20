@@ -172,6 +172,15 @@ class LeaveBloc extends Bloc {
       // isResponseLoad.value = false;
     }
   }
-//#endregion
-
+  ValueNotifier balanceData = ValueNotifier(null);
+  getLeaveBalanceDetail() async {
+    try {
+     var   res = await _repo.leaveBalance();
+     balanceData.value = res.data['data'];
+     print('value is availble:${res.data['data']}');
+    } catch(e,s) {
+      debugPrint('$e');
+      debugPrintStack(stackTrace: s);
+    }
+  }
 }

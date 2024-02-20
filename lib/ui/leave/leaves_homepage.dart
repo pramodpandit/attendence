@@ -41,222 +41,231 @@ class _LeavesHomePageState extends State<LeavesHomePage> {
     });
     bloc.getLeaveCategory();
     bloc.getLeaveRecords();
+    bloc.getLeaveBalanceDetail();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white.withOpacity(0.97),
-      // appBar: MyAppBar(
-      //   title: "My Leaves",
-      //   actions: [
-      //     Container(
-      //         margin: const EdgeInsets.only(right: 10),
-      //         child: GestureDetector(
-      //             onTap: () {
-      //               Navigator.of(context).push(MaterialPageRoute(builder: (context)=> const LeavePolicy()));
-      //             }, child: const Icon(Icons.question_mark))),
-      //   ],
-      // ),
-      body: Stack(
+      body: Column(
         children: [
-          Container(
-            height: 100,
-            width: 1.sw,
-            decoration: const BoxDecoration(
-                color: Color(0xFF009FE3),
-                borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(20),
-                    bottomRight: Radius.circular(20))),
-            child: const Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(
-                  height: 56,
-                ),
-                Text(
-                  "My Leaves",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18),
-                ),
-              ],
-            ),
-          ),
-          Positioned(
-            top: 56,
-            left: 10,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: const CircleAvatar(
-                backgroundColor: Colors.white,
-                radius: 15,
-                child: Icon(
-                  Icons.arrow_back,
-                  size: 18,
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            top: 56,
-            right: 10,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const LeavePolicy()));
-              },
-              child: const CircleAvatar(
-                backgroundColor: Colors.white,
-                radius: 15,
-                child: Icon(
-                  Icons.question_mark,
-                  size: 18,
-                ),
-              ),
-            ),
-          ),
-          Column(
+          Stack(
             children: [
-              const SizedBox(
+              Container(
                 height: 100,
-              ),
-              Expanded(
-                child: Column(
+                width: 1.sw,
+                decoration: const BoxDecoration(
+                    color: Color(0xFF009FE3),
+                    borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(20),
+                        bottomRight: Radius.circular(20))),
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const SizedBox(
-                      height: 30,
+                    SizedBox(
+                      height: 56,
                     ),
-                    const Center(
-                      child: DashedCircularProgressBar.square(
-                        dimensions: 160,
-                        progress: 60,
-                        startAngle: 0,
-                        sweepAngle: 360,
-                        foregroundColor: Colors.blue,
-                        backgroundColor: Color(0xffadacac),
-                        foregroundStrokeWidth: 13,
-                        backgroundStrokeWidth: 10,
-                        animation: true,
-                        seekSize: 16,
-                        seekColor: Colors.white,
-                        child: Center(
-                            child: Text(
-                          '21\nLeave Balance',
-                          style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.w600),
-                          textAlign: TextAlign.center,
-                        )),
+                    Text(
+                      "My Leaves",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18),
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                top: 56,
+                left: 10,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: const CircleAvatar(
+                    backgroundColor: Colors.white,
+                    radius: 15,
+                    child: Icon(
+                      Icons.arrow_back,
+                      size: 18,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 56,
+                right: 10,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const LeavePolicy()));
+                  },
+                  child: const CircleAvatar(
+                    backgroundColor: Colors.white,
+                    radius: 15,
+                    child: Icon(
+                      Icons.question_mark,
+                      size: 18,
+                    ),
+                  ),
+                ),
+              ),
+
+            ],
+          ),
+          Expanded(
+            child: ValueListenableBuilder(
+              valueListenable: bloc.balanceData,
+              builder: (context, balanceLeave, child){
+                if(balanceLeave ==null){
+                  return SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.7,
+                      child: Center(child: CircularProgressIndicator()));
+                }
+                if(balanceLeave.isEmpty){
+                  return SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.7,
+                      child: Center(child: Text("No data available")));
+                }
+                List progressBar = balanceLeave['live'];
+                var leavepending =100/ balanceLeave['totlelive'];
+                var totalleave = balanceLeave['blance']*leavepending;
+                return SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const SizedBox(
+                        height: 30,
                       ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => Provider.value(
-                            value: bloc,
-                            child: const ApplyLeavePage(),
-                          ),
-                        ));
-                      },
-                      child: const Text(
-                        "Click the leave request",
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontWeight: FontWeight.w600,
+                       Center(
+                        child: DashedCircularProgressBar.square(
+                          dimensions: 160,
+                          progress: double.parse(totalleave.toString()),
+                          startAngle: 0,
+                          sweepAngle: 360,
+                          foregroundColor: Colors.blue,
+                          backgroundColor: Color(0xffadacac),
+                          foregroundStrokeWidth: 13,
+                          backgroundStrokeWidth: 10,
+                          animation: true,
+                          seekSize: 16,
+                          seekColor: Colors.white,
+                          child: Center(
+                              child: Text(
+                                '${balanceLeave['blance']}\nLeave Balance',
+                                style: TextStyle(
+                                    fontSize: 14, fontWeight: FontWeight.w600),
+                                textAlign: TextAlign.center,
+                              )),
                         ),
                       ),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    SizedBox(
-                      height: 120,
-                      child: ListView.builder(
-                          itemCount: 4,
-                          scrollDirection: Axis.horizontal,
-                          itemBuilder: (context, index) {
-                            return Container(
-                              margin: const EdgeInsets.only(left: 15, right: 5),
-                              child: const Column(
-                                children: [
-                                  DashedCircularProgressBar.square(
-                                    dimensions: 70,
-                                    progress: 60,
-                                    startAngle: 0,
-                                    sweepAngle: 360,
-                                    foregroundColor: Color(0xff4BCD36),
-                                    backgroundColor: Color(0xffeeeeee),
-                                    foregroundStrokeWidth: 7,
-                                    backgroundStrokeWidth: 5,
-                                    animation: true,
-                                    seekSize: 8,
-                                    seekColor: Colors.white,
-                                    child: Center(
-                                        child: Text(
-                                      '04',
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600),
-                                    )),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    'Casual Leave',
-                                    style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Leave Details',
-                            style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => Provider.value(
+                              value: bloc,
+                              child: const ApplyLeavePage(),
+                            ),
+                          ));
+                        },
+                        child: const Text(
+                          "Click the leave request",
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.w600,
                           ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => Provider.value(
-                                        value: bloc,
-                                        child: const LeavesRecordsPage(),
-                                      )));
-                            },
-                            child: const Text(
-                              'More Details',
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      SizedBox(
+                        height: 120,
+                        child: ListView.builder(
+                            itemCount: progressBar.length,
+                            scrollDirection: Axis.horizontal,
+                            itemBuilder: (context, index) {
+                              var data = progressBar[index];
+                              var limit = 100/int.parse(data['monthly_limit']);
+                              var total  = limit * double.parse(data['tlivr']);
+                              return Container(
+                                margin: const EdgeInsets.only(left: 15, right: 5),
+                                child:  Column(
+                                  children: [
+                                    DashedCircularProgressBar.square(
+                                      dimensions: 70,
+                                      progress: double.parse(total.toString()),
+                                      startAngle: 0,
+                                      sweepAngle: 360,
+                                      foregroundColor: Color(0xff4BCD36),
+                                      backgroundColor: Color(0xffeeeeee),
+                                      foregroundStrokeWidth: 7,
+                                      backgroundStrokeWidth: 5,
+                                      animation: true,
+                                      seekSize: 8,
+                                      seekColor: Colors.white,
+                                      child: Center(
+                                          child: Text(
+                                            '${data['tlivr']}',
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600),
+                                          )),
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text(
+                                      '${data['leave_name']}',
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Leave Details',
                               style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.blue,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => Provider.value(
+                                      value: bloc,
+                                      child: const LeavesRecordsPage(),
+                                    )));
+                              },
+                              child: const Text(
+                                'More Details',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.blue,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Expanded(
-                      child: Padding(
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: ValueListenableBuilder(
                             valueListenable: bloc.leaveRecordsState,
@@ -293,14 +302,14 @@ class _LeavesHomePageState extends State<LeavesHomePage> {
                                     if (leaves.isEmpty) {
                                       return const Center(
                                         child:
-                                            Text("No Leave Record Available!"),
+                                        Text("No Leave Record Available!"),
                                       );
                                     }
                                     return ListView.builder(
                                       itemCount: leaves.length,
                                       shrinkWrap: true,
                                       padding: EdgeInsets.zero,
-                                      physics: const ScrollPhysics(),
+                                      physics: const NeverScrollableScrollPhysics(),
                                       itemBuilder: (context, index) {
                                         return GestureDetector(
                                           onTap: () {
@@ -324,12 +333,12 @@ class _LeavesHomePageState extends State<LeavesHomePage> {
                                                 horizontal: 5, vertical: 10),
                                             child: Column(
                                               crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                              CrossAxisAlignment.start,
                                               children: [
                                                 Row(
                                                   mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
                                                   children: [
                                                     Flexible(
                                                       child: Text(
@@ -337,7 +346,7 @@ class _LeavesHomePageState extends State<LeavesHomePage> {
                                                         style: const TextStyle(
                                                           fontSize: 14,
                                                           fontWeight:
-                                                              FontWeight.w500,
+                                                          FontWeight.w500,
                                                         ),
                                                       ),
                                                     ),
@@ -346,26 +355,26 @@ class _LeavesHomePageState extends State<LeavesHomePage> {
                                                     ),
                                                     Container(
                                                       padding: const EdgeInsets
-                                                              .symmetric(
+                                                          .symmetric(
                                                           horizontal: 8,
                                                           vertical: 6),
                                                       decoration: BoxDecoration(
                                                         color: leaves[index]
-                                                                    .status! ==
-                                                                "approve"
+                                                            .status! ==
+                                                            "approve"
                                                             ? const Color(
-                                                                0xff4BCD36)
+                                                            0xff4BCD36)
                                                             : leaves[index]
-                                                                        .status! ==
-                                                                    "pending"
-                                                                ? Colors.yellow
-                                                                : Colors.red,
+                                                            .status! ==
+                                                            "pending"
+                                                            ? Colors.yellow
+                                                            : Colors.red,
                                                         borderRadius:
-                                                            BorderRadius
-                                                                .circular(8),
+                                                        BorderRadius
+                                                            .circular(8),
                                                       ),
                                                       child: Text(
-                                                      leaves[index].status=="pending" ? "Pending" : leaves[index].status=="reject" ? "Rejected" : leaves[index].status=="approve" ? "Approved" : "--",
+                                                        leaves[index].status=="pending" ? "Pending" : leaves[index].status=="reject" ? "Rejected" : leaves[index].status=="approve" ? "Approved" : "--",
                                                         // leaves[index].status ==
                                                         //         "approve"
                                                         //     ? "Approve"
@@ -378,10 +387,10 @@ class _LeavesHomePageState extends State<LeavesHomePage> {
                                                         style: TextStyle(
                                                             fontSize: 12,
                                                             fontWeight:
-                                                                FontWeight.w500,
+                                                            FontWeight.w500,
                                                             color: leaves[index]
-                                                                        .status! ==
-                                                                    "pending"
+                                                                .status! ==
+                                                                "pending"
                                                                 ? Colors.black
                                                                 : Colors.white),
                                                       ),
@@ -395,16 +404,16 @@ class _LeavesHomePageState extends State<LeavesHomePage> {
                                                   leaves[index]
                                                       .updatedDate==null?leaves[index].startDate.toString():
                                                   DateFormat(
-                                                          'MMMM dd,yyyy hh:mm a')
+                                                      'MMMM dd,yyyy hh:mm a')
                                                       .format(DateTime.parse(
-                                                          leaves[index]
-                                                                  .updatedDate??
-                                                              ""))
+                                                      leaves[index]
+                                                          .updatedDate??
+                                                          ""))
                                                   ,
                                                   style: const TextStyle(
                                                       fontSize: 12,
                                                       fontWeight:
-                                                          FontWeight.w500,
+                                                      FontWeight.w500,
                                                       color: Colors.grey),
                                                 ),
                                                 Divider(
@@ -420,11 +429,12 @@ class _LeavesHomePageState extends State<LeavesHomePage> {
                                   });
                             }),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+                    ],
+                  ),
+                );
+              }
+
+            ),
           ),
         ],
       ),

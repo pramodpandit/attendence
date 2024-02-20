@@ -23,6 +23,26 @@ class LeadsRepository {
 
   LeadsRepository(this.prefs, this._api);
 
+  Future<ApiResponse2> leadsData() async {
+    try{
+      SharedPreferences _pref = await SharedPreferences.getInstance();
+      Map<String, dynamic> data = {
+       // "user_id": _pref.getString('uid')
+      };
+      var response= await _api.getRequest("leads", );
+
+      print('rahul ${response}');
+      if (response == null) {
+        ApiException.fromString("response null");
+      }
+      return ApiResponse2.fromJson(response,response);
+    }catch(e){
+      print("data is not avaible ${e.toString()}");
+      throw Exception('data is not avaible ${e.toString()}');
+    }
+
+  }
+
   Future<ApiResponse<List<LeadDetail>>> getLeads(int page,
       {String? eid, String? sort, bool sortAsc = false, String? filter}) async {
     Map<String, dynamic> data = {
