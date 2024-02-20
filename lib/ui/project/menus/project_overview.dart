@@ -32,6 +32,7 @@ class _ProjectOverviewState extends State<ProjectOverview> {
     bloc = ProjectBloc(context.read<ProjectRepository>());
     bloc.fetchProjectsDetails(widget.data['id']);
 
+
   }
   @override
   Widget build(BuildContext context) {

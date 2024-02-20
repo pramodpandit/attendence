@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:nb_utils/nb_utils.dart';
 import 'package:provider/provider.dart';
 import '../../../bloc/project_bloc.dart';
 import '../../../data/repository/project_repo.dart';
@@ -26,14 +25,13 @@ class _ProjectFilesState extends State<ProjectFiles> {
   void initState() {
     // TODO: implement initState
     super.initState();
-
     bloc = ProjectBloc(context.read<ProjectRepository>());
     bloc.fetchProjectsDetails(widget.data['id']);
     bloc.msgController?.stream.listen((event) {
       AppMessageHandler().showSnackBar(context, event);
     });
   }
-  var downloadLoading = -1;
+ // var downloadLoading = -1;
 
   @override
   Widget build(BuildContext context) {
@@ -97,41 +95,41 @@ class _ProjectFilesState extends State<ProjectFiles> {
                                         fontFamily: "Poppins"),
                                   ),
                                   Spacer(),
-                                  GestureDetector(
-                                    child: Container(
-                                      padding: EdgeInsets.all(6),
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(100),
-                                          color: Colors.white,
-                                          boxShadow: [
-                                            BoxShadow(
-                                                spreadRadius: 0,
-                                                blurRadius: 3,
-                                                color: Colors.black.withOpacity(0.2)
-                                            )
-                                          ]
-                                      ),
-                                      child: InkWell(
-                                        onTap: () async{
-                                          setState(() {
-                                            downloadLoading = index;
-                                          });
-                                          FileDownloader.downloadFile(url: 'https://freeze.talocare.co.in/public/${data['file']}',name: data['file'].toString().split('/').last,onDownloadCompleted: (path) {
-                                            bloc.showMessage(MessageType.info('File Downloaded'));
-                                            setState(() {
-                                              downloadLoading = -1;
-                                            });
-                                          },
-
-                                          );
-                                      },
-                                        child: downloadLoading == index?SizedBox(width: 20,height:20,child: CircularProgressIndicator()): Icon(
-                                          Icons.download,
-                                          color: Colors.black,
-                                          size: 20,
+                                  ValueListenableBuilder(
+                                    valueListenable: bloc.isLoadingDownload,
+                                    builder: (context, downloadLoading, child) {
+                                      return  GestureDetector(
+                                        child: Container(
+                                          padding: EdgeInsets.all(6),
+                                          decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(100),
+                                              color: Colors.white,
+                                              boxShadow: [
+                                                BoxShadow(
+                                                    spreadRadius: 0,
+                                                    blurRadius: 3,
+                                                    color: Colors.black.withOpacity(0.2)
+                                                )
+                                              ]
+                                          ),
+                                          child: InkWell(
+                                            onTap: () async{
+                                              bloc.isLoadingDownload.value = index;
+                                              FileDownloader.downloadFile(url: 'https://freeze.talocare.co.in/public/${data['file']}',name: data['file'].toString().split('/').last,onDownloadCompleted: (path) {
+                                                bloc.showMessage(MessageType.success('File Downloaded'));
+                                                bloc.isLoadingDownload.value = -1;
+                                                },
+                                              );
+                                            },
+                                            child: downloadLoading == index?SizedBox(width: 20,height:20,child: CircularProgressIndicator()): Icon(
+                                              Icons.download,
+                                              color: Colors.black,
+                                              size: 20,
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                    ),
+                                      );
+                                    },
                                   ),
                                 ],
                               ),

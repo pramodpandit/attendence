@@ -74,4 +74,17 @@ class LeaveRepository {
     }
     return ApiResponse2.fromJson(response);
   }
+  Future<ApiResponse2> leaveBalance() async {
+    SharedPreferences _pref = await SharedPreferences.getInstance();
+
+    var response = await _api.postRequest("leaves_count", {
+      "user_id": _pref.getString('uid'),
+
+    });
+
+    if (response == null) {
+      ApiException.fromString("response null");
+    }
+    return ApiResponse2.fromJson(response,response);
+  }
 }

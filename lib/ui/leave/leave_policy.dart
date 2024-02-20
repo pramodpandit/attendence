@@ -40,7 +40,7 @@ class LeavePolicy extends StatelessWidget {
           Positioned(
             top: 56,
             left: 10,
-            child: GestureDetector(
+            child: InkWell(
               onTap: () {
                 Navigator.pop(context);
               },

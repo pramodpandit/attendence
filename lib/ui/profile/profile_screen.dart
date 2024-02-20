@@ -26,6 +26,7 @@ class _ProfilePageState extends State<ProfilePage> {
     bloc.msgController?.stream.listen((event) {
       AppMessageHandler().showSnackBar(context, event);
     });
+    print('hlooooo');
   }
   @override
   Widget build(BuildContext context) {

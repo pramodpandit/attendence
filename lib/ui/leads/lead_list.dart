@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 import 'package:office/bloc/leads_bloc.dart';
 import 'package:office/ui/leads/add_lead.dart';
 import 'package:office/ui/leads/lead_details.dart';
@@ -18,6 +19,7 @@ class LeadList extends StatefulWidget {
 
 class _LeadListState extends State<LeadList> {
   late LeadsBloc bloc;
+
   @override
   void initState() {
     bloc = LeadsBloc(context.read<LeadsRepository>());
@@ -27,6 +29,7 @@ class _LeadListState extends State<LeadList> {
     bloc.department();
     bloc.technology();
     bloc.leadFor();
+    bloc.getLeadData();
   }
   @override
   Widget build(BuildContext context) {
@@ -78,95 +81,112 @@ class _LeadListState extends State<LeadList> {
                 height: 100,
               ),
               Expanded(
-                child: ListView.builder(
-                  itemCount: 10,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const LeadDetails()));
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.only(left: 25,right: 25,bottom: 25),
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                  spreadRadius: 0,
-                                  blurRadius: 5,
-                                  color: Colors.black.withOpacity(0.1))
-                            ]),
-                        // ignore: prefer_const_constructors
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 5,),
-                            const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                child: ValueListenableBuilder(
+                  valueListenable:bloc.balanceData,
+                  builder: (context, allLeads, child) {
+                    if(allLeads ==null){
+                      return SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.7,
+                          child: Center(child: CircularProgressIndicator()));
+                    }
+                    if(allLeads.isEmpty){
+                      return SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.7,
+                          child: Center(child: Text("No data available")));
+                    }
+                    return ListView.builder(
+                      itemCount: allLeads.length,
+                      itemBuilder: (context, index) {
+                        var data = allLeads[index];
+                        return GestureDetector(
+                          onTap: () {
+                            // Navigator.of(context).push(MaterialPageRoute(
+                            //     builder: (context) => const LeadDetails()));
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.only(left: 25,right: 25,bottom: 25),
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                      spreadRadius: 0,
+                                      blurRadius: 5,
+                                      color: Colors.black.withOpacity(0.1))
+                                ]),
+                            // ignore: prefer_const_constructors
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                Text(
-                                  "Aarvy Office",
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15
-                                  ),
-                                )
+                                const SizedBox(height: 5,),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "${data['Lead_title']}",
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                const SizedBox(height: 10,),
+                                Dash(
+                                  dashColor: Colors.grey.withOpacity(0.3),
+                                  dashGap: 3,
+                                  length: 270.w,
+                                ),
+                                const SizedBox(height: 10,),
+                                 DetailsContainer(
+                                  title:"${data['createdby_fname']} ${data['createdby_lname']}",
+                                  //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
+                                  heading: 'Created By', isHtml: false,
+                                ),
+                                Dash(
+                                  dashColor: Colors.grey.withOpacity(0.3),
+                                  dashGap: 3,
+                                  length: 270.w,
+                                ),
+                                const SizedBox(height: 10,),
+                                 DetailsContainer(
+                                  title:"${DateFormat.yMMMd().format(DateTime.parse(data['created_date']))}",
+                                  //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
+                                  heading: 'Created At', isHtml: false,
+                                ),
+                                Dash(
+                                  dashColor: Colors.grey.withOpacity(0.3),
+                                  dashGap: 3,
+                                  length: 270.w,
+                                ),
+                                const SizedBox(height: 10,),
+                                 DetailsContainer(
+                                  title:"${data['clientsurname']} ${data['clientfirstname'] } ${data['clientlastname']}",
+                                  //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
+                                  heading: 'Client Name', isHtml: false,
+                                ),
+                                Dash(
+                                  dashColor: Colors.grey.withOpacity(0.3),
+                                  dashGap: 3,
+                                  length: 270.w,
+                                ),
+                                const SizedBox(height: 10,),
+                                 DetailsContainer(
+                                  title:"${data['status']}",
+                                  //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
+                                  heading: 'Status', isHtml: false,
+                                ),
                               ],
                             ),
-                            const SizedBox(height: 10,),
-                            Dash(
-                              dashColor: Colors.grey.withOpacity(0.3),
-                              dashGap: 3,
-                              length: 270.w,
-                            ),
-                            const SizedBox(height: 10,),
-                            const DetailsContainer(
-                              title:"Jay singh",
-                              //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
-                              heading: 'Created By', isHtml: false,
-                            ),
-                            Dash(
-                              dashColor: Colors.grey.withOpacity(0.3),
-                              dashGap: 3,
-                              length: 270.w,
-                            ),
-                            const SizedBox(height: 10,),
-                            const DetailsContainer(
-                              title:"2023-06-15",
-                              //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
-                              heading: 'Created At', isHtml: false,
-                            ),
-                            Dash(
-                              dashColor: Colors.grey.withOpacity(0.3),
-                              dashGap: 3,
-                              length: 270.w,
-                            ),
-                            const SizedBox(height: 10,),
-                            const DetailsContainer(
-                              title:"Jay",
-                              //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
-                              heading: 'Client Name', isHtml: false,
-                            ),
-                            Dash(
-                              dashColor: Colors.grey.withOpacity(0.3),
-                              dashGap: 3,
-                              length: 270.w,
-                            ),
-                            const SizedBox(height: 10,),
-                            const DetailsContainer(
-                              title:"Open",
-                              //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
-                              heading: 'Status', isHtml: false,
-                            ),
-                          ],
-                        ),
-                      ),
+                          ),
+                        );
+                      },
                     );
                   },
+
                 ),
               ),
             ],

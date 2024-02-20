@@ -25,6 +25,20 @@ import 'bloc.dart';
 class LeadsBloc extends Bloc {
   final LeadsRepository _repo;
   LeadsBloc(this._repo);
+  ValueNotifier<List?> balanceData = ValueNotifier(null);
+
+  //ValueNotifier<List> balanceData = ValueNotifier([]);
+  Future getLeadData() async {
+
+    try {
+      var res = await _repo.leadsData();
+      balanceData.value = res.data['data'];
+      print('value is availble:${res.data}');
+    } catch(e,s) {
+      debugPrint('$e');
+      debugPrintStack(stackTrace: s);
+    }
+  }
 
   ValueNotifier<LoadingState> state = ValueNotifier(LoadingState.loading);
 
@@ -76,6 +90,7 @@ class LeadsBloc extends Bloc {
           leadLastPage = true;
         } else {
           leads.value.addAll(data);
+          print('fghjk${leads.value}');
           leadPage++;
           leads.notifyListeners();
         }
