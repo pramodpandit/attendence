@@ -7,7 +7,6 @@ class ProjectBloc extends Bloc {
   final ProjectRepository repo;
 
   ProjectBloc(this.repo);
-
   ValueNotifier<String> selectedProjects = ValueNotifier("doing");
   ValueNotifier<List?> allProjects = ValueNotifier(null);
   ValueNotifier allprojectDetail = ValueNotifier(null);
@@ -17,6 +16,7 @@ class ProjectBloc extends Bloc {
   ValueNotifier<List?> projectmember = ValueNotifier(null);
   ValueNotifier<List?> projectcredentails = ValueNotifier(null);
   ValueNotifier<List?> projectcomment = ValueNotifier(null);
+  ValueNotifier<List?> projectTask  = ValueNotifier(null);
 
   fetchProjects(String type) async{
     try{
@@ -42,8 +42,8 @@ class ProjectBloc extends Bloc {
         projectlink.value = result.data["data"]["project_links"];
         projectmember.value = result.data["data"]["project_members"];
         projectcredentails.value = result.data["data"]["project_credentials"];
+        projectTask.value = result.data["data"]["project_task"];
         projectcomment.value = result.data["data"]["project_comment"];
-        print("the all projects are : ${allprojectDetail.value}");
       }
     }catch (e, s) {
       print(e);

@@ -16,7 +16,6 @@ class ProjectMembers extends StatefulWidget {
 
 class _ProjectMembersState extends State<ProjectMembers> {
   late ProjectBloc bloc;
-
   @override
   void initState() {
     // TODO: implement initState
@@ -56,15 +55,14 @@ class _ProjectMembersState extends State<ProjectMembers> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Team Leader",
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                              color: Colors.black),
-                        ),
-
+                        // const Text(
+                        //   "Team Leader",
+                        //   textAlign: TextAlign.left,
+                        //   style: TextStyle(
+                        //       fontWeight: FontWeight.bold,
+                        //       fontSize: 18,
+                        //       color: Colors.black),
+                        // ),
                         ListView.builder(
                           itemCount: projectMember.length,
                           padding: const EdgeInsets.only(top: 10),
@@ -84,7 +82,8 @@ class _ProjectMembersState extends State<ProjectMembers> {
                                   // crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     CircleAvatar(
-                                      child: Icon(Icons.person),
+                                      backgroundImage:data['employee_img']==null?null:NetworkImage('https://freeze.talocare.co.in/public/${data['employee_img']}'),
+                                      child: data['employee_img']==null?Icon(Icons.person):Offstage(),
                                     ),
                                     SizedBox(width: 10),
                                     Expanded(
@@ -92,7 +91,7 @@ class _ProjectMembersState extends State<ProjectMembers> {
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            "${data['first_name']}",
+                                            "${data['first_name']} ${data['l_name']==null?data['m_name']:data['l_name']}",
                                             style: TextStyle(fontWeight: FontWeight.bold,fontSize: 15),
                                           ),
                                         ],
@@ -104,61 +103,60 @@ class _ProjectMembersState extends State<ProjectMembers> {
                             );
                           },
                         ),
-                        const Text(
-                          "Team Members",
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                              color: Colors.black),
-                        ),
-                        ListView.builder(
-                          itemCount: 3,
-                          padding: const EdgeInsets.only(top: 10),
-                          physics: const NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemBuilder: (context, index) {
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => const CommunityProfile()));
-                              },
-                              child: Container(
-                                margin: const EdgeInsets.only(bottom: 20),
-                                child: const Row(
-                                  // mainAxisAlignment: MainAxisAlignment.start,
-                                  // crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    CircleAvatar(
-                                      child: Icon(Icons.person),
-                                    ),
-                                    SizedBox(width: 10),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "Alex Smith",
-                                            style: TextStyle(fontWeight: FontWeight.bold,fontSize: 15),
-                                          ),
-                                          SizedBox(
-                                            height: 2,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
+                        // const Text(
+                        //   "Team Members",
+                        //   textAlign: TextAlign.left,
+                        //   style: TextStyle(
+                        //       fontWeight: FontWeight.bold,
+                        //       fontSize: 18,
+                        //       color: Colors.black),
+                        // ),
+                        // ListView.builder(
+                        //   itemCount: 3,
+                        //   padding: const EdgeInsets.only(top: 10),
+                        //   physics: const NeverScrollableScrollPhysics(),
+                        //   shrinkWrap: true,
+                        //   itemBuilder: (context, index) {
+                        //     return GestureDetector(
+                        //       onTap: () {
+                        //         Navigator.of(context).push(MaterialPageRoute(
+                        //             builder: (context) => const CommunityProfile()));
+                        //       },
+                        //       child: Container(
+                        //         margin: const EdgeInsets.only(bottom: 20),
+                        //         child: const Row(
+                        //           // mainAxisAlignment: MainAxisAlignment.start,
+                        //           // crossAxisAlignment: CrossAxisAlignment.start,
+                        //           children: [
+                        //             CircleAvatar(
+                        //               child: Icon(Icons.person),
+                        //             ),
+                        //             SizedBox(width: 10),
+                        //             Expanded(
+                        //               child: Column(
+                        //                 crossAxisAlignment: CrossAxisAlignment.start,
+                        //                 children: [
+                        //                   Text(
+                        //                     "Alex Smith",
+                        //                     style: TextStyle(fontWeight: FontWeight.bold,fontSize: 15),
+                        //                   ),
+                        //                   SizedBox(
+                        //                     height: 2,
+                        //                   ),
+                        //                 ],
+                        //               ),
+                        //             ),
+                        //           ],
+                        //         ),
+                        //       ),
+                        //     );
+                        //   },
+                        // ),
                       ],
                     ),
                   ) ,
                 );
               },),
-
           ],
         ),
       ),

@@ -107,12 +107,12 @@ class _ProjectFilesState extends State<ProjectFiles> {
                                       ),
                                       child: InkWell(
                                         onTap: () async{
-                                          String url = "https://freeze.talocare.co.in/${data['file']}";
+                                         // String url = "https://freeze.talocare.co.in/${data['file']}";
 
 
-                                      // try {
-                                      //          // showLoadingDialog(context);
-                                      // // Saved with this method.
+                                     // try {
+                                               // showLoadingDialog(context);
+                                      // Saved with this method.
                                       //         var imageId =
                                       // await ImageDownloader.downloadImage("https://freeze.talocare.co.in/${data['file']}");
                                       // if (imageId == null) {
@@ -142,15 +142,15 @@ class _ProjectFilesState extends State<ProjectFiles> {
                               // const SizedBox(
                               //   height: 10,
                               // ),
-                              Text(
-                                "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi.Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi",
-                                style: const TextStyle(
-                                    color: Colors.black45,
-                                    fontWeight:
-                                    FontWeight.w600,
-                                    fontSize: 11,
-                                    fontFamily: "Poppins"),
-                              ),
+                              // Text(
+                              //   "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi.Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi",
+                              //   style: const TextStyle(
+                              //       color: Colors.black45,
+                              //       fontWeight:
+                              //       FontWeight.w600,
+                              //       fontSize: 11,
+                              //       fontFamily: "Poppins"),
+                              // ),
                             ],
                           ),
                         );

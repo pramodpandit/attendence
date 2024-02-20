@@ -16,20 +16,23 @@ import 'package:office/ui/project/projectScreen.dart';
 import 'package:provider/provider.dart';
 
 import '../../bloc/project_bloc.dart';
+import '../../data/model/user.dart';
 import '../../data/repository/project_repo.dart';
 import '../widget/stack_user_list.dart';
 
 class ProjectDetails extends StatefulWidget {
+  final User user;
   final data;
-  const ProjectDetails({Key? key, this.data}) : super(key: key);
+  const ProjectDetails({Key? key, this.data, required this.user}) : super(key: key);
 
   @override
-  State<ProjectDetails> createState() => _ProjectDetailsState(data);
+  State<ProjectDetails> createState() => _ProjectDetailsState(data,user);
 }
 
 class _ProjectDetailsState extends State<ProjectDetails> {
+  final User user;
   final dataa;
-  _ProjectDetailsState(this.dataa);
+  _ProjectDetailsState(this.dataa, this.user);
   ValueNotifier<int> selectedMenuIndex = ValueNotifier(0);
   List<String> projectMenus = [
     "Overview",
@@ -58,14 +61,14 @@ class _ProjectDetailsState extends State<ProjectDetails> {
     // TODO: implement initState
     super.initState();
     projectMenusWidgets=[
-     ProjectOverview(data: dataa,),
-      const ProjectTask(),
-       ProjectFiles(data: dataa),
-     ProjectComments(data: dataa),
+     ProjectOverview(data: dataa,user: user,),
+      ProjectTask(data:dataa),
+      ProjectFiles(data: dataa),
+      ProjectComments(data: dataa),
       // const ProjectTimeSheet(),
-      ProjectNotesList(),
-     ProjectCredentialList(),
-       ProjectLinks(data: dataa),
+      ProjectNotesList(data:dataa),
+      ProjectCredentialList(data:dataa),
+      ProjectLinks(data: dataa),
       ProjectMembers(data: dataa,)
     ];
     bloc = ProjectBloc(context.read<ProjectRepository>());
@@ -173,7 +176,8 @@ class _ProjectDetailsState extends State<ProjectDetails> {
                                     ],
                                   ),
                                   const SizedBox(height: 8,),
-                                  const StackedUserList(totalUser: 5,
+                                  const StackedUserList(
+                                    totalUser: 5,
                                     users: [
                                       '',
                                       '',
@@ -209,7 +213,6 @@ class _ProjectDetailsState extends State<ProjectDetails> {
                               TaskContent(tittle: '5', icon: Icons.error_outline,color: Colors.blue,),
                               TaskContent(tittle: '5', icon: Icons.check_circle_outline,color: Colors.green,),
                               TaskContent(tittle: '5', icon: Icons.cancel_outlined,color: Colors.red,),
-
                             ],
                           ),
                           const SizedBox(height: 10,)

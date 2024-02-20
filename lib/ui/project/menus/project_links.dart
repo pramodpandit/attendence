@@ -105,7 +105,9 @@ class _ProjectLinksState extends State<ProjectLinks> {
                             height: 5,
                           ),
                           Text(
-                            "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi.Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi",
+                            '${data['other_link_info']}',
+
+                            //"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi.Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi",
                             //  "${document[index].other}",
                             style: const TextStyle(
                                 color: Colors.black45,

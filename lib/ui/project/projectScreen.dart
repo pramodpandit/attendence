@@ -11,15 +11,21 @@ import 'package:office/ui/widget/stack_user_list.dart';
 import 'package:office/utils/constants.dart';
 import 'package:provider/provider.dart';
 
+import '../../data/model/user.dart';
+
 class ProjectScreen extends StatefulWidget {
-  const ProjectScreen({super.key});
+  final User user;
+  const ProjectScreen({super.key, required this.user});
 
   @override
-  State<ProjectScreen> createState() => _ProjectScreenState();
+  State<ProjectScreen> createState() => _ProjectScreenState(user);
 }
 
 class _ProjectScreenState extends State<ProjectScreen> {
+  final User user;
   late ProjectBloc bloc;
+
+  _ProjectScreenState(this. user);
 
   @override
   void initState() {
@@ -116,7 +122,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                       return GestureDetector(
                         onTap: () {
                           Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>  ProjectDetails(data: data,)));
+                              builder: (context) =>  ProjectDetails(data: data,user: user,)));
                         },
                         child: Container(
                           margin: const EdgeInsets.only(left: 25,right: 25,bottom: 25),
