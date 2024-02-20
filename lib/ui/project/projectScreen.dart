@@ -119,6 +119,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                     itemCount: projectData.length,
                     itemBuilder: (context, index) {
                       var data = projectData[index];
+                      List imageList = projectData[index]["user_pic"]["user_p"];
                       return GestureDetector(
                         onTap: () {
                           Navigator.of(context).push(MaterialPageRoute(
@@ -192,14 +193,15 @@ class _ProjectScreenState extends State<ProjectScreen> {
                                         ],
                                       ),
                                       const SizedBox(height: 8,),
-                                      const StackedUserList(totalUser: 5,
-                                        users: [
-                                          'https://www.google.co.in/url?sa=i&url=https%3A%2F%2Funsplash.com%2Fs%2Fphotos%2Fimage&psig=AOvVaw2FDh29Vf0nsix3FPxuuJ_Z&ust=1685794097080000&source=images&cd=vfe&ved=0CBEQjRxqFwoTCOjW58TGpP8CFQAAAAAdAAAAABAE',
-                                          'https://www.google.co.in/url?sa=i&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FImage&psig=AOvVaw2FDh29Vf0nsix3FPxuuJ_Z&ust=1685794097080000&source=images&cd=vfe&ved=0CBEQjRxqFwoTCOjW58TGpP8CFQAAAAAdAAAAABAI'
-                                              '','',''],
-                                        numberOfUsersToShow: 5,
+                                      StackedUserList(totalUser: imageList.length,
+                                        users: imageList.map((e) => 'https://freeze.talocare.co.in/public/$e').toList(),
+                                        numberOfUsersToShow: imageList.length < 5?imageList.length:5,
                                         avatarSize: 18,
                                       )
+                                      // [
+                                      // 'https://www.google.co.in/url?sa=i&url=https%3A%2F%2Funsplash.com%2Fs%2Fphotos%2Fimage&psig=AOvVaw2FDh29Vf0nsix3FPxuuJ_Z&ust=1685794097080000&source=images&cd=vfe&ved=0CBEQjRxqFwoTCOjW58TGpP8CFQAAAAAdAAAAABAE',
+                                      // 'https://www.google.co.in/url?sa=i&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FImage&psig=AOvVaw2FDh29Vf0nsix3FPxuuJ_Z&ust=1685794097080000&source=images&cd=vfe&ved=0CBEQjRxqFwoTCOjW58TGpP8CFQAAAAAdAAAAABAI'
+                                      //     '','','']
                                     ],
                                   ),
                                   const Spacer(),

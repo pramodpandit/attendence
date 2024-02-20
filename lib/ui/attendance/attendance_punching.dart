@@ -229,6 +229,8 @@ class _AttendancePunchingState extends State<AttendancePunching> {
       actions: [
         OutlinedButton(onPressed: () {
           Navigator.of(context).pop();
+          bloc.imageFile.value=null;
+          punchWorkController.text ='';
         }, child: Text("Cancel")),
         OutlinedButton(onPressed: () {
           if(bloc.todayWorkingDetail.value["selfi"]== "yes" && bloc.imageFile.value == null){
@@ -256,6 +258,8 @@ class _AttendancePunchingState extends State<AttendancePunching> {
               child: Text("Cancel"),
               onPressed: () {
                 Navigator.of(context).pop();
+                bloc.imageFile.value = null;
+                punchWorkController.text = "";
               },
             ),
             TextButton(
@@ -291,7 +295,6 @@ class _AttendancePunchingState extends State<AttendancePunching> {
       int hours = timeGap.inHours;
       int minutes = (timeGap.inMinutes - hours * 60);
       int seconds = (timeGap.inSeconds - hours * 3600 - minutes * 60);
-
       return "${hours.toString().padLeft(2,'0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}";
   }
 
@@ -594,7 +597,7 @@ class _AttendancePunchingState extends State<AttendancePunching> {
                                                       ),
                                                       Text(
                                                         workingDetail["checkin"] != ""
-                                                            ? workingDetail["checkin"].toString().splitAfter(" ")
+                                                            ? workingDetail["checkin"].toString().splitAfter(" ").splitBefore('.')
                                                             : "-----",
                                                         style: TextStyle(
                                                             color: Colors.black,
@@ -638,7 +641,7 @@ class _AttendancePunchingState extends State<AttendancePunching> {
                                                       ),
                                                       Text(
                                                         workingDetail["checkout"] != ""
-                                                            ? workingDetail["checkout"].toString().splitAfter(" ")
+                                                            ? workingDetail["checkout"].toString().splitAfter(" ").splitBefore('.')
                                                             : "-----",
                                                         style: TextStyle(
                                                             color: Colors.black,

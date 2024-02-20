@@ -124,7 +124,7 @@ dependencies:
 #  audioplayers: ^5.2.1
   audio_waveforms: ^1.0.4
   google_fonts: ^6.1.0
-
+  flutter_file_downloader: ^1.2.1
 
 
 dev_dependencies:

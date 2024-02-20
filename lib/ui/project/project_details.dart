@@ -48,6 +48,7 @@ class _ProjectDetailsState extends State<ProjectDetails> {
   List<Widget> projectMenusWidgets = [
 
   ];
+  List imageList =[];
 
 
 
@@ -73,6 +74,7 @@ class _ProjectDetailsState extends State<ProjectDetails> {
     ];
     bloc = ProjectBloc(context.read<ProjectRepository>());
     bloc.fetchProjectsDetails(widget.data['id']);
+    imageList = dataa["user_pic"]["user_p"];
   }
   @override
   Widget build(BuildContext context) {
@@ -176,13 +178,10 @@ class _ProjectDetailsState extends State<ProjectDetails> {
                                     ],
                                   ),
                                   const SizedBox(height: 8,),
-                                  const StackedUserList(
-                                    totalUser: 5,
-                                    users: [
-                                      '',
-                                      '',
-                                          '','',''],
-                                    numberOfUsersToShow: 5,
+                                   StackedUserList(
+                                    totalUser: imageList.length,
+                                    users: imageList.map((e) => 'https://freeze.talocare.co.in/public/$e').toList(),
+                                    numberOfUsersToShow: imageList.length<5?imageList.length:5,
                                     avatarSize: 18,
                                   )
                                 ],
