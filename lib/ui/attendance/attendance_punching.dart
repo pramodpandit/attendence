@@ -594,7 +594,7 @@ class _AttendancePunchingState extends State<AttendancePunching> {
                                                       ),
                                                       Text(
                                                         workingDetail["checkin"] != ""
-                                                            ? workingDetail["checkin"].toString().splitAfter(" ")
+                                                            ? workingDetail["checkin"].toString().splitAfter(" ").splitBefore(".")
                                                             : "-----",
                                                         style: TextStyle(
                                                             color: Colors.black,
@@ -638,7 +638,7 @@ class _AttendancePunchingState extends State<AttendancePunching> {
                                                       ),
                                                       Text(
                                                         workingDetail["checkout"] != ""
-                                                            ? workingDetail["checkout"].toString().splitAfter(" ")
+                                                            ? workingDetail["checkout"].toString().splitAfter(" ").splitBefore(".")
                                                             : "-----",
                                                         style: TextStyle(
                                                             color: Colors.black,
