@@ -232,7 +232,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             image: "images/project.png",
                             onTap: () {
                               Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => const ProjectScreen()));
+                                  builder: (context) => ProjectScreen(user: user,)));
                             },
                           ),
                           if (bloc.hasAccess(department,5,'1')) BoxContainer(

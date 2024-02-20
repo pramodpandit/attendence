@@ -27,6 +27,7 @@ class User {
   String? department;
   String? reportTo;
   String? reportTeam;
+  String? managerTo;
   String? aboutUs;
   String? skills;
   String? qualification;
@@ -57,7 +58,7 @@ class User {
   String? marketPerson;
   String? targetStatus;
   String? minimumTarget;
-  int? targetDuration;
+  String? targetDuration;
   String? penaltyStatus;
   String? penaltyType;
   String? penaltyVal;
@@ -86,6 +87,7 @@ class User {
   String? createdDate;
   String? updateDate;
   String? mobile;
+  String? userType;
   String? reportFirst;
   String? reportMiddle;
   String? reportLast;
@@ -97,6 +99,7 @@ class User {
   String? teamName;
   String? designationname;
   String? departmentname;
+  String? departmenttype;
   List<Departmentaccess>? departmentaccess;
   String? skillName;
   String? name;
@@ -130,6 +133,7 @@ class User {
         this.department,
         this.reportTo,
         this.reportTeam,
+        this.managerTo,
         this.aboutUs,
         this.skills,
         this.qualification,
@@ -189,6 +193,7 @@ class User {
         this.createdDate,
         this.updateDate,
         this.mobile,
+        this.userType,
         this.reportFirst,
         this.reportMiddle,
         this.reportLast,
@@ -200,6 +205,7 @@ class User {
         this.teamName,
         this.designationname,
         this.departmentname,
+        this.departmenttype,
         this.departmentaccess,
         this.skillName,
         this.name});
@@ -233,6 +239,7 @@ class User {
     department = json['department'];
     reportTo = json['report_to'];
     reportTeam = json['report_team'];
+    managerTo = json['manager_to'];
     aboutUs = json['about_us'];
     skills = json['skills'];
     qualification = json['Qualification'];
@@ -292,6 +299,7 @@ class User {
     createdDate = json['created_date'];
     updateDate = json['update_date'];
     mobile = json['mobile'];
+    userType = json['user_type'];
     reportFirst = json['report_first'];
     reportMiddle = json['report_middle'];
     reportLast = json['report_last'];
@@ -303,6 +311,7 @@ class User {
     teamName = json['team_name'];
     designationname = json['designationname'];
     departmentname = json['departmentname'];
+    departmenttype = json['departmenttype'];
     if (json['departmentaccess'] != null) {
       departmentaccess = <Departmentaccess>[];
       json['departmentaccess'].forEach((v) {
@@ -343,6 +352,7 @@ class User {
     data['department'] = this.department;
     data['report_to'] = this.reportTo;
     data['report_team'] = this.reportTeam;
+    data['manager_to'] = this.managerTo;
     data['about_us'] = this.aboutUs;
     data['skills'] = this.skills;
     data['Qualification'] = this.qualification;
@@ -404,6 +414,7 @@ class User {
     data['created_date'] = this.createdDate;
     data['update_date'] = this.updateDate;
     data['mobile'] = this.mobile;
+    data['user_type'] = this.userType;
     data['report_first'] = this.reportFirst;
     data['report_middle'] = this.reportMiddle;
     data['report_last'] = this.reportLast;
@@ -415,6 +426,7 @@ class User {
     data['team_name'] = this.teamName;
     data['designationname'] = this.designationname;
     data['departmentname'] = this.departmentname;
+    data['departmenttype'] = this.departmenttype;
     if (this.departmentaccess != null) {
       data['departmentaccess'] =
           this.departmentaccess!.map((v) => v.toJson()).toList();

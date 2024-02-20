@@ -30,14 +30,14 @@ class _TaskDetailsState extends State<TaskDetails> {
     "Logs/Follow"
   ];
   List<Widget> projectMenusWidgets = [
-    const ProjectOverview(),
-    const ProjectFiles(),
-    const ProjectLinks(),
-    const ProjectComments(),
-    const ProjectNotesList(),
-    const ProjectCredentialList(),
-    const ProjectMembers(),
-    const Logs(),
+    // ProjectOverview(),
+    // const ProjectFiles(),
+    // const ProjectLinks(),
+    // const ProjectComments(),
+    // const ProjectNotesList(),
+    // const ProjectCredentialList(),
+    // const ProjectMembers(),
+    // const Logs(),
   ];
 
   selectMenu(int index){

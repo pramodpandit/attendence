@@ -76,12 +76,10 @@ class _SplashPageState extends State<SplashPage> {
       vapidKey: FirebaseVapidKey.key,
     ))!;
     debugPrint('fcmToken $token');
-
     initApp();
   }
 
   initApp() {
-
     final prefs = context.read<SharedPreferences>();
     if(prefs.containsKey('uid')) {
       Future.delayed(const Duration(seconds: 3), () {

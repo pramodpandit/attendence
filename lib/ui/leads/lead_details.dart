@@ -28,12 +28,12 @@ class _LeadDetailsState extends State<LeadDetails> {
     "Logs/Follow"
   ];
   List<Widget> projectMenusWidgets = [
-    const ProjectOverview(),
-    const ProjectFiles(),
-    const ProjectNotesList(),
-    const ProjectLinks(),
-    const ProjectMembers(),
-    const Logs(),
+    // ProjectOverview(),
+    // const ProjectFiles(),
+    // const ProjectNotesList(),
+    // const ProjectLinks(),
+    // const ProjectMembers(),
+    // const Logs(),
   ];
 
   selectMenu(int index){
