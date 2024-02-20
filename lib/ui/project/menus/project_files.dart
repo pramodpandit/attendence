@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:provider/provider.dart';
 import '../../../bloc/project_bloc.dart';
 import '../../../data/repository/project_repo.dart';
@@ -27,7 +29,11 @@ class _ProjectFilesState extends State<ProjectFiles> {
 
     bloc = ProjectBloc(context.read<ProjectRepository>());
     bloc.fetchProjectsDetails(widget.data['id']);
+    bloc.msgController?.stream.listen((event) {
+      AppMessageHandler().showSnackBar(context, event);
+    });
   }
+  var downloadLoading = -1;
 
   @override
   Widget build(BuildContext context) {
@@ -107,29 +113,19 @@ class _ProjectFilesState extends State<ProjectFiles> {
                                       ),
                                       child: InkWell(
                                         onTap: () async{
-                                         // String url = "https://freeze.talocare.co.in/${data['file']}";
+                                          setState(() {
+                                            downloadLoading = index;
+                                          });
+                                          FileDownloader.downloadFile(url: 'https://freeze.talocare.co.in/public/${data['file']}',name: data['file'].toString().split('/').last,onDownloadCompleted: (path) {
+                                            bloc.showMessage(MessageType.info('File Downloaded'));
+                                            setState(() {
+                                              downloadLoading = -1;
+                                            });
+                                          },
 
-
-                                     // try {
-                                               // showLoadingDialog(context);
-                                      // Saved with this method.
-                                      //         var imageId =
-                                      // await ImageDownloader.downloadImage("https://freeze.talocare.co.in/${data['file']}");
-                                      // if (imageId == null) {
-                                      // return;
-                                      // }
-                                      // // Below is a method of obtaining saved image information.
-                                      // var fileName = await ImageDownloader.findName(imageId);
-                                      // var path = await ImageDownloader.findPath(imageId);
-                                      // var size = await ImageDownloader.findByteSize(imageId);
-                                      // var mimeType = await ImageDownloader.findMimeType(imageId);
-                                      // Navigator.pop(context);
-                                      //   bloc.showMessage(MessageType.info('Image downloaded'));
-                                      // } on PlatformException catch (error) {
-                                      // print(error);
-                                      // }
+                                          );
                                       },
-                                        child: const Icon(
+                                        child: downloadLoading == index?SizedBox(width: 20,height:20,child: CircularProgressIndicator()): Icon(
                                           Icons.download,
                                           color: Colors.black,
                                           size: 20,

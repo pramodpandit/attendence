@@ -9,6 +9,7 @@ class ProjectBloc extends Bloc {
   ProjectBloc(this.repo);
   ValueNotifier<String> selectedProjects = ValueNotifier("doing");
   ValueNotifier<List?> allProjects = ValueNotifier(null);
+  ValueNotifier<List?> imageList = ValueNotifier(null);
   ValueNotifier allprojectDetail = ValueNotifier(null);
   ValueNotifier<List?> projectNotes = ValueNotifier(null);
   ValueNotifier<List?> projectfile = ValueNotifier(null);
@@ -24,6 +25,7 @@ class ProjectBloc extends Bloc {
       var result = await repo.fetchAllProjects();
       if(result.status && result.data != null){
         allProjects.value = result.data["data"]["project"][type];
+        imageList.value = result.data["data"]["project"][type]['user_pic']['user_p'];
         print("the all projects are : ${allProjects.value}");
       }
     }catch (e, s) {
