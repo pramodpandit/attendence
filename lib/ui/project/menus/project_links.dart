@@ -2,30 +2,64 @@ import 'package:flutter/material.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../../../bloc/project_bloc.dart';
+import '../../../data/repository/project_repo.dart';
+import '../../../utils/message_handler.dart';
 
 class ProjectLinks extends StatefulWidget {
-  const ProjectLinks({Key? key}) : super(key: key);
+  final data;
+  const ProjectLinks({Key? key, this.data}) : super(key: key);
 
   @override
-  State<ProjectLinks> createState() => _ProjectLinksState();
+  State<ProjectLinks> createState() => _ProjectLinksState(data);
 }
 
 class _ProjectLinksState extends State<ProjectLinks> {
+  final data;
+  late ProjectBloc bloc;
+
+  _ProjectLinksState(this.data);
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    bloc = ProjectBloc(context.read<ProjectRepository>());
+    bloc.fetchProjectsDetails(data['id']);
+    bloc.msgController?.stream.listen((event) {
+      AppMessageHandler().showSnackBar(context, event);
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
+        child:ValueListenableBuilder(
+          valueListenable: bloc.projectlink,
+          builder: (context, projectLinks, child) {
+            if(projectLinks ==null){
+              return SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.7,
+                  child: Center(child: CircularProgressIndicator()));
+            }
+            if(projectLinks.isEmpty){
+              return SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.7,
+                  child: Center(child: Text("No data available")));
+            }
+            return   Padding(
               padding: const EdgeInsets.only(
                   left: 25, right: 25, top: 10, bottom: 10),
               child: ListView.builder(
                   physics: const NeverScrollableScrollPhysics(),
                   padding: EdgeInsets.only(top: 10),
                   shrinkWrap: true,
-                  itemCount: 10,
+                  itemCount: projectLinks.length,
                   itemBuilder: (context, index) {
+                    var data=projectLinks[index];
                     return Container(
                       width: 1.sw,
                       padding: const EdgeInsets.all(12),
@@ -48,7 +82,7 @@ class _ProjectLinksState extends State<ProjectLinks> {
                           Row(
                             children: [
                               Text(
-                                "Google",
+                                "${data['name']}",
                                 // "${document[index].name}",
                                 style: const TextStyle(
                                     color: Colors.black,
@@ -58,7 +92,7 @@ class _ProjectLinksState extends State<ProjectLinks> {
                               ),
                               Spacer(),
                               Text(
-                                DateFormat.yMMMMd().format(DateTime.now()),
+                                DateFormat.yMMMMd().format(DateTime.parse(data['created_date'])),
                                 style: const TextStyle(
                                     color: Colors.grey,
                                     fontWeight: FontWeight.w500,
@@ -85,18 +119,15 @@ class _ProjectLinksState extends State<ProjectLinks> {
                           Row(
                             children: [
                               GestureDetector(
-                                // onTap: () async {
-                                //   final Uri url = Uri.parse(
-                                //       '${links[index].links}');
-                                //   try {
-                                //     await launchUrl(url);
-                                //   } catch (e) {
-                                //     ScaffoldMessenger.of(context)
-                                //         .showSnackBar(SnackBar(
-                                //         content: Text(
-                                //             '${links[index].links} does not exist')));
-                                //   }
-                                // },
+                                onTap: () async {
+                                  final Uri url = Uri.parse(
+                                      '${data['links']}');
+                                  try {
+                                    await launchUrl(url);
+                                  } catch (e) {
+                                    bloc.showMessage(MessageType.info('${data['links']} does not exist'));
+                                  }
+                                },
                                 child: Container(
                                     padding: EdgeInsets.all(6),
                                     decoration: BoxDecoration(
@@ -118,7 +149,7 @@ class _ProjectLinksState extends State<ProjectLinks> {
                                 width: 10,
                               ),
                               Flexible(
-                                child: Text("https://www.google.co.in/"),
+                                child: Text("${data['links']}"),
                               )
                             ],
                           ),
@@ -126,9 +157,10 @@ class _ProjectLinksState extends State<ProjectLinks> {
                       ),
                     );
                   }),
-            )
-          ],
-        ),
+            );
+          },),
+
+      
       ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,

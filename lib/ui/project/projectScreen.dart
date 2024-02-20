@@ -26,7 +26,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
     // TODO: implement initState
     super.initState();
     bloc = ProjectBloc(context.read<ProjectRepository>());
-    bloc.fetchProjects("todo");
+    bloc.fetchProjects("doing");
   }
 
   @override
@@ -81,9 +81,9 @@ class _ProjectScreenState extends State<ProjectScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: DropdownButtonFormField(
-                  value: "todo",
+                  value: "doing",
                   items: [
-                    DropdownMenuItem(child: Text("Todo"),value: "todo",),
+                    DropdownMenuItem(child: Text("Doing"),value: "doing",),
                     DropdownMenuItem(child: Text("Total"),value: "total",),
                     DropdownMenuItem(child: Text("Incomplete"),value: "incomplete",),
                     DropdownMenuItem(child: Text("Complete"),value: "complete",)

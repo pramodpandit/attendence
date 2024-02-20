@@ -20,14 +20,16 @@ import '../../data/repository/project_repo.dart';
 import '../widget/stack_user_list.dart';
 
 class ProjectDetails extends StatefulWidget {
-  final  data;
+  final data;
   const ProjectDetails({Key? key, this.data}) : super(key: key);
 
   @override
-  State<ProjectDetails> createState() => _ProjectDetailsState();
+  State<ProjectDetails> createState() => _ProjectDetailsState(data);
 }
 
 class _ProjectDetailsState extends State<ProjectDetails> {
+  final dataa;
+  _ProjectDetailsState(this.dataa);
   ValueNotifier<int> selectedMenuIndex = ValueNotifier(0);
   List<String> projectMenus = [
     "Overview",
@@ -41,16 +43,10 @@ class _ProjectDetailsState extends State<ProjectDetails> {
     "Members"
   ];
   List<Widget> projectMenusWidgets = [
-    const ProjectOverview(),
-    const ProjectTask(),
-    const ProjectFiles(),
-    const ProjectComments(),
-    // const ProjectTimeSheet(),
-    const ProjectNotesList(),
-    const ProjectCredentialList(),
-    const ProjectLinks(),
-    const ProjectMembers(),
+
   ];
+
+
 
   selectMenu(int index){
     selectedMenuIndex.value =index;
@@ -61,8 +57,19 @@ class _ProjectDetailsState extends State<ProjectDetails> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    projectMenusWidgets=[
+     ProjectOverview(data: dataa,),
+      const ProjectTask(),
+       ProjectFiles(data: dataa),
+     ProjectComments(data: dataa),
+      // const ProjectTimeSheet(),
+      ProjectNotesList(),
+     ProjectCredentialList(),
+       ProjectLinks(data: dataa),
+      ProjectMembers(data: dataa,)
+    ];
     bloc = ProjectBloc(context.read<ProjectRepository>());
-    bloc.fetchProjectsDetails(widget.data['project_id'].toString());
+    bloc.fetchProjectsDetails(widget.data['id']);
   }
   @override
   Widget build(BuildContext context) {
@@ -176,7 +183,7 @@ class _ProjectDetailsState extends State<ProjectDetails> {
                                   )
                                 ],
                               ),
-                              Spacer(),
+                              const Spacer(),
                               DashedCircularProgressBar.square(
                                 dimensions: 80,
                                 progress: double.parse(widget.data["progress"].toString()),
@@ -189,7 +196,7 @@ class _ProjectDetailsState extends State<ProjectDetails> {
                                 animation: true,
                                 seekSize: 8,
                                 seekColor: Colors.white,
-                                child: Center(child: Text("${widget.data['progress']}%",
+                                child: Center(child: Text('${widget.data['progress'].toString()}%',
                                   style: TextStyle(fontSize: 16,fontWeight: FontWeight.w600),)),
                               ),
                             ],

@@ -178,7 +178,6 @@ class ProfileRepository {
       data: {
         'emp_id': _pref.getString('uid'),
         'date' : "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}",
-        // "date" : "2024-02-19"
       },
     );
     if (response == null) {
@@ -193,14 +192,14 @@ class ProfileRepository {
     var response = await _api.postRequest("mark_attendence", {
       "user_id": _pref.getString('uid'),
       "date" : "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}",
-      // "date" : "2024-02-19",
       "check_in" : DateTime.now(),
       "check_in_latitude" : latitude,
       "check_in_longitude" : longitude,
       "check_in_worknote" : work,
-      "check_in_selfi" : await MultipartFile.fromFile(image.path,
+      "image" : await MultipartFile.fromFile(image.path,
         filename: image.path.split("/").last
       ),
+      "type" : "check_in",
     },withFile: true);
     if (response == null) {
       throw ApiException.fromString("response null");
@@ -214,14 +213,14 @@ class ProfileRepository {
     var response = await _api.postRequest("mark_attendence", {
       "user_id": _pref.getString('uid'),
       "date" : "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}",
-      // "date" : "2024-02-19",
       "check_out" : DateTime.now(),
       "check_out_latitude" : latitude,
       "check_out_longitude" : longitude,
       "check_out_worknote" : work,
-      "check_out_selfi" : await MultipartFile.fromFile(image.path,
+      "image" : await MultipartFile.fromFile(image.path,
           filename: image.path.split("/").last
       ),
+      "type" : "check_out",
     },withFile: true);
     if (response == null) {
       throw ApiException.fromString("response null");

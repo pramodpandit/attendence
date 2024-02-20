@@ -8,7 +8,7 @@ class ProjectBloc extends Bloc {
 
   ProjectBloc(this.repo);
 
-  ValueNotifier<String> selectedProjects = ValueNotifier("todo");
+  ValueNotifier<String> selectedProjects = ValueNotifier("doing");
   ValueNotifier<List?> allProjects = ValueNotifier(null);
   ValueNotifier allprojectDetail = ValueNotifier(null);
   ValueNotifier<List?> projectNotes = ValueNotifier(null);
@@ -16,6 +16,7 @@ class ProjectBloc extends Bloc {
   ValueNotifier<List?> projectlink = ValueNotifier(null);
   ValueNotifier<List?> projectmember = ValueNotifier(null);
   ValueNotifier<List?> projectcredentails = ValueNotifier(null);
+  ValueNotifier<List?> projectcomment = ValueNotifier(null);
 
   fetchProjects(String type) async{
     try{
@@ -30,7 +31,7 @@ class ProjectBloc extends Bloc {
       print(s);
     }
   }
-  fetchProjectsDetails(String type) async{
+  fetchProjectsDetails(int type) async{
     try{
       // isUserDetailLoad.value = true;
       var result = await repo.fetchAllProjectsDetail(type);
@@ -41,6 +42,7 @@ class ProjectBloc extends Bloc {
         projectlink.value = result.data["data"]["project_links"];
         projectmember.value = result.data["data"]["project_members"];
         projectcredentails.value = result.data["data"]["project_credentials"];
+        projectcomment.value = result.data["data"]["project_comment"];
         print("the all projects are : ${allprojectDetail.value}");
       }
     }catch (e, s) {

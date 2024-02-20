@@ -1,66 +1,109 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
+import 'package:provider/provider.dart';
+
+import '../../../bloc/project_bloc.dart';
+import '../../../data/repository/project_repo.dart';
 
 class ProjectComments extends StatefulWidget {
-  const ProjectComments({Key? key}) : super(key: key);
+  final data;
+  const ProjectComments({Key? key, this.data}) : super(key: key);
 
   @override
-  State<ProjectComments> createState() => _ProjectCommentsState();
+  State<ProjectComments> createState() => _ProjectCommentsState(data);
 }
 
 class _ProjectCommentsState extends State<ProjectComments> {
+  final data;
+  _ProjectCommentsState(this.data);
+  late ProjectBloc bloc;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    bloc = ProjectBloc(context.read<ProjectRepository>());
+    bloc.fetchProjectsDetails(widget.data['id']);
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 15,right: 20),
-              child: ListView.builder(
-                itemCount: 15,
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 20),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        CircleAvatar(
-                          child: Icon(Icons.person),
+      resizeToAvoidBottomInset: true,
+      body: ValueListenableBuilder(
+        valueListenable: bloc.projectcomment,
+        builder: (context, projectComment, child) {
+          if(projectComment ==null){
+            return SizedBox(
+                height: MediaQuery.of(context).size.height * 0.7,
+                child: Center(child: CircularProgressIndicator()));
+          }
+          if(projectComment.isEmpty){
+            return SizedBox(
+                height: MediaQuery.of(context).size.height * 0.7,
+                child: Center(child: Text("No data available")));
+          }
+          return   Padding(
+            padding: const EdgeInsets.only(left: 15,right: 20),
+            child: ListView.builder(
+              itemCount: projectComment.length,
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                var data = projectComment[index];
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 20),
+                  child:Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CircleAvatar(
+                        child: Icon(Icons.person),
+                      ),
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "${data['first_name']} ${data['l_name']}",
+                              style: TextStyle(fontWeight: FontWeight.w500),
+                            ),
+                            SizedBox(
+                              height: 2,
+                            ),
+                            Container(
+                              child: Html(
+                                data:
+                                "${data['comment']}",
+                                style: {
+                                  "body": Style(
+                                      color: Colors.black54,
+                                      fontWeight:
+                                      FontWeight.w400,
+                                      display: Display.inline,
+                                      fontSize: FontSize(12),
+                                      textAlign:
+                                      TextAlign.start),
+                                  "p": Style(
+                                      color: Colors.black54,
+                                      display: Display.inline,
+                                      fontSize: FontSize(12),
+                                      textAlign:
+                                      TextAlign.start),
+                                },
+                              ),
+                            ),
+
+                          ],
                         ),
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Alex Smith",
-                                style: TextStyle(fontWeight: FontWeight.w500),
-                              ),
-                              SizedBox(
-                                height: 2,
-                              ),
-                              Text(
-                                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 12,
-                                    color: Colors.black54),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
-          ),
-        ],
-      ),
+          );
+        },),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [

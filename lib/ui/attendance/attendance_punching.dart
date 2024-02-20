@@ -263,16 +263,16 @@ class _AttendancePunchingState extends State<AttendancePunching> {
               onPressed: () {
                 // Toggle the state when confirmed
                 setState(() {
-                  // if (isPunching) {
+                  if (bloc.todayWorkingDetail.value["checkin"] == "") {
                     bloc.markCheckInAttendance(punchWorkController.text);
                     punchInTime = DateTime.now();
                     punchOutTime=null;
                     _saveDateTime('punchInTime', punchInTime);
-                  // } else {
-                  //   bloc.markCheckOutAttendance(punchWorkController.text);
-                  //   punchOutTime = DateTime.now();
-                  //   _saveDateTime('punchOutTime', punchOutTime);
-                  // }
+                  } else {
+                    bloc.markCheckOutAttendance(punchWorkController.text);
+                    punchOutTime = DateTime.now();
+                    _saveDateTime('punchOutTime', punchOutTime);
+                  }
                   isPunching = !isPunching;
                   bloc.imageFile.value = null;
                   punchWorkController.text = "";
@@ -286,17 +286,13 @@ class _AttendancePunchingState extends State<AttendancePunching> {
     );
   }
 
-  String calculateTimeGap() {
-    if (punchInTime != null && punchOutTime != null) {
-      Duration timeGap = punchOutTime!.difference(punchInTime!);
+  String calculateTimeGap(DateTime inTime, DateTime outTime) {
+      Duration timeGap = outTime.difference(inTime);
       int hours = timeGap.inHours;
       int minutes = (timeGap.inMinutes - hours * 60);
       int seconds = (timeGap.inSeconds - hours * 3600 - minutes * 60);
 
       return "${hours.toString().padLeft(2,'0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}";
-    } else {
-      return "----";
-    }
   }
 
   @override
@@ -470,7 +466,7 @@ class _AttendancePunchingState extends State<AttendancePunching> {
                                             height: 20,
                                           ),
                                           workingDetail["working"]==1?
-                                          workingDetail["checkin"] == "" && workingDetail["checkout"] ==""?
+                                          workingDetail["checkin"] == "" || workingDetail["checkout"] ==""?
                                           workingDetail["location"] == "yes"?
                                           GestureDetector(
                                             onTap: () {
@@ -598,7 +594,7 @@ class _AttendancePunchingState extends State<AttendancePunching> {
                                                       ),
                                                       Text(
                                                         workingDetail["checkin"] != ""
-                                                            ? workingDetail["checkin"]
+                                                            ? workingDetail["checkin"].toString().splitAfter(" ")
                                                             : "-----",
                                                         style: TextStyle(
                                                             color: Colors.black,
@@ -642,7 +638,7 @@ class _AttendancePunchingState extends State<AttendancePunching> {
                                                       ),
                                                       Text(
                                                         workingDetail["checkout"] != ""
-                                                            ? workingDetail["checkout"]
+                                                            ? workingDetail["checkout"].toString().splitAfter(" ")
                                                             : "-----",
                                                         style: TextStyle(
                                                             color: Colors.black,
@@ -672,7 +668,7 @@ class _AttendancePunchingState extends State<AttendancePunching> {
                                                         size: 25,
                                                       ),
                                                       Text(
-                                                        calculateTimeGap()??"-----",
+                                                          workingDetail["checkin"] != "" && workingDetail["checkout"] != ""?calculateTimeGap(DateTime.parse(workingDetail["checkin"]),DateTime.parse(workingDetail["checkout"])):"-----",
                                                         style: TextStyle(
                                                             color: Colors.black,
                                                             fontWeight: FontWeight.w600,

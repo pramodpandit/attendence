@@ -252,6 +252,8 @@ class ProfileBloc extends Bloc {
       ApiResponse2 result = await _repo.checkInAttendance(work, imageFile.value!,currentLatitude.value!,currentLongitude.value!);
       if (result.status) {
         toast("Attendance checked in");
+        todayWorkingDetail.value = null;
+        fetchTodayWorkingDetail();
       }
     } catch (e, s) {
       print(e);
@@ -263,6 +265,8 @@ class ProfileBloc extends Bloc {
       ApiResponse2 result = await _repo.checkOutAttendance(work, imageFile.value!, currentLatitude.value!, currentLongitude.value!);
       if (result.status) {
         toast("Attendance checked out");
+        todayWorkingDetail.value = null;
+        fetchTodayWorkingDetail();
       }
     } catch (e, s) {
       print(e);
