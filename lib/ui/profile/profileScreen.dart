@@ -26,6 +26,7 @@ import 'package:office/ui/profile/profile_screen.dart';
 import 'package:office/ui/project/projectScreen.dart';
 import 'package:office/ui/task/task_screen.dart';
 import 'package:office/ui/water/add_water.dart';
+import 'package:office/ui/work_from_home/workFromHomePage.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../bill/add_bill.dart';
@@ -217,6 +218,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             onTap: () {
                               Navigator.of(context).push(MaterialPageRoute(
                                   builder: (context) => const LeavesHomePage()));
+                            },
+                          ),
+                          if (bloc.hasAccess(department, 3,'1'))BoxContainer(
+                            heading: "Work from home",
+                            image: "images/calendar1.png",
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => const WorkFromHomePage()));
                             },
                           ),
                           if (bloc.hasAccess(department, 29,'1'))BoxContainer(

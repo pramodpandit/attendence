@@ -20,6 +20,7 @@ import 'package:office/data/repository/post_repo.dart';
 import 'package:office/data/repository/profile_repo.dart';
 import 'package:office/data/repository/project_repo.dart';
 import 'package:office/data/repository/water_repo.dart';
+import 'package:office/data/repository/work_from_home_repository.dart';
 import 'package:office/ui/splash/splash_page.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -147,6 +148,8 @@ class MyApp extends StatelessWidget {
             value: PostRepository(prefs, apiService)),
         Provider<ProjectRepository>.value(
             value: ProjectRepository(prefs, apiService)),
+        Provider<WorkFromHomeRepository>.value(
+            value: WorkFromHomeRepository(prefs, apiService)),
         // Provider<HiveService>.value(value: HiveService()),
         // ChangeNotifierProvider<ThemeBloc>(
         //   create: (_) => ThemeBloc(AppRepository(prefs, apiService)),
