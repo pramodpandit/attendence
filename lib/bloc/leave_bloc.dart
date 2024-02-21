@@ -19,6 +19,8 @@ class LeaveBloc extends Bloc {
   //#region -Leaves
 
   ValueNotifier<int> recordIndex = ValueNotifier(0);
+  TextEditingController remark = TextEditingController();
+
   updateRecordIndex(int index) {
     if(leaveRecordsState.value==LoadingState.loading) {
       return;

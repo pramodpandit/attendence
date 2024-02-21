@@ -21,11 +21,13 @@ class ProjectBloc extends Bloc {
   ValueNotifier<List?> projectTask  = ValueNotifier(null);
 
   fetchProjects(String type) async{
+
     try{
       // isUserDetailLoad.value = true;
       var result = await repo.fetchAllProjects();
+      print('data${type}');
       if(result.status && result.data != null){
-        allProjects.value = result.data["data"]["project"][type];
+        allProjects.value = result.data["data"]["project"]['$type'];
         print("the all projects are : ${allProjects.value}");
       }
     }catch (e, s) {

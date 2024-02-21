@@ -120,6 +120,8 @@ class _ProjectScreenState extends State<ProjectScreen> {
                     itemBuilder: (context, index) {
                       var data = projectData[index];
                       List imageList = projectData[index]["user_pic"]["user_p"];
+                      var date = projectData[index]["deadline_date"].toString().split('-');
+
                       return GestureDetector(
                         onTap: () {
                           Navigator.of(context).push(MaterialPageRoute(
@@ -129,7 +131,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                           margin: const EdgeInsets.only(left: 25,right: 25,bottom: 25),
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           decoration: BoxDecoration(
-                              color: Colors.white,
+                              color:projectData[index]['deadline']=='no'?Colors.white:DateTime.now().year < date[0].toInt() && DateTime.now().month < date[1].toInt() && DateTime.now().day < date[2].toInt() ?Colors.red:Colors.white,
                               borderRadius: BorderRadius.circular(10),
                               boxShadow: [
                                 BoxShadow(
@@ -176,7 +178,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                                             bloc.selectedProjects.value == "todo"?
                                             'In Process':
                                             bloc.selectedProjects.value == "incomplete"?
-                                                "Not Completed":
+                                                "Incomplete":
                                                 bloc.selectedProjects.value == "complete"?
                                                     "Completed": projectData[index]["status"],
                                             style: TextStyle(fontSize: 11,color: Colors.green.shade400),)
@@ -189,7 +191,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                                           const SizedBox(
                                             width: 10,
                                           ),
-                                          Text(projectData[index]["created_date"].toString().splitBefore(" "),style: TextStyle(fontSize: 11,color: Colors.redAccent.withOpacity(0.9)),)
+                                          Text('${projectData[index]["start_date"].toString()}${projectData[index]['deadline']=='no'?'':' - ${projectData[index]['deadline_date']}'}',style: TextStyle(fontSize: 11,color: Colors.redAccent.withOpacity(0.9)),)
                                         ],
                                       ),
                                       const SizedBox(height: 8,),

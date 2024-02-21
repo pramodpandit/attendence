@@ -174,7 +174,7 @@ class _ProjectDetailsState extends State<ProjectDetails> {
                                       const SizedBox(
                                         width: 10,
                                       ),
-                                      Text('${DateFormat.yMMMM().format(DateTime.parse(widget.data['created_date']))}',style: TextStyle(fontSize: 11,color: Colors.redAccent.withOpacity(0.9)),)
+                                      Text('${dataa["start_date"].toString()}${dataa['deadline']=='no'?'':' - ${dataa['deadline_date']}'}',style: TextStyle(fontSize: 11,color: Colors.redAccent.withOpacity(0.9)),)
                                     ],
                                   ),
                                   const SizedBox(height: 8,),
