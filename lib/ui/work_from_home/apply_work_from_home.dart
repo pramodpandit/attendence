@@ -196,9 +196,6 @@ class _ApplyWorkFromHomeState extends State<ApplyWorkFromHome> {
                                 return AppButton(
                                   title: "Request",
                                   onTap: ()=> bloc.applyForWFH(),
-                                  // onTap: () {
-                                  //
-                                  // },
                                   margin: EdgeInsets.zero,
                                   loading: loading,
                                 );

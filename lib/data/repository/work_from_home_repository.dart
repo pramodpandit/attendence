@@ -17,8 +17,8 @@ class WorkFromHomeRepository {
   Future<List> getWorkFromHomeRecords(String recordType) async{
     SharedPreferences _pref = await SharedPreferences.getInstance();
     Map<String, dynamic> data = {
-      // "user_id": _pref.getString('uid'),
-      "user_id": 490,
+      "user_id": _pref.getString('uid'),
+      // "user_id": 490,
       "status": recordType,
     };
 
@@ -33,8 +33,8 @@ class WorkFromHomeRepository {
   Future<ApiResponse> applyForWorkFromHome(String title, String description, DateTime startDate, String durationType, {DateTime? endDate}) async{
     SharedPreferences _pref = await SharedPreferences.getInstance();
     Map<String, dynamic> data = {
-      // "user_id": _pref.getString('uid'),
-      "user_id" : 490,
+      "user_id": _pref.getString('uid'),
+      // "user_id" : 490,
       "reason_title": title,
       "reason": description,
       "start_date": DateFormat("yyyy-MM-dd").format(startDate),
