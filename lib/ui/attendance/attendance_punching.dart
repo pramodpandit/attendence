@@ -135,6 +135,7 @@ class _AttendancePunchingState extends State<AttendancePunching> {
         setState(() {
           distance = calculatedDistance;
         });
+        print("the distance is : $distance");
         getAddress(position.latitude, position.longitude);
       } else {
         setState(() {
@@ -309,7 +310,16 @@ class _AttendancePunchingState extends State<AttendancePunching> {
       child: Scaffold(
         backgroundColor: Colors.white,
         body: SingleChildScrollView(
-          child: ValueListenableBuilder(
+          child: location.isEmpty?
+          Column(
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.width * 1,
+              ),
+              const Center(child: CircularProgressIndicator()),
+            ],
+          ):
+          ValueListenableBuilder(
               valueListenable: bloc.isUserDetailLoad,
               builder: (context, bool loading, __) {
                 if (loading == true) {
@@ -471,37 +481,7 @@ class _AttendancePunchingState extends State<AttendancePunching> {
                                           workingDetail["working"]==1?
                                           workingDetail["checkin"] == "" || workingDetail["checkout"] ==""?
                                           workingDetail["location"] == "yes"?
-                                          GestureDetector(
-                                            onTap: () {
-                                              // Toggle the state on tap
-                                              // setState(() {
-                                              //   isPuchin = !isPuchin;
-                                              // });
-                                              if(location ==''){
-                                                getLocation();
-                                              } else{
-                                                if(isPunching){
-                                                  if(workingDetail["dailyworkcheckin"]=="yes") {
-                                                    showDailyWorkDialog();
-                                                  }else{
-                                                    showPunchConfirmationDialog();
-                                                  }
-                                                }else{
-                                                  if(workingDetail["dailyworkcheckout"]=="yes") {
-                                                    showDailyWorkDialog();
-                                                  }else{
-                                                    showPunchConfirmationDialog();
-                                                  }
-                                                }
-                                              }
-                                            },
-                                            child: Image.asset(
-                                              // "images/puchin.png",
-                                              workingDetail["checkin"] == "" ? "images/puchin.png" : "images/puchout.png",
-                                              height: 230,
-                                            ),
-                                          ):
-                                          distance <= 300.0?
+                                          distance <=double.parse(workingDetail["branch_details"]["radius"])?
                                           GestureDetector(
                                             onTap: () {
                                               // Toggle the state on tap
@@ -535,7 +515,37 @@ class _AttendancePunchingState extends State<AttendancePunching> {
                                               :SizedBox(
                                               height: 230,
                                               child: Center(child: Text("You are out of range")))
-                                              :SizedBox(
+                                              :GestureDetector(
+                                                onTap: () {
+                                                  // Toggle the state on tap
+                                                  // setState(() {
+                                                  //   isPuchin = !isPuchin;
+                                                  // });
+                                                  if(location ==''){
+                                                    getLocation();
+                                                  } else{
+                                                    if(isPunching){
+                                                      if(workingDetail["dailyworkcheckin"]=="yes") {
+                                                        showDailyWorkDialog();
+                                                      }else{
+                                                        showPunchConfirmationDialog();
+                                                      }
+                                                    }else{
+                                                      if(workingDetail["dailyworkcheckout"]=="yes") {
+                                                        showDailyWorkDialog();
+                                                      }else{
+                                                        showPunchConfirmationDialog();
+                                                      }
+                                                    }
+                                                  }
+                                                },
+                                                child: Image.asset(
+                                                  // "images/puchin.png",
+                                                  workingDetail["checkin"] == "" ? "images/puchin.png" : "images/puchout.png",
+                                                  height: 230,
+                                                ),
+                                              ):
+                                          SizedBox(
                                               height: 230,
                                               child: Center(child: Text("You Punched Out Succesfully")))
                                               :SizedBox(

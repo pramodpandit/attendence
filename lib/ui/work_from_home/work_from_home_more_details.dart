@@ -11,6 +11,7 @@ import 'package:office/ui/leave/leave_policy.dart';
 import 'package:office/ui/leave/leaves_detail.dart';
 import 'package:office/ui/widget/app_bar.dart';
 import 'package:office/ui/widget/loading_widget.dart';
+import 'package:office/ui/work_from_home/apply_work_from_home.dart';
 import 'package:office/utils/constants.dart';
 import 'package:office/utils/enums.dart';
 import 'package:office/utils/message_handler.dart';
@@ -50,7 +51,7 @@ class _WorkFromHomeMoreDetailPageState extends State<WorkFromHomeMoreDetailPage>
                 MaterialPageRoute(
                     builder: (_) => Provider.value(
                       value: bloc,
-                      child: const ApplyLeavePage(),
+                      child: const ApplyWorkFromHome(),
                     )),
               );
             },
@@ -223,7 +224,7 @@ class _WorkFromHomeMoreDetailPageState extends State<WorkFromHomeMoreDetailPage>
                                   if(workFromHomeData.isEmpty) {
                                     return const SliverFillRemaining(
                                       child: Center(
-                                        child: Text("No Leave Record Available!"),
+                                        child: Text("No Record Available!"),
                                       ),
                                     );
                                   }
