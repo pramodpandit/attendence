@@ -1,12 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:office/bloc/leave_bloc.dart';
 import 'package:office/ui/widget/app_button.dart';
 import 'package:office/ui/widget/app_dropdown.dart';
 import 'package:office/ui/widget/app_text_field.dart';
 import 'package:provider/provider.dart';
+import 'package:file_picker/file_picker.dart';
 
 class ApplyLeavePage extends StatefulWidget {
   const ApplyLeavePage({Key? key}) : super(key: key);
@@ -16,21 +20,30 @@ class ApplyLeavePage extends StatefulWidget {
 }
 
 class _ApplyLeavePageState extends State<ApplyLeavePage> {
-
   late LeaveBloc bloc;
+  File? galleryFile;
+  FilePickerResult? filePickerResult;
 
   @override
   void initState() {
     bloc = context.read<LeaveBloc>();
     super.initState();
   }
+  Future<void> _openImagePicker(ImageSource source) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: source);
+    if (pickedFile != null) {
+      setState(() {
+        galleryFile = File(pickedFile.path);
+        bloc.image = galleryFile;
+        bloc.filepath.text = pickedFile.path.toString().split('/').last;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text("Request Leave"),
-      // ),
       body: Stack(
         children: [
           Container(
@@ -189,6 +202,19 @@ class _ApplyLeavePageState extends State<ApplyLeavePage> {
                             },
                           ),
                           const SizedBox(height: 10),
+                          InkWell(
+                            onTap: (){
+                              openFilePicker();
+                             // _openImagePicker(ImageSource.gallery);
+                            },
+                            child:AppTextField(
+                              enabled: false,
+                              controller: bloc.filepath,
+                              title: "Attach File",
+                              validate: false,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
                           ValueListenableBuilder(
                             valueListenable: bloc.requesting,
                             builder: (context, bool loading, _) {
@@ -211,5 +237,12 @@ class _ApplyLeavePageState extends State<ApplyLeavePage> {
         ],
       ),
     );
+  }
+  Future<void> openFilePicker() async{
+    filePickerResult = await FilePicker.platform.pickFiles(
+    );
+     galleryFile = File(filePickerResult!.files.single.path!);
+      bloc.image = galleryFile;
+      bloc.filepath.text = galleryFile!.path.split('/').last;
   }
 }

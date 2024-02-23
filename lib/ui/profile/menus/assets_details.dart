@@ -59,8 +59,6 @@ class _assetsDetailState extends State<assetsDetail> {
                         ),
                       ),
                     ),
-
-
                   ],
                 ),
                 Text(
@@ -72,152 +70,173 @@ class _assetsDetailState extends State<assetsDetail> {
                   ),
                 ),
                10.height,
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Table(
-                    border: TableBorder.all(),
-                    defaultColumnWidth: FixedColumnWidth(80),
-                    children: [
-                      TableRow(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black),
+                Table(
+                //  border: TableBorder.all(),
+                  defaultColumnWidth: FixedColumnWidth(80),
+                  children: [
+                    TableRow(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black),
+                        ),
+                        children:const [
+                          Padding(
+                            padding: EdgeInsets.all(5.0),
+                            child: Text("Date",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.w600,fontSize: 11),),
                           ),
-                          children:const [
-                            Padding(
-                              padding: EdgeInsets.all(5.0),
-                              child: Text("Date",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.w600),),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.all(5.0),
-                              child: Text("Description",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.w600),),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.all(5.0),
-                              child: Text("Status",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.w600),),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.all(5.0),
-                              child: Text("Value",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.w600),),
-                            ),
-                          ]
-                      ),
-                    ],
-                  ),
+                          Padding(
+                            padding: EdgeInsets.all(5.0),
+                            child: Text("Description",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.w600,fontSize: 11),),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(5.0),
+                            child: Text("Status",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.w600,fontSize: 11),),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(5.0),
+                            child: Text("Value",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.w600,fontSize: 11),),
+                          ),
+                        ]
+                    ),
+                  ],
                 ),
-                // ValueListenableBuilder(
-                //     valueListenable: bloc.isAssetsLoadDetail,
-                //     builder: (context, bool loading, __) {
-                //       if (loading == true) {
-                //         return Column(
-                //           children: [
-                //             SizedBox(
-                //               height: MediaQuery.of(context).size.width * 0.5,
-                //             ),
-                //             const Center(child: CircularProgressIndicator()),
-                //           ],
-                //         );
-                //       }
-                //       return Padding(
-                //         padding: const EdgeInsets.only(
-                //             left: 20, right: 20, top: 0, bottom: 10),
-                //         child: ValueListenableBuilder(
-                //             valueListenable: bloc.assetsUserDetail,
-                //             builder: (context, List<UserAssetDetail>? asset, __) {
-                //               if (asset == null) {
-                //                 return const Center(
-                //                   child: Text("User Details Not Found!"),
-                //                 );
-                //               }
-                //               return ListView.builder(
-                //                   itemCount: asset.length,
-                //                   shrinkWrap: true,
-                //                   physics: const ScrollPhysics(),
-                //                   itemBuilder: (context,index){
-                //                     UserAssetDetail data = asset[index];
-                //                     return Container(
-                //                       padding: const EdgeInsets.symmetric(horizontal: 10),
-                //                       margin: const EdgeInsets.only(bottom: 20),
-                //                       decoration: BoxDecoration(
-                //                         boxShadow: [
-                //                           BoxShadow(
-                //                               color: Colors.grey.withOpacity(0.3),
-                //                               blurRadius: 3,
-                //                               spreadRadius: 1)
-                //                         ],
-                //                         color: Colors.white,
-                //                         borderRadius: const BorderRadius.all(Radius.circular(10)),
-                //                       ),
-                //                       child:  Column(
-                //                         crossAxisAlignment: CrossAxisAlignment.start,
-                //                         mainAxisAlignment: MainAxisAlignment.start,
-                //                         children: [
-                //                           const SizedBox(height: 10,),
-                //                           Row(
-                //                             mainAxisAlignment: MainAxisAlignment.start,
-                //                             crossAxisAlignment: CrossAxisAlignment.start,
-                //                             children: [
-                //                                Expanded(
-                //                                 child: Text(
-                //                                   "${data.itemName}",
-                //                                   textAlign: TextAlign.left,
-                //                                   style: TextStyle(
-                //                                     fontWeight: FontWeight.w700,
-                //                                   ),
-                //                                 ),
-                //                               ),
-                //
-                //                               Text(
-                //                                 data.status=='allotment'?'Allotment':'Receiving',
-                //                                 textAlign: TextAlign.left,
-                //                                 style: TextStyle(
-                //                                   fontWeight: FontWeight.w700,
-                //                                   color:index==1 || index==3?const Color(0xFFD41817):const Color(0xFF3CEB43),
-                //                                 ),
-                //                               ),
-                //                             ],
-                //                           ),
-                //                           Text(
-                //                             data.itemGroupName.toString(),
-                //                             textAlign: TextAlign.left,
-                //                             style: TextStyle(
-                //                               fontWeight: FontWeight.w700,
-                //                               color:Colors.black
-                //                             ),
-                //                           ),
-                //                           // Text(
-                //                           //   DateFormat.yMMMMd().format(DateTime.parse(data.allotedDate.toString())),
-                //                           //   textAlign: TextAlign.start,
-                //                           //   style:  TextStyle(
-                //                           //       color: Colors.black.withOpacity(0.7), fontSize: 8),
-                //                           // ),
-                //                           10.height,
-                //
-                //
-                //                           const SizedBox(height: 10,),
-                //                           // Text(
-                //                           //   "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi.Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi. Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi.Neque porro quisquam.",
-                //                           //   textAlign: TextAlign.left,
-                //                           //   style: TextStyle(
-                //                           //       color: Colors.black.withOpacity(0.7),
-                //                           //       fontWeight:
-                //                           //       FontWeight.w400,
-                //                           //       fontFamily: "Poppins",
-                //                           //       fontSize: 11
-                //                           //   ),
-                //                           // ),
-                //                           const SizedBox(height: 20,),
-                //                         ],
-                //                       ),
-                //                     );
-                //                   }
-                //               );
-                //
-                //
-                //
-                //
-                //             }),
-                //       );
-                //     })
+                ValueListenableBuilder(
+                    valueListenable: bloc.isAssetsLoadDetail,
+                    builder: (context, bool loading, __) {
+                      if (loading == true) {
+                        return Column(
+                          children: [
+                            SizedBox(
+                              height: MediaQuery.of(context).size.width * 0.5,
+                            ),
+                            const Center(child: CircularProgressIndicator()),
+                          ],
+                        );
+                      }
+                      return ValueListenableBuilder(
+                          valueListenable: bloc.assetsUserDetail,
+                          builder: (context, List<UserAssetDetail>? asset, __) {
+                            if (asset == null) {
+                              return const Center(
+                                child: Text("User Details Not Found!"),
+                              );
+                            }
+                            return ListView.builder(
+                                itemCount: asset.length,
+                                shrinkWrap: true,
+                                physics: const ScrollPhysics(),
+                                itemBuilder: (context,index){
+                                  UserAssetDetail data = asset[index];
+                                  return Table(
+                                    //border: TableBorder.all(),
+                                    defaultColumnWidth: FixedColumnWidth(70),
+                                    children: [
+                                      TableRow(
+                                          decoration: BoxDecoration(
+                                            border: Border.all(color: Colors.black),
+                                          ),
+                                          children: [
+                                            Padding(
+                                              padding: EdgeInsets.all(5.0),
+                                              child: Text("${DateFormat.yMd().format(DateTime.parse(data.createdAt.toString()))}",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.w600,fontSize: 11),),
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.all(5.0),
+                                              child: Text("${data.remarks}",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.w600,fontSize: 11),),
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.all(5.0),
+                                              child: Text("${data.status}",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.w600,fontSize: 11),),
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.all(5.0),
+                                              child: Text("${data.amount}",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.w600,fontSize: 11),),
+                                            ),
+                                          ]
+                                      ),
+                                    ],
+                                  );
+
+
+
+                                  //   Container(
+                                  //   padding: const EdgeInsets.symmetric(horizontal: 10),
+                                  //   margin: const EdgeInsets.only(bottom: 20),
+                                  //   decoration: BoxDecoration(
+                                  //     boxShadow: [
+                                  //       BoxShadow(
+                                  //           color: Colors.grey.withOpacity(0.3),
+                                  //           blurRadius: 3,
+                                  //           spreadRadius: 1)
+                                  //     ],
+                                  //     color: Colors.white,
+                                  //     borderRadius: const BorderRadius.all(Radius.circular(10)),
+                                  //   ),
+                                  //   child:  Column(
+                                  //     crossAxisAlignment: CrossAxisAlignment.start,
+                                  //     mainAxisAlignment: MainAxisAlignment.start,
+                                  //     children: [
+                                  //       const SizedBox(height: 10,),
+                                  //       Row(
+                                  //         mainAxisAlignment: MainAxisAlignment.start,
+                                  //         crossAxisAlignment: CrossAxisAlignment.start,
+                                  //         children: [
+                                  //            Expanded(
+                                  //             child: Text(
+                                  //               "${data.itemName}",
+                                  //               textAlign: TextAlign.left,
+                                  //               style: TextStyle(
+                                  //                 fontWeight: FontWeight.w700,
+                                  //               ),
+                                  //             ),
+                                  //           ),
+                                  //
+                                  //           Text(
+                                  //             data.status=='allotment'?'Allotment':'Receiving',
+                                  //             textAlign: TextAlign.left,
+                                  //             style: TextStyle(
+                                  //               fontWeight: FontWeight.w700,
+                                  //               color:index==1 || index==3?const Color(0xFFD41817):const Color(0xFF3CEB43),
+                                  //             ),
+                                  //           ),
+                                  //         ],
+                                  //       ),
+                                  //       Text(
+                                  //         data.itemGroupName.toString(),
+                                  //         textAlign: TextAlign.left,
+                                  //         style: TextStyle(
+                                  //           fontWeight: FontWeight.w700,
+                                  //           color:Colors.black
+                                  //         ),
+                                  //       ),
+                                  //       // Text(
+                                  //       //   DateFormat.yMMMMd().format(DateTime.parse(data.allotedDate.toString())),
+                                  //       //   textAlign: TextAlign.start,
+                                  //       //   style:  TextStyle(
+                                  //       //       color: Colors.black.withOpacity(0.7), fontSize: 8),
+                                  //       // ),
+                                  //       10.height,
+                                  //
+                                  //
+                                  //       const SizedBox(height: 10,),
+                                  //       // Text(
+                                  //       //   "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi.Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi. Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi.Neque porro quisquam.",
+                                  //       //   textAlign: TextAlign.left,
+                                  //       //   style: TextStyle(
+                                  //       //       color: Colors.black.withOpacity(0.7),
+                                  //       //       fontWeight:
+                                  //       //       FontWeight.w400,
+                                  //       //       fontFamily: "Poppins",
+                                  //       //       fontSize: 11
+                                  //       //   ),
+                                  //       // ),
+                                  //       const SizedBox(height: 20,),
+                                  //     ],
+                                  //   ),
+                                  // );
+                                }
+                            );
+                          });
+                    }),
                 // Text(
                 //   // "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
                 //   widget.data.itemName ?? "",

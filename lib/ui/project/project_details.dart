@@ -205,13 +205,13 @@ class _ProjectDetailsState extends State<ProjectDetails> {
                             ],
                           ),
                           const Divider(),
-                           const Row(
+                        Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              TaskContent(tittle: '15', icon: Icons.offline_bolt_outlined,),
-                              TaskContent(tittle: '5', icon: Icons.error_outline,color: Colors.blue,),
-                              TaskContent(tittle: '5', icon: Icons.check_circle_outline,color: Colors.green,),
-                              TaskContent(tittle: '5', icon: Icons.cancel_outlined,color: Colors.red,),
+                              TaskContent(tittle: '${dataa['user_project_task']['project_task_totle']}', icon: Icons.offline_bolt_outlined,),
+                              TaskContent(tittle: '${dataa['user_project_task']['project_task_doing']}', icon: Icons.error_outline,color: Colors.blue,),
+                              TaskContent(tittle: '${dataa['user_project_task']['project_task_complete']}', icon: Icons.check_circle_outline,color: Colors.green,),
+                              TaskContent(tittle: '${dataa['user_project_task']['project_task_incomplete']}', icon: Icons.cancel_outlined,color: Colors.red,),
                             ],
                           ),
                           const SizedBox(height: 10,)

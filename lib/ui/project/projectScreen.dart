@@ -131,7 +131,8 @@ class _ProjectScreenState extends State<ProjectScreen> {
                           margin: const EdgeInsets.only(left: 25,right: 25,bottom: 25),
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           decoration: BoxDecoration(
-                              color:projectData[index]['deadline']=='no'?Colors.white:DateTime.now().year < date[0].toInt() && DateTime.now().month < date[1].toInt() && DateTime.now().day < date[2].toInt() ?Colors.red:Colors.white,
+                            border: Border.all(color:projectData[index]['deadline'].toString()=='no'?Colors.white:DateTime.now().year >= int.parse(date[0]) || DateTime.now().month >= int.parse(date[1]) || DateTime.now().day >= int.parse(date[2]) ?Colors.red:Colors.white ),
+                              color:Colors.white,
                               borderRadius: BorderRadius.circular(10),
                               boxShadow: [
                                 BoxShadow(
@@ -225,13 +226,13 @@ class _ProjectScreenState extends State<ProjectScreen> {
                                 ],
                               ),
                               const Divider(),
-                              const Row(
+                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  TaskContent(tittle: '15', icon: Icons.offline_bolt_outlined,),
-                                  TaskContent(tittle: '5', icon: Icons.error_outline,color: Colors.blue,),
-                                  TaskContent(tittle: '5', icon: Icons.check_circle_outline,color: Colors.green,),
-                                  TaskContent(tittle: '5', icon: Icons.cancel_outlined,color: Colors.red,),
+                                  TaskContent(tittle: '${projectData[index]['user_project_task']['project_task_totle']}', icon: Icons.offline_bolt_outlined,),
+                                  TaskContent(tittle: '${projectData[index]['user_project_task']['project_task_doing']}', icon: Icons.error_outline,color: Colors.blue,),
+                                  TaskContent(tittle: '${projectData[index]['user_project_task']['project_task_complete']}', icon: Icons.check_circle_outline,color: Colors.green,),
+                                  TaskContent(tittle: '${projectData[index]['user_project_task']['project_task_incomplete']}', icon: Icons.cancel_outlined,color: Colors.red,),
 
                                 ],
                               ),

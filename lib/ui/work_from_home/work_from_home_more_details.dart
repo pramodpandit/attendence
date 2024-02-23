@@ -1,20 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:office/bloc/leave_bloc.dart';
 import 'package:office/bloc/work_from_home_bloc.dart';
-import 'package:office/data/model/LeaveRecord.dart';
-import 'package:office/data/repository/leave_repository.dart';
 import 'package:office/data/repository/work_from_home_repository.dart';
-import 'package:office/ui/leave/apply_leave.dart';
-import 'package:office/ui/leave/leave_policy.dart';
 import 'package:office/ui/leave/leaves_detail.dart';
-import 'package:office/ui/widget/app_bar.dart';
 import 'package:office/ui/widget/loading_widget.dart';
 import 'package:office/ui/work_from_home/apply_work_from_home.dart';
 import 'package:office/utils/constants.dart';
 import 'package:office/utils/enums.dart';
-import 'package:office/utils/message_handler.dart';
 import 'package:provider/provider.dart';
 
 class WorkFromHomeMoreDetailPage extends StatefulWidget {

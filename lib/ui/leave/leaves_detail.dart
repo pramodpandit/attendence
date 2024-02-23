@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:office/data/model/LeaveRecord.dart';
@@ -8,6 +9,7 @@ import '../../bloc/leave_bloc.dart';
 import '../../utils/message_handler.dart';
 import '../widget/app_button.dart';
 import '../widget/custom_button.dart';
+import 'edit_leave.dart';
 
 
 class LeavesDetail extends StatefulWidget {
@@ -16,7 +18,7 @@ class LeavesDetail extends StatefulWidget {
   final bool responseButton;
 
   @override
-  State<LeavesDetail> createState() => _LeavesDetailState();
+  State<LeavesDetail> createState() => _LeavesDetailState(data);
 }
 
 class _LeavesDetailState extends State<LeavesDetail> {
@@ -24,6 +26,9 @@ class _LeavesDetailState extends State<LeavesDetail> {
 
   late LeaveBloc bloc;
   String uid="";
+  final LeaveRecord editData;
+
+  _LeavesDetailState( this.editData);
 
 
   @override
@@ -31,14 +36,55 @@ class _LeavesDetailState extends State<LeavesDetail> {
     bloc = context.read<LeaveBloc>();
     super.initState();
     init();
+
     bloc.msgController!.stream.listen((event) {
       AppMessageHandler().showSnackBar(context, event);
+    });
+    bloc.CancelStream.stream.listen((event) {
+      if (event == 'Post') {
+        bloc.getLeaveCategory();
+        bloc.getLeaveRecords();
+        Navigator.pop(context);
+      }
     });
   }
   init()async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     uid=prefs.getString('uid')??"";
     setState(() {});
+  }
+  void showDialogBoxcancel(){
+    showDialog(context: context, builder: (context){
+      return AlertDialog(
+        title: Text('Confirm',style: TextStyle(color: Colors.black),),
+        content: Text('Are You Sure?',style: TextStyle(color: Colors.black),),
+        actions: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              TextButton(onPressed: (){Navigator.pop(context);}, child: Text('No',style: TextStyle(color: Colors.black),)),
+              ValueListenableBuilder(
+                valueListenable: bloc.isCancelLoading,
+                builder: (context, value, child) {
+                  return ElevatedButton(
+                      style:ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blueAccent,
+                          shape: BeveledRectangleBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(5))
+                          )
+                      ),
+                      onPressed: (){
+                        bloc.CanelLeave(int.parse(widget.data.id.toString()));
+                        Navigator.pop(context);
+                      }, child: Text('Yes',style: TextStyle(color: Colors.white),));
+                },
+
+              )
+            ],
+          )
+        ],
+      );
+    });
   }
 
   @override
@@ -158,10 +204,15 @@ class _LeavesDetailState extends State<LeavesDetail> {
                               ),
                             IconTittle(
                                 icon: Icons.calendar_month,
-                                tittle: widget.data.endDate != null
-                                    ? "${widget.data.startDate==null?widget.data.startDate:DateFormat.yMMMMd().format(DateTime.parse(widget.data.startDate ?? ""))} To ${DateFormat.yMMMMd().format(DateTime.parse(widget.data.endDate ?? ""))}"
-                                    :widget.data.endDate==null?widget.data.endDate.toString(): DateFormat.yMMMMd().format(DateTime.parse(
-                                        widget.data.endDate ?? ""))),
+                                tittle: widget.data.endDate ==null?DateFormat.yMMMMd().format(DateTime.parse(widget.data.startDate ?? "")):
+                                    '${DateFormat.yMMMMd().format(DateTime.parse(widget.data.startDate ?? ""))} to ${DateFormat.yMMMMd().format(DateTime.parse(widget.data.endDate ?? ""))}'),
+
+
+                                // widget.data.endDate != null
+                                //     ?
+                                // "${widget.data.startDate==null?widget.data.startDate:
+                                // DateFormat.yMMMMd().format(DateTime.parse(widget.data.startDate ?? ""))} To ${DateFormat.yMMMMd().format(DateTime.parse(widget.data.endDate ?? ""))}"
+                                //     :widget.data.endDate==null?widget.data.endDate.toString(): DateFormat.yMMMMd().format(DateTime.parse(widget.data.endDate ?? ""))),
                             if (widget.data.durationType != null)
                               IconTittle(
                                 icon: Icons.merge_type,
@@ -172,9 +223,53 @@ class _LeavesDetailState extends State<LeavesDetail> {
                                 icon: Icons.verified_user_outlined,
                                 tittle: widget.data.approvedBy ?? "",
                               ),
-                            const SizedBox(
-                              height: 20,
-                            ),
+
+                            widget.data.document ==null?Offstage():Row(
+
+                              children: [
+                              Icon(Icons.file_open,color: Colors.grey,),
+                              SizedBox(width: 10,),
+                              Text('${widget.data.document.toString().split('/').last}',style: TextStyle(color: Colors.grey),),
+                              SizedBox(width: MediaQuery.of(context).size.width*0.35,),
+                                ValueListenableBuilder(
+                                  valueListenable: bloc.isLoadingDownload,
+                                  builder: (context, downloadLoading, child) {
+                                    return  GestureDetector(
+                                      child: Container(
+                                        padding: EdgeInsets.all(6),
+                                        decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(100),
+                                            color: Colors.white,
+                                            boxShadow: [
+                                              BoxShadow(
+                                                  spreadRadius: 0,
+                                                  blurRadius: 3,
+                                                  color: Colors.black.withOpacity(0.2)
+                                              )
+                                            ]
+                                        ),
+                                        child: InkWell(
+                                          onTap: () async{
+                                            bloc.isLoadingDownload.value = true;
+                                            FileDownloader.downloadFile(url: 'https://freeze.talocare.co.in/public/${widget.data.document}',name: widget.data.document.toString().split('/').last,onDownloadCompleted: (path) {
+                                              bloc.showMessage(MessageType.success('File Downloaded'));
+                                              bloc.isLoadingDownload.value = false;
+                                            },
+                                            );
+                                          },
+                                          child: downloadLoading?SizedBox(width: 20,height:20,child: CircularProgressIndicator()): Icon(
+                                            Icons.download,
+                                            color: Colors.black,
+                                            size: 20,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+
+                            ],),
+
                             Text(
                               widget.data.reason ?? "",
                               style: const TextStyle(
@@ -182,122 +277,61 @@ class _LeavesDetailState extends State<LeavesDetail> {
                                   fontSize: 12,
                                   fontWeight: FontWeight.w400),
                             ),
-
+                            SizedBox(height: 20,),
                             widget.data.status! == "pending"?
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   children: [
-                                    OutlinedButton(
-                                       style: ElevatedButton.styleFrom(side: BorderSide(color: Colors.red,width: 0),shape: BeveledRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(3)))),
-                                        onPressed: (){}, child: Text('Cancel',style: TextStyle(color: Colors.red),)),
-                                    ElevatedButton(
-                                       style: ElevatedButton.styleFrom(
-                                           backgroundColor: Colors.green,
-                                           side: BorderSide(color: Colors.green,width: 0),shape: BeveledRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(3)))),
-                                        onPressed: (){}, child: Text('Edit',style: TextStyle(color: Colors.white),)),
+                                    ValueListenableBuilder(
+                                      valueListenable: bloc.isCancelLoading,
+                                      builder: (context, value, child) {
+                                        return SizedBox(
+                                          width: 100,
+                                          child: OutlinedButton(
+                                              style: ElevatedButton.styleFrom(side: BorderSide(color: Colors.red,width: 0),shape: BeveledRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(3)))),
+                                              onPressed: (){
+                                                showDialogBoxcancel();
+                                              }, child: Text('Cancel',style: TextStyle(color: Colors.red),)),
+                                        );
+                                        },
+                                     
+                                    ),
+                                    SizedBox(
+                                      width: 100,
+                                      child: ElevatedButton(
+                                         style: ElevatedButton.styleFrom(
+                                             backgroundColor: Colors.green,
+                                             side: BorderSide(color: Colors.green,width: 0),shape: BeveledRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(3)))),
+                                          onPressed: (){
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (_) => Provider.value(
+                                                    value: bloc,
+                                                    child: EditLeavePage(data: editData,),
+                                                  )),
+                                            );
+                                          }, child: Text('Edit',style: TextStyle(color: Colors.white),)),
+                                    ),
 
                                   ],
-                                ):
-                            Column(
-                              children: [
-                                const SizedBox(
-                                  height: 30,
-                                ),
-                                Padding(
-                                  padding:
-                                  const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                                  child: Form(
-                                    key: formKey,
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          "Remark",
-                                          style: TextStyle(
-                                              color: Color(0xff777777),
-                                              fontFamily: "Poppins",
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-                                        Container(
-                                          height: 200,
-                                          padding: const EdgeInsets.all(10),
-                                          decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(20.0),
-                                              border: Border.all(
-                                                  width: 1, color: const Color(0xff777777))),
-                                          child: TextFormField(
-                                            style: const TextStyle(color: Colors.black),
-                                            keyboardType: TextInputType.multiline,
-                                            controller: bloc.remark,
-                                            maxLines: null,
-                                            decoration: const InputDecoration(
-                                              border: InputBorder.none,
-                                              hintText: "Write here...",
-                                              focusColor: Colors.white,
-                                              counterStyle: TextStyle(color: Colors.white),
-                                              hintStyle: TextStyle(
-                                                  color: Color(0xff777777),
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w300,
-                                                  fontFamily: "Poppins"),
-                                            ),
-                                            onFieldSubmitted: (value) {
-                                              bloc.remark.text = value;
-                                            },
-                                            validator: (value) {
-                                              if (value.toString().isEmpty) {
-                                                return "Please enter your remark.";
-                                              }
-                                              return null;
-                                            },
-                                          ),
-                                        ),
-                                        const SizedBox(
-                                          height: 20,
-                                        ),
-                                        ValueListenableBuilder(
-                                          valueListenable: bloc.isResponseApproveLoad,
-                                          builder: (BuildContext context, bool loading,
-                                              Widget? child) {
-                                            return Row(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                loading
-                                                    ? CircularProgressIndicator()
-                                                    : CustomButton2(
-                                                    onPressed: () {
-                                                      if (formKey.currentState!
-                                                          .validate()) {
-                                                        //bloc.addFeedback();
-                                                      }
-                                                    },
-                                                    tittle: 'Add Remark'),
-                                                //     SizedBox(
-                                                //       width: 0.8.sw,
-                                                //       child: ElevatedButton(
-                                                //         onPressed: () async {},
-                                                //         style: ElevatedButton.styleFrom(
-                                                //             shape: RoundedRectangleBorder(
-                                                //                 borderRadius: BorderRadius.circular(20))),
-                                                //         child: const Text(
-                                                //           "Publish Feedback",
-                                                //           style: TextStyle(color: Colors.white),
-                                                //         ),
-                                                //       ),
-                                                //     ),
-                                              ],
-                                            );
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
+                                ):Container(
+                              child:Row(
+                                children: [
+                                  SizedBox(
+                                      height:25,
+                                      width: 25,
+                                      child: Image.asset('images/img_2.png',color: Colors.grey,)),
+                                 SizedBox(width: 10,),
+                                 widget.data.remark == null ?Offstage(): Text(widget.data.remark.toString())
+                                ],
+                              ),
                             ),
+                            SizedBox(height: 20,),
+                            // widget.data.document != null? Container(
+                            //     height: MediaQuery.of(context).size.height*0.4,
+                            //     width: MediaQuery.of(context).size.width,
+                            //     child: Image.network('https://freeze.talocare.co.in/public/${widget.data.document}',fit: BoxFit.contain,)):Offstage()
                           ],
                         ),
                       ),

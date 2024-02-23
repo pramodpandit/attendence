@@ -38,17 +38,14 @@ class _AddPostState extends State<AddPost> {
       if (event == 'Post successfully') {
         bloc.fetchPostData();
         Navigator.pop(context);
-
       }
     });
 
   }
-
   Future<void> _openGallery() async {
     print("Opening Image Picker");
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
     if (pickedFile != null) {
       setState(() {
         galleryFile = File(pickedFile.path);
@@ -64,7 +61,6 @@ class _AddPostState extends State<AddPost> {
     double widthScreen = MediaQuery.of(context).size.width;
     double heightScreen = MediaQuery.of(context).size.height;
     print("Height:${heightScreen} Width:${widthScreen}");
-
     if (galleryFile != null) {
       imageView = Stack(children: [
         //image container:::
@@ -93,7 +89,6 @@ class _AddPostState extends State<AddPost> {
         )
       ]);
     }
-
     return Scaffold(
       appBar: MyAppBar(title: "Add Post"),
       body: ListView(

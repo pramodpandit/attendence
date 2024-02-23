@@ -338,6 +338,9 @@ class _LeavesRecordsPageState extends State<LeavesRecordsPage> {
                                                 color: Colors.grey[700],
                                               ),),
                                             ),
+                                            // leaves[i].document != null? Container(
+                                            //     height: 100,
+                                            //     child: Image.network('https://freeze.talocare.co.in/public/${leaves[i].document}')):Offstage()
                                           ],
                                         ),
                                       ),
