@@ -22,20 +22,67 @@ class LeadsRepository {
   final ApiService _api;
 
   LeadsRepository(this.prefs, this._api);
+  
+  Future<ApiResponse2> fetchLeadSource()async {
+    try {
+      var response = await _api.getRequest("leadSource");
+      return ApiResponse2.fromJson(response, response['data']);
+    } catch (e) {
+      throw Exception('data is not avaible ${e.toString()}');
+    }
+  }
+  Future<ApiResponse2> fetchAllDesignationData()async{
+    try{
+      var response = await _api.getRequest("fetch_designation_data");
+      return ApiResponse2.fromJson(response,response['data']);
+    }catch(e){
+      throw Exception('data is not avaible ${e.toString()}');
+    }
+  }
+  Future<ApiResponse2> fetchAllDepartmentData()async{
+    try{
+      var response = await _api.getRequest("fetch_data");
+      return ApiResponse2.fromJson(response,response['data']);
+    }catch(e){
+      throw Exception('data is not avaible ${e.toString()}');
+    }
+  }
+  Future<ApiResponse2> fetchAllClientsData()async{
+    try{
+      var response = await _api.getRequest("fetch_all_client");
+      return ApiResponse2.fromJson(response,response['data']);
+    }catch(e){
+      throw Exception('data is not avaible ${e.toString()}');
+    }
+  }
+  Future<ApiResponse2> fetchTechnologyData()async{
+    try{
+      var response = await _api.getRequest("technology");
+      return ApiResponse2.fromJson(response,response['data']);
+    }catch(e){
+      throw Exception('data is not avaible ${e.toString()}');
+    }
+  }
+  Future<ApiResponse2> fetchPortfolioCategoryData()async{
+    try{
+      var response = await _api.getRequest("portfolio/category");
+      return ApiResponse2.fromJson(response,response['data']);
+    }catch(e){
+      throw Exception('data is not avaible ${e.toString()}');
+    }
+  }
 
-  Future<ApiResponse2> leadsData() async {
+  Future<ApiResponse2> leadsData(String type) async {
     try{
       SharedPreferences _pref = await SharedPreferences.getInstance();
       Map<String, dynamic> data = {
-       // "user_id": _pref.getString('uid')
+       "emp_id": _pref.getString('uid')
       };
-      var response= await _api.getRequest("leads", );
-
-      print('rahul ${response}');
+      var response= await _api.postRequest("leads",data);
       if (response == null) {
         ApiException.fromString("response null");
       }
-      return ApiResponse2.fromJson(response,response);
+      return ApiResponse2.fromJson(response,response["data"]["lead"][type]);
     }catch(e){
       print("data is not avaible ${e.toString()}");
       throw Exception('data is not avaible ${e.toString()}');
@@ -97,16 +144,17 @@ class LeadsRepository {
         List.from((res['data'] ?? []).map((e) => ClientDetail.fromJson(e))));
   }
 
-  Future<ApiResponse> createNewLead(String lead, {File? image}) async {
+  Future<ApiResponse> createNewLead(Map<String,dynamic> lead) async {
     Map<String, dynamic> data = {
-      'lead': lead,
+
     };
-    if (image != null) {
-      data['image'] = await MultipartFile.fromFile(image.path,
-          filename: image.path.split('/').last);
-    }
-    var res = await _api.postRequest('create_lead', data,
-        withFile: true, cacheRequest: false, requireToken: true);
+    data.addAll(lead);
+    // if (image != null) {
+    //   data['image'] = await MultipartFile.fromFile(image.path,
+    //       filename: image.path.split('/').last);
+    // }
+    var res = await _api.postRequest('lead/add_lead', data);
+    print("the main data is : ${res}");
     return ApiResponse.fromJson(res);
   }
 
@@ -258,7 +306,8 @@ class LeadsRepository {
   //lead repository
 
   Future<List<LeadSource>> allLeadSource() async{
-    var response= await _api.getRequest("leadSource",);
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var response= await _api.getRequest("leads");
     if(response==null){
       throw ApiException.fromString("response null");
     }

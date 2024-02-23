@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:office/data/repository/attendance_repo.dart';
 import 'package:office/data/repository/auth_repo.dart';
 import 'package:office/data/repository/complaint_repo.dart';
 import 'package:office/data/repository/e_bill_repo.dart';
@@ -150,6 +151,8 @@ class MyApp extends StatelessWidget {
             value: ProjectRepository(prefs, apiService)),
         Provider<WorkFromHomeRepository>.value(
             value: WorkFromHomeRepository(prefs, apiService)),
+        Provider<AttendanceRepository>.value(
+            value: AttendanceRepository(prefs, apiService)),
         // Provider<HiveService>.value(value: HiveService()),
         // ChangeNotifierProvider<ThemeBloc>(
         //   create: (_) => ThemeBloc(AppRepository(prefs, apiService)),

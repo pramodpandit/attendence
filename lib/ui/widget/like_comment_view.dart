@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:office/ui/widget/comment_sheet.dart';
 import 'package:office/ui/widget/like_sheet.dart';
 
@@ -22,41 +23,46 @@ class _LikeShareCommentState extends State<LikeShareComment> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        ValueListenableBuilder(
-          valueListenable: isLike,
-          builder: (BuildContext context, bool liked, Widget? child) {
-            return GestureDetector(
-              onTap: () {
-                isLike.value = !isLike.value;
-                },
-              child: Icon(
-                liked ? Icons.favorite : Icons.favorite_border,
-                color: Colors.red,
-                size: 18,
-              ),
-            );
-          },
-        ),
-        GestureDetector(
-          onTap: () {
-            showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(20),
-                ),
-              ),
-              clipBehavior: Clip.antiAliasWithSaveLayer,
-              builder: (BuildContext context) {
-                return LikeSheet(ctx: context);
+        Row(
+          children: [
+            ValueListenableBuilder(
+              valueListenable: isLike,
+              builder: (BuildContext context, bool liked, Widget? child) {
+                return GestureDetector(
+                  onTap: () {
+                    isLike.value = !isLike.value;
+                  },
+                  child: Icon(
+                    liked ? Icons.favorite : Icons.favorite_border,
+                    color: Colors.red,
+                    size: 18,
+                  ),
+                );
               },
-            );
-          },
-          child: Text(
-            "${widget.data.totalLike! }",
-            style: TextStyle(fontWeight: FontWeight.w600),
-          ),
+            ),
+            5.width,
+            GestureDetector(
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
+                  ),
+                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                  builder: (BuildContext context) {
+                    return LikeSheet(ctx: context);
+                  },
+                );
+              },
+              child: Text(
+                "${widget.data.totalLike! }",
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
+          ],
         ),
         const SizedBox(
           width: 15,
@@ -94,18 +100,18 @@ class _LikeShareCommentState extends State<LikeShareComment> {
             ],
           ),
         ),
-        const SizedBox(
-          width: 15,
-        ),
-        const Icon(
-          Icons.remove_red_eye,
-          color: Colors.black,
-          size: 18,
-        ),
-        Text(
-          "${widget.data.totalView}",
-          style: TextStyle(fontWeight: FontWeight.w600),
-        ),
+        // const SizedBox(
+        //   width: 15,
+        // ),
+        // const Icon(
+        //   Icons.remove_red_eye,
+        //   color: Colors.black,
+        //   size: 18,
+        // ),
+        // Text(
+        //   "${widget.data.totalView}",
+        //   style: TextStyle(fontWeight: FontWeight.w600),
+        // ),
         // Spacer(),
         // Container(
         //   padding: EdgeInsets.symmetric(horizontal: 8,vertical: 5),

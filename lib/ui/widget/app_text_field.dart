@@ -85,6 +85,10 @@ class AppTextField extends StatelessWidget {
               borderSide: BorderSide(color: const Color(0xffF4F5F7)),
               borderRadius: BorderRadius.circular(8),
             ),
+            disabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: const Color(0xffF4F5F7)),
+              borderRadius: BorderRadius.circular(8),
+            ),
             contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
             hintText: hint ?? '${title/*.toLowerCase()*/}',
             filled: true,

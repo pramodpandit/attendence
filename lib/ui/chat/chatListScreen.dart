@@ -113,7 +113,11 @@ class _ChatListScreenState extends State<ChatListScreen> {
                         return MoreSheet(
                             ctx: context,
                             items: ["Report", "Block",],
-                            icons: [Icon(Icons.report), Icon(Icons.block)]);
+                            icons: [Icon(Icons.report), Icon(Icons.block)],
+                            deleteOnTap: () {
+
+                            },
+                        );
                       },
                     );
                   },

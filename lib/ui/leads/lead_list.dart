@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:office/bloc/leads_bloc.dart';
 import 'package:office/ui/leads/add_lead.dart';
+import 'package:office/ui/leads/create_lead_page.dart';
 import 'package:office/ui/leads/lead_details.dart';
 import 'package:provider/provider.dart';
 import '../../data/repository/lead_repository.dart';
@@ -24,12 +25,12 @@ class _LeadListState extends State<LeadList> {
   void initState() {
     bloc = LeadsBloc(context.read<LeadsRepository>());
     super.initState();
-    bloc.fetchAllLeadSource();
-    bloc.fetchAllManageBy();
-    bloc.department();
-    bloc.technology();
-    bloc.leadFor();
-    bloc.getLeadData();
+    // bloc.fetchAllLeadSource();
+    // bloc.fetchAllManageBy();
+    // bloc.department();
+    // bloc.technology();
+    // bloc.leadFor();
+    bloc.getLeadData("total");
   }
   @override
   Widget build(BuildContext context) {
@@ -75,6 +76,25 @@ class _LeadListState extends State<LeadList> {
               ),
             ),
           ),
+          Positioned(
+            top: 56,
+            right: 10,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => Provider.value(
+                      value: bloc,
+                      child: const CreateNewLeadPage(),
+                    )
+                ));
+              },
+              child: const CircleAvatar(
+                backgroundColor: Colors.white,
+                radius: 15,
+                child: Icon(Icons.add, size: 18,),
+              ),
+            ),
+          ),
           Column(
             children: [
               const SizedBox(
@@ -82,26 +102,26 @@ class _LeadListState extends State<LeadList> {
               ),
               Expanded(
                 child: ValueListenableBuilder(
-                  valueListenable:bloc.balanceData,
-                  builder: (context, allLeads, child) {
-                    if(allLeads ==null){
+                  valueListenable:bloc.leadData,
+                  builder: (context, leadData, child) {
+                    if(leadData ==null){
                       return SizedBox(
                           height: MediaQuery.of(context).size.height * 0.7,
                           child: Center(child: CircularProgressIndicator()));
                     }
-                    if(allLeads.isEmpty){
+                    if(leadData.isEmpty){
                       return SizedBox(
                           height: MediaQuery.of(context).size.height * 0.7,
                           child: Center(child: Text("No data available")));
                     }
                     return ListView.builder(
-                      itemCount: allLeads.length,
+                      itemCount: leadData.length,
                       itemBuilder: (context, index) {
-                        var data = allLeads[index];
+                        var data = leadData[index];
                         return GestureDetector(
                           onTap: () {
-                            // Navigator.of(context).push(MaterialPageRoute(
-                            //     builder: (context) => const LeadDetails()));
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => LeadDetails(data: data)));
                           },
                           child: Container(
                             margin: const EdgeInsets.only(left: 25,right: 25,bottom: 25),
@@ -197,21 +217,69 @@ class _LeadListState extends State<LeadList> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           SizedBox(
-            height: 40,
-            width: 90,
+            height: 50,
+            width: 50,
             child: FloatingActionButton.extended(
                 shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(5.0))
                 ),
                 onPressed: () async{
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => Provider.value(
-                          value: bloc,
-                          child: const AddLead(),
-                        )),
-                  );
+                  showModalBottomSheet(
+                    context: context,
+                    backgroundColor: Colors.white,
+                    builder: (context) {
+                      List leadTypeData = [
+                        {"title": "Total", "value": "total"},
+                        {"title": "Open", "value": "open"},
+                        {"title": "Dead", "value": "dead"},
+                        {"title": "Converted", "value": "converted"},
+                      ];
+                    return Container(
+                      padding: EdgeInsets.all(10),
+                      width: double.infinity,
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: leadTypeData.length,
+                        itemBuilder: (context, index) {
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              bloc.leadData.value = null;
+                              bloc.leadType.value = leadTypeData[index]["value"];
+                              bloc.getLeadData(leadTypeData[index]["value"]);
+                            },
+                            child: ValueListenableBuilder(
+                              valueListenable: bloc.leadType,
+                              builder: (context, type, child) {
+                              return Container(
+                                margin: EdgeInsets.all(5),
+                                padding : EdgeInsets.symmetric(horizontal: 10,vertical: 3),
+                                child: Text(
+                                    leadTypeData[index]["title"],
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: type == leadTypeData[index]["value"]?Colors.white:Colors.black,
+                                    )),
+                                decoration: BoxDecoration(
+                                    color: type == leadTypeData[index]["value"]? Colors.green: Colors.white,
+                                    borderRadius: BorderRadius.circular(5)
+                                ),
+                              );
+                            },),
+                          );
+                        },
+                      ),
+                    );
+                  },);
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //       builder: (_) => Provider.value(
+                  //         value: bloc,
+                  //         child: const AddLead(),
+                  //       )),
+                  // );
                 },
                 backgroundColor: const  Color(0xFF009FE3),
                 label: AnimatedSwitcher(
@@ -227,22 +295,22 @@ class _LeadListState extends State<LeadList> {
                       ),
                   child: const Row(
                     children: [
-                      Padding(
-                        padding: EdgeInsets.only(right: 5.0),
+                      Center(
+                        // padding: EdgeInsets.only(right: 5.0),
                         child: Icon(
-                          PhosphorIcons.plus_circle_fill,
+                          Icons.filter_alt,
                           color: Colors.white,
                         ),
                       ),
-                      Text(
-                        "Lead",
-                        style: TextStyle(color: Colors.white),
-                      )
+                      // Text(
+                      //   "Lead",
+                      //   style: TextStyle(color: Colors.white),
+                      // )
                     ],
                   ),
                 )),
           ),
-          const SizedBox(height: 30,)
+          const SizedBox(height: 10,)
         ],
       ),
     );

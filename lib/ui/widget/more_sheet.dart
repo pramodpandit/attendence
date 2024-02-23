@@ -11,10 +11,11 @@ class MoreSheet extends StatefulWidget {
   final BuildContext ctx;
   final List<String> items;
   final List<Widget> icons;
+  final VoidCallback deleteOnTap;
   //final ScrollController _scrollController = ScrollController();
 
   MoreSheet(
-      {super.key, required this.ctx, required this.items, required this.icons});
+      {super.key, required this.ctx, required this.items, required this.icons,required this.deleteOnTap});
 
   @override
   State<MoreSheet> createState() => _MoreSheetState();
@@ -108,9 +109,7 @@ class _MoreSheetState extends State<MoreSheet> {
                                                     fontWeight: FontWeight.w500,
                                                     fontSize: 14),
                                               ),
-                                            ):widget.items[i] == 'Delete'?InkWell(onTap: (){
-                                              //var result = bloc.D
-                                              },child:  Text(
+                                            ):widget.items[i] == 'Delete'?InkWell(onTap: widget.deleteOnTap,child:  Text(
                                                 widget.items[i],
                                                 style: TextStyle(
                                                     fontWeight: FontWeight.w500,

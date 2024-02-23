@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
+import 'package:office/data/model/user.dart';
 import 'package:office/ui/project/menus/logs.dart';
 
 import '../profile/menus/basic_info.dart';
@@ -11,7 +13,8 @@ import '../project/menus/project_notes_list.dart';
 import '../project/menus/project_overview.dart';
 
 class LeadDetails extends StatefulWidget {
-  const LeadDetails({Key? key}) : super(key: key);
+  final Map<String, dynamic> data;
+  const LeadDetails({Key? key,required this.data}) : super(key: key);
 
   @override
   State<LeadDetails> createState() => _LeadDetailsState();
@@ -110,8 +113,8 @@ class _LeadDetailsState extends State<LeadDetails> {
                         children: [
                           const SizedBox(height: 5,),
                           const SizedBox(height: 10,),
-                          const DetailsContainer(
-                            title:"Jay singh",
+                          DetailsContainer(
+                            title:"${widget.data['createdby_fname']} ${widget.data['createdby_lname']}",
                             //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
                             heading: 'Created By', isHtml: false,
                           ),
@@ -121,8 +124,8 @@ class _LeadDetailsState extends State<LeadDetails> {
                             length: 270.w,
                           ),
                           const SizedBox(height: 10,),
-                          const DetailsContainer(
-                            title:"2023-06-15",
+                          DetailsContainer(
+                            title:"${DateFormat.yMMMd().format(DateTime.parse(widget.data['created_date']))}",
                             //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
                             heading: 'Created At', isHtml: false,
                           ),
@@ -132,8 +135,8 @@ class _LeadDetailsState extends State<LeadDetails> {
                             length: 270.w,
                           ),
                           const SizedBox(height: 10,),
-                          const DetailsContainer(
-                            title:"Jay",
+                          DetailsContainer(
+                            title:"${widget.data['clientsurname']} ${widget.data['clientfirstname'] } ${widget.data['clientlastname']}",
                             //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
                             heading: 'Client Name', isHtml: false,
                           ),
@@ -143,8 +146,8 @@ class _LeadDetailsState extends State<LeadDetails> {
                             length: 270.w,
                           ),
                           const SizedBox(height: 10,),
-                          const DetailsContainer(
-                            title:"Open",
+                          DetailsContainer(
+                            title:"${widget.data['status']}",
                             //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
                             heading: 'Status', isHtml: false,
                           ),

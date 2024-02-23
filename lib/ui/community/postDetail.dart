@@ -134,6 +134,9 @@ class _PostDetailState extends State<PostDetail> {
                           return Container(
                             //padding: EdgeInsets.only(top: 300),
                             child: MoreSheet(
+                              deleteOnTap: () {
+
+                              },
                               ctx: context,
                               icons: [
                                 Icon(PhosphorIcons.flag),

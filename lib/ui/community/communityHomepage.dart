@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:intl/intl.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:office/data/repository/post_repo.dart';
 import 'package:office/ui/community/addPost.dart';
 import 'package:office/ui/community/communityProfile.dart';
@@ -219,6 +220,13 @@ class _PostListState extends State<PostList> {
             height: MediaQuery.of(context).size.height,
             child: Column(
               children: [
+                block.feedbackData.isEmpty?
+                    Column(
+                      children: [
+                        200.height,
+                        Text("No posts yet"),
+                      ],
+                    ):
                 Expanded(
                   child:
                   ListView.builder(
@@ -228,275 +236,271 @@ class _PostListState extends State<PostList> {
                         var data  = block.feedbackData[index];
                         var date = data.dateTime!.split(' ');
                         var date1 = date[0] ;
-                        if(data == null){
-                          return Center(child: CircularProgressIndicator());
-                        }else{
-                          return Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                              margin: const EdgeInsets.only(left: 20, right: 20, bottom: 15),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(15),
-                                  color: Colors.white,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      spreadRadius: 0,
-                                      blurRadius: 3,
-                                      color: Colors.black.withOpacity(0.2),
-                                    ),
-                                  ]),
-                              child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          margin: const EdgeInsets.only(left: 20, right: 20, bottom: 15),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(15),
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  spreadRadius: 0,
+                                  blurRadius: 3,
+                                  color: Colors.black.withOpacity(0.2),
+                                ),
+                              ]),
+                          child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.of(context).push(MaterialPageRoute(
-                                              builder: (context) => const CommunityProfile()));
-                                        },
-                                        child: const CircleAvatar(
-                                          child: Icon(Icons.person),
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        width: 10,
-                                      ),
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "Jhon Smith",
-                                            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),maxLines: 1,
-                                          ),
-                                          Text(
-                                            DateFormat.yMMMd().format(DateTime.parse(date1)),
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 14,
-                                                color: Colors.grey),
-                                          ),
-                                        ],
-                                      ),
-                                      Spacer(),
-                                      GestureDetector(
-                                        onTap: () async{
-                                          final SharedPreferences prefs =await SharedPreferences.getInstance();
-                                          showModalBottomSheet(
-                                            context: context,
-                                            isScrollControlled: false,
-                                            //backgroundColor: Colors.white,
-                                            shape: const RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.vertical(
-                                                top: Radius.circular(20),
-                                              ),
-                                            ),
-                                            clipBehavior: Clip.antiAliasWithSaveLayer,
-                                            builder: (BuildContext context) {
-                                              return Container(
-                                                padding: EdgeInsets.only(top: 150),
-                                                child: MoreSheet(
-                                                  ctx: context,
-                                                  icons: [
-                                                    Icon(PhosphorIcons.flag),
-                                                    Icon(PhosphorIcons.prohibit),
-                                                    Icon(Icons.cancel_outlined),
-                                                    Icon(PhosphorIcons.share),
-                                                    prefs.getString('uid')==data.userId?InkWell(
-                                                        onTap: (){
-                                                          Navigator.pop(context);
-                                                          var result= block.DeletePost(data.postId!);
-                                                          if(result !=null){
-                                                            print(result.toString());
-                                                            block.feedbackData.remove(data);
-                                                          }
-                                                          },
-                                                        child: Icon(Icons.delete)):Icon(Icons.border_all,color: Colors.white,)
-                                                  ],
-                                                  items: [
-                                                    'Report',
-                                                    "Don't recommend Post",
-                                                    'Not interested',
-                                                    'Share',
-                                                    prefs.getString('uid')==data.userId?'Delete':''
-                                                  ],
-                                                ),
-                                              );
-                                            },
-                                          );
-                                        },
-                                        child: Icon(
-                                          Icons.more_horiz,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                      // Expanded(
-                                      //   child: DropdownButtonFormField(
-                                      //     // underline: const SizedBox(),
-                                      //     icon: const Icon(
-                                      //       Icons.more_horiz,
-                                      //       color: Colors.grey,
-                                      //     ),
-                                      //     items: items.map((String items) {
-                                      //       return DropdownMenuItem(
-                                      //         value: items,
-                                      //         child: Text(""),
-                                      //       );
-                                      //     }).toList(),
-                                      //     onChanged: (String? newValue) {},
-                                      //   ),
-                                      // ),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  //text Post
-                                  RichText(
-                                    text: TextSpan(
-                                      text:data.text,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 12,
-                                          height: 1.3,
-                                          color: Color.fromRGBO(74, 74, 74, 1)),
-                                    ),
-                                    textAlign: TextAlign.start,
-                                    maxLines: 4,
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
                                   GestureDetector(
                                     onTap: () {
-                                      Navigator.of(context)
-                                          .push(MaterialPageRoute(builder: (context) => PostDetail(data: data,)));
+                                      Navigator.of(context).push(MaterialPageRoute(
+                                          builder: (context) => const CommunityProfile()));
                                     },
-                                    child: ClipRRect(
-                                      borderRadius: const BorderRadius.only(
-                                        topRight: Radius.circular(30),
-                                        bottomLeft: Radius.circular(30),
-                                      ),
-                                      child:data.image ==null?Container(height: 0,width: 0,):Image.network(
-                                        "https://freeze.talocare.co.in/${data.image}",
-                                        width: double.infinity,
-                                        fit: BoxFit.cover,
-                                      ),
+                                    child: const CircleAvatar(
+                                      child: Icon(Icons.person),
                                     ),
                                   ),
                                   const SizedBox(
-                                    height: 10,
+                                    width: 10,
                                   ),
-                                  LikeShareComment(data: data,)
-                                  // Row(
-                                  //   children: [
-                                  //     ValueListenableBuilder(
-                                  //       valueListenable: isLike,
-                                  //       builder: (BuildContext context, bool liked, Widget? child) {
-                                  //         return GestureDetector(
-                                  //           onTap: () {
-                                  //             isLike.value = !isLike.value;
-                                  //           },
-                                  //           child: Icon(
-                                  //             liked ? Icons.favorite : Icons.favorite_border,
-                                  //             color: Colors.red,
-                                  //             size: 18,
-                                  //           ),
-                                  //         );
-                                  //       },
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Jhon Smith",
+                                        style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),maxLines: 1,
+                                      ),
+                                      Text(
+                                        DateFormat.yMMMd().format(DateTime.parse(date1)),
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14,
+                                            color: Colors.grey),
+                                      ),
+                                    ],
+                                  ),
+                                  Spacer(),
+                                  GestureDetector(
+                                    onTap: () async{
+                                      final SharedPreferences prefs =await SharedPreferences.getInstance();
+                                      showModalBottomSheet(
+                                        context: context,
+                                        isDismissible: true,
+                                        // isScrollControlled: false,
+                                        //backgroundColor: Colors.white,
+                                        shape: const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.vertical(
+                                            top: Radius.circular(20),
+                                          ),
+                                        ),
+                                        // clipBehavior: Clip.antiAliasWithSaveLayer,
+                                        builder: (BuildContext context) {
+                                          return Container(
+                                            padding: EdgeInsets.only(top: 150),
+                                            child: MoreSheet(
+                                              ctx: context,
+                                              deleteOnTap: () {
+                                                Navigator.pop(context);
+                                                var result= block.DeletePost(data.postId!);
+                                                if(result !=null){
+                                                  print(result.toString());
+                                                  block.feedbackData.remove(data);
+                                                }
+                                              },
+                                              icons: [
+                                                Icon(PhosphorIcons.flag),
+                                                Icon(PhosphorIcons.prohibit),
+                                                Icon(Icons.cancel_outlined),
+                                                Icon(PhosphorIcons.share),
+                                                prefs.getString('uid')==data.userId?Icon(Icons.delete):Icon(Icons.border_all,color: Colors.white,)
+                                              ],
+                                              items: [
+                                                'Report',
+                                                "Don't recommend Post",
+                                                'Not interested',
+                                                'Share',
+                                                prefs.getString('uid')==data.userId?'Delete':''
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    },
+                                    child: Icon(
+                                      Icons.more_horiz,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  // Expanded(
+                                  //   child: DropdownButtonFormField(
+                                  //     // underline: const SizedBox(),
+                                  //     icon: const Icon(
+                                  //       Icons.more_horiz,
+                                  //       color: Colors.grey,
                                   //     ),
-                                  //     const SizedBox(
-                                  //       width: 5,
-                                  //     ),
-                                  //     GestureDetector(
-                                  //       onTap: () {
-                                  //         showModalBottomSheet(
-                                  //           context: context,
-                                  //           isScrollControlled: true,
-                                  //           shape: const RoundedRectangleBorder(
-                                  //             borderRadius: BorderRadius.vertical(
-                                  //               top: Radius.circular(20),
-                                  //             ),
-                                  //           ),
-                                  //           clipBehavior: Clip.antiAliasWithSaveLayer,
-                                  //           builder: (BuildContext context) {
-                                  //             return LikeSheet(ctx: context);
-                                  //           },
-                                  //         );
-                                  //       },
-                                  //       child: const Text(
-                                  //         "1.1K",
-                                  //         style: TextStyle(fontWeight: FontWeight.w600),
-                                  //       ),
-                                  //     ),
-                                  //     const SizedBox(
-                                  //       width: 15,
-                                  //     ),
-                                  //     GestureDetector(
-                                  //       onTap: () {
-                                  //         showModalBottomSheet(
-                                  //           context: context,
-                                  //           isScrollControlled: true,
-                                  //           shape: const RoundedRectangleBorder(
-                                  //             borderRadius: BorderRadius.vertical(
-                                  //               top: Radius.circular(20),
-                                  //             ),
-                                  //           ),
-                                  //           clipBehavior: Clip.antiAliasWithSaveLayer,
-                                  //           builder: (BuildContext context) {
-                                  //             return CommentSheet(ctx: context);
-                                  //           },
-                                  //         );
-                                  //       },
-                                  //       child: Row(
-                                  //         children: [
-                                  //           Icon(
-                                  //             Icons.comment,
-                                  //             color: Colors.yellow.shade700,
-                                  //             size: 18,
-                                  //           ),
-                                  //           const SizedBox(
-                                  //             width: 5,
-                                  //           ),
-                                  //           const Text(
-                                  //             "59 comments",
-                                  //             style: TextStyle(fontWeight: FontWeight.w600),
-                                  //           ),
-                                  //         ],
-                                  //       ),
-                                  //     ),
-                                  //     const SizedBox(
-                                  //       width: 15,
-                                  //     ),
-                                  //     const Icon(
-                                  //       Icons.remove_red_eye,
-                                  //       color: Colors.black,
-                                  //       size: 18,
-                                  //     ),
-                                  //     const SizedBox(
-                                  //       width: 5,
-                                  //     ),
-                                  //     const Text(
-                                  //       "33,456",
-                                  //       style: TextStyle(fontWeight: FontWeight.w600),
-                                  //     ),
-                                  //     // Spacer(),
-                                  //     // Container(
-                                  //     //   padding: EdgeInsets.symmetric(horizontal: 8,vertical: 5),
-                                  //     //   decoration: BoxDecoration(
-                                  //     //     borderRadius: BorderRadius.only(
-                                  //     //       topRight: Radius.circular(10),
-                                  //     //       bottomLeft: Radius.circular(10),
-                                  //     //     ),
-                                  //     //     color: Colors.blue,
-                                  //     //   ),
-                                  //     //   child: Text("View Post",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w500),),
-                                  //     // ),
-                                  //   ],
+                                  //     items: items.map((String items) {
+                                  //       return DropdownMenuItem(
+                                  //         value: items,
+                                  //         child: Text(""),
+                                  //       );
+                                  //     }).toList(),
+                                  //     onChanged: (String? newValue) {},
+                                  //   ),
                                   // ),
                                 ],
                               ),
-                            );
-                        }
+                              SizedBox(
+                                height: 10,
+                              ),
+                              //text Post
+                              RichText(
+                                text: TextSpan(
+                                  text:data.text,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 12,
+                                      height: 1.3,
+                                      color: Color.fromRGBO(74, 74, 74, 1)),
+                                ),
+                                textAlign: TextAlign.start,
+                                maxLines: 4,
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context)
+                                      .push(MaterialPageRoute(builder: (context) => PostDetail(data: data,)));
+                                },
+                                child: ClipRRect(
+                                  borderRadius: const BorderRadius.only(
+                                    topRight: Radius.circular(30),
+                                    bottomLeft: Radius.circular(30),
+                                  ),
+                                  child:data.image ==null?Container(height: 0,width: 0,):Image.network(
+                                    "https://freeze.talocare.co.in/${data.image}",
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              LikeShareComment(data: data,)
+                              // Row(
+                              //   children: [
+                              //     ValueListenableBuilder(
+                              //       valueListenable: isLike,
+                              //       builder: (BuildContext context, bool liked, Widget? child) {
+                              //         return GestureDetector(
+                              //           onTap: () {
+                              //             isLike.value = !isLike.value;
+                              //           },
+                              //           child: Icon(
+                              //             liked ? Icons.favorite : Icons.favorite_border,
+                              //             color: Colors.red,
+                              //             size: 18,
+                              //           ),
+                              //         );
+                              //       },
+                              //     ),
+                              //     const SizedBox(
+                              //       width: 5,
+                              //     ),
+                              //     GestureDetector(
+                              //       onTap: () {
+                              //         showModalBottomSheet(
+                              //           context: context,
+                              //           isScrollControlled: true,
+                              //           shape: const RoundedRectangleBorder(
+                              //             borderRadius: BorderRadius.vertical(
+                              //               top: Radius.circular(20),
+                              //             ),
+                              //           ),
+                              //           clipBehavior: Clip.antiAliasWithSaveLayer,
+                              //           builder: (BuildContext context) {
+                              //             return LikeSheet(ctx: context);
+                              //           },
+                              //         );
+                              //       },
+                              //       child: const Text(
+                              //         "1.1K",
+                              //         style: TextStyle(fontWeight: FontWeight.w600),
+                              //       ),
+                              //     ),
+                              //     const SizedBox(
+                              //       width: 15,
+                              //     ),
+                              //     GestureDetector(
+                              //       onTap: () {
+                              //         showModalBottomSheet(
+                              //           context: context,
+                              //           isScrollControlled: true,
+                              //           shape: const RoundedRectangleBorder(
+                              //             borderRadius: BorderRadius.vertical(
+                              //               top: Radius.circular(20),
+                              //             ),
+                              //           ),
+                              //           clipBehavior: Clip.antiAliasWithSaveLayer,
+                              //           builder: (BuildContext context) {
+                              //             return CommentSheet(ctx: context);
+                              //           },
+                              //         );
+                              //       },
+                              //       child: Row(
+                              //         children: [
+                              //           Icon(
+                              //             Icons.comment,
+                              //             color: Colors.yellow.shade700,
+                              //             size: 18,
+                              //           ),
+                              //           const SizedBox(
+                              //             width: 5,
+                              //           ),
+                              //           const Text(
+                              //             "59 comments",
+                              //             style: TextStyle(fontWeight: FontWeight.w600),
+                              //           ),
+                              //         ],
+                              //       ),
+                              //     ),
+                              //     const SizedBox(
+                              //       width: 15,
+                              //     ),
+                              //     const Icon(
+                              //       Icons.remove_red_eye,
+                              //       color: Colors.black,
+                              //       size: 18,
+                              //     ),
+                              //     const SizedBox(
+                              //       width: 5,
+                              //     ),
+                              //     const Text(
+                              //       "33,456",
+                              //       style: TextStyle(fontWeight: FontWeight.w600),
+                              //     ),
+                              //     // Spacer(),
+                              //     // Container(
+                              //     //   padding: EdgeInsets.symmetric(horizontal: 8,vertical: 5),
+                              //     //   decoration: BoxDecoration(
+                              //     //     borderRadius: BorderRadius.only(
+                              //     //       topRight: Radius.circular(10),
+                              //     //       bottomLeft: Radius.circular(10),
+                              //     //     ),
+                              //     //     color: Colors.blue,
+                              //     //   ),
+                              //     //   child: Text("View Post",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w500),),
+                              //     // ),
+                              //   ],
+                              // ),
+                            ],
+                          ),
+                        );
                       }),
                 ),
                 SizedBox(height: 120,)

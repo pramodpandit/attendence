@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:nb_utils/nb_utils.dart';
+import 'package:office/bloc/attendence_bloc.dart';
 import 'package:office/bloc/holiday_bloc.dart';
 import 'package:office/data/model/holiday_model.dart';
+import 'package:office/data/repository/attendance_repo.dart';
 import 'package:office/data/repository/holiday_repo.dart';
 import 'package:office/ui/attendance/attendancePolicy.dart';
 import 'package:provider/provider.dart';
@@ -20,7 +23,7 @@ class AttendanceScreen extends StatefulWidget {
 }
 
 class _AttendanceScreenState extends State<AttendanceScreen> {
-  late HolidayEventBloc holidayBloc;
+  late AttendanceBloc attendanceBloc;
   int month = DateTime.now().month;
   var value;
   var condition;
@@ -28,8 +31,9 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
   @override
   void initState() {
-    holidayBloc = HolidayEventBloc(context.read<HolidayEventRepository>());
+    attendanceBloc = AttendanceBloc(context.read<AttendanceRepository>());
     super.initState();
+    attendanceBloc.fetchAttendanceData();
   }
 
   @override
@@ -159,7 +163,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                               ),
                             ),
                             ValueListenableBuilder(
-                                valueListenable: holidayBloc.startYear,
+                                valueListenable: attendanceBloc.startYear,
                                 builder: (context, DateTime? date, _) {
                                   return InkWell(
                                     // onTap: () async {
@@ -194,6 +198,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                                     );
                                                   }),
                                               onChanged: (int? value) {
+                                                attendanceBloc.allAttendanceData.value = null;
                                                 Navigator.pop(
                                                     context, value);
                                               },
@@ -223,8 +228,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                       if (selectedYear != null) {
                                         DateTime selectedDate =
                                         DateTime(selectedYear);
-                                        await holidayBloc.updateStartYear(selectedDate);
-                                        await holidayBloc.holidayList();
+                                        await attendanceBloc.updateStartYear(selectedDate);
+                                        await attendanceBloc.fetchAttendanceData();
                                         print("$selectedDate");
                                       }
                                     },
@@ -274,7 +279,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                               ),
                             ),
                             ValueListenableBuilder(
-                              valueListenable: holidayBloc.startmonth,
+                              valueListenable: attendanceBloc.startmonth,
                               builder: (context, DateTime? monthDate, _) {
                                 return InkWell(
                                   onTap: () async {
@@ -301,6 +306,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                               );
                                             }),
                                             onChanged: (int? value) {
+                                              attendanceBloc.allAttendanceData.value = null;
                                               Navigator.pop(context, value);
                                             },
                                           ),
@@ -328,12 +334,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
                                     if (selectedMonth != null) {
                                       DateTime selectedDate = DateTime(
-                                        holidayBloc.year.value?.year ??
+                                        attendanceBloc.year.value?.year ??
                                             DateTime.now().year,
                                         selectedMonth,
                                       );
-                                      await holidayBloc.updateStartMonth(selectedDate);
-                                      await holidayBloc.holidayList();
+                                      await attendanceBloc.updateStartMonth(selectedDate);
+                                      await attendanceBloc.fetchAttendanceData();
                                       print("$selectedDate");
                                     }
                                   },
@@ -379,11 +385,11 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                     )
                         :condition =='2'?
                     ValueListenableBuilder(
-                      valueListenable: holidayBloc.calendar,
+                      valueListenable: attendanceBloc.calendar,
                       builder: (context, calendarFormatValue, child) {
                         return ValueListenableBuilder(
-                          valueListenable: holidayBloc.holidayData,
-                          builder: (BuildContext context, List<Holiday> value, Widget? child) {
+                          valueListenable: attendanceBloc.allAttendanceData,
+                          builder: (BuildContext context, value, Widget? child) {
                             Map<DateTime, List<dynamic>> eventsList = {};
                             final events = LinkedHashMap(
                               equals: isSameDay,
@@ -391,15 +397,15 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                             List _getEventsForDay(DateTime day) {
                               return events[day] ?? [];
                             }
-                            print("focusDay1 ${holidayBloc.focusDay}");
+                            print("focusDay1 ${attendanceBloc.focusDay}");
                            return TableCalendar(
                               eventLoader: (day) {
                               return _getEventsForDay(day);
                               },
                               firstDay: DateTime.utc(DateTime.now().year, 01, 01),
                               lastDay: DateTime.utc(DateTime.now().year, 12, 31),
-                              focusedDay: holidayBloc.focusDay,
-                              currentDay: holidayBloc.focusDay/*DateTime.now()*/,
+                              focusedDay: attendanceBloc.focusDay,
+                              currentDay: attendanceBloc.focusDay/*DateTime.now()*/,
                               headerStyle: const HeaderStyle(
                                 formatButtonVisible: false,
                               ),
@@ -413,20 +419,20 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                               calendarFormat: calendarFormatValue,
                               onPageChanged: (focusedDay) {
                                 if(focusedDay.month != month){
-                                  print(holidayBloc.focusDay);
+                                  print(attendanceBloc.focusDay);
                                   month = focusedDay.month;
-                                  holidayBloc.focusDay = focusedDay;
+                                  attendanceBloc.focusDay = focusedDay;
                                 }
                               },
                               onFormatChanged: (format) {
                                 if (value != format) {
-                                  holidayBloc.calendar.value = format;
+                                  attendanceBloc.calendar.value = format;
                                 }
                               },
                              onDaySelected: (selectedDay, focusedDay) {
                                 print("Selected Day: $selectedDay");
                                setState(() {
-                                 holidayBloc.focusDay = selectedDay;
+                                 attendanceBloc.focusDay = selectedDay;
                                });
                              },
                               availableCalendarFormats: const {
@@ -439,11 +445,11 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                       },
                     ):
                     ValueListenableBuilder(
-                      valueListenable: holidayBloc.calendar,
+                      valueListenable: attendanceBloc.calendar,
                       builder: (context, calendarFormatValue, child) {
                         return ValueListenableBuilder(
-                          valueListenable: holidayBloc.holidayData,
-                          builder: (BuildContext context, List<Holiday> value, Widget? child) {
+                          valueListenable: attendanceBloc.allAttendanceData,
+                          builder: (BuildContext context, value, Widget? child) {
                             Map<DateTime, List<dynamic>> eventsList = {};
                             final events = LinkedHashMap(
                               equals: isSameDay,
@@ -451,15 +457,15 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                             List _getEventsForDay(DateTime day) {
                               return events[day] ?? [];
                             }
-                            print("focusDay1 ${holidayBloc.focusDay}");
+                            print("focusDay1 ${attendanceBloc.focusDay}");
                             return TableCalendar(
                               eventLoader: (day) {
                                 return _getEventsForDay(day);
                               },
                               firstDay: DateTime.utc(DateTime.now().year, 01, 01),
                               lastDay: DateTime.utc(DateTime.now().year, 12, 31),
-                              focusedDay: holidayBloc.focusDay,
-                              currentDay: holidayBloc.focusDay/*DateTime.now()*/,
+                              focusedDay: attendanceBloc.focusDay,
+                              currentDay: attendanceBloc.focusDay/*DateTime.now()*/,
                               headerStyle: const HeaderStyle(
                                 formatButtonVisible: false,
                               ),
@@ -473,20 +479,20 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                               calendarFormat: calendarFormatValue,
                               onPageChanged: (focusedDay) {
                                 if(focusedDay.month != month){
-                                  print(holidayBloc.focusDay);
+                                  print(attendanceBloc.focusDay);
                                   month = focusedDay.month;
-                                  holidayBloc.focusDay = focusedDay;
+                                  attendanceBloc.focusDay = focusedDay;
                                 }
                               },
                               onFormatChanged: (format) {
                                 if (value != format) {
-                                  holidayBloc.calendar.value = format;
+                                  attendanceBloc.calendar.value = format;
                                 }
                               },
                               onDaySelected: (selectedDay, focusedDay) {
                                 print("Selected Day: $selectedDay");
                                 setState(() {
-                                  holidayBloc.focusDay = selectedDay;
+                                  attendanceBloc.focusDay = selectedDay;
                                 });
                               },
                               availableCalendarFormats: const {
@@ -500,88 +506,98 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                     ),
                     SizedBox(height: 20,),
                     Expanded(
-                              child:
-                              Container(
-                                padding: const EdgeInsets.only(bottom: 20),
-                                color: Colors.grey.shade100.withOpacity(0.5),
-                                child: ValueListenableBuilder(
-                                      valueListenable: holidayBloc.isAttendanceLoading,
-                                      builder: (BuildContext context, bool isLoading,
-                                          Widget? child) {
-                                        return ValueListenableBuilder(
-                                          valueListenable: holidayBloc.attendanceData,
-                                          builder: (BuildContext context,
-                                              List attendance, Widget? child) {
-                                            if (isLoading) {
-                                              return const Center(
-                                                child: CircularProgressIndicator(),
-                                              );
-                                            }
-                                            // if(attendance.isEmpty){
-                                            //   return Center(
-                                            //     child: Text(
-                                            //       "No Data Found",
-                                            //       style: TextStyle(
-                                            //         fontWeight: FontWeight.w600,
-                                            //         fontSize: 18,
-                                            //       ),
-                                            //     ),
-                                            //   );
-                                            // }
-                                            return Column(
-                                              children: [
-                                                Container(
-                                                  margin: const EdgeInsets.symmetric(horizontal: 20),
-                                                  padding: const EdgeInsets.only(left: 10, top: 10, bottom: 10,right: 10),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.grey.withOpacity(0.3),
-                                                    boxShadow: [
-                                                      BoxShadow(
-                                                          spreadRadius: 0,
-                                                          blurRadius: 3,
-                                                          color: Colors.black.withOpacity(0.1))
-                                                    ],
-                                                    borderRadius: BorderRadius.circular(10),
-                                                  ),
-                                                  child: Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                    children: [
-                                                      Text('Date'
-                                                      ,style: TextStyle(fontSize: 12),
-                                                      ),
-                                                      Row(
-                                                        children: [
-                                                          Text('Punchin' ,style: TextStyle(fontSize: 12),),
-                                                          Icon(PhosphorIcons.arrow_up,size: 15,color: Colors.green,)
-                                                        ],
-                                                      ),
-                                                      Row(
-                                                        children: [
-                                                          Text('Punchout' ,style: TextStyle(fontSize: 12),),
-                                                          Icon(PhosphorIcons.arrow_down,size: 15,color: Colors.red,)
-                                                        ],
-                                                      ),
-                                                      Text('Working Hour' ,style: TextStyle(fontSize: 12),),
-                                                      Text('Status' ,style: TextStyle(fontSize: 12),),
-                                                    ],
-                                                  )
-                                                ),
-                                                Expanded(
-                                                  child: ListView.builder(
-                                                    physics: const ScrollPhysics(),
-                                                    itemCount: 2,
-                                                    // attendance.length,
-                                                    itemBuilder: (_, index) {
-                                                      return AttendanceList();
-                                                    },
-                                                  ),
-                                                ),
-                                              ],
+                      child:
+                      Container(
+                        padding: const EdgeInsets.only(bottom: 20),
+                        color: Colors.grey.shade100.withOpacity(0.5),
+                        child: ValueListenableBuilder(
+                              valueListenable: attendanceBloc.isAttendanceLoading,
+                              builder: (BuildContext context, bool isLoading,
+                                  Widget? child) {
+                                return ValueListenableBuilder(
+                                  valueListenable: attendanceBloc.attendanceData,
+                                  builder: (BuildContext context,
+                                      List attendance, Widget? child) {
+                                    if (isLoading) {
+                                      return const Center(
+                                        child: CircularProgressIndicator(),
+                                      );
+                                    }
+                                    // if(attendance.isEmpty){
+                                    //   return Center(
+                                    //     child: Text(
+                                    //       "No Data Found",
+                                    //       style: TextStyle(
+                                    //         fontWeight: FontWeight.w600,
+                                    //         fontSize: 18,
+                                    //       ),
+                                    //     ),
+                                    //   );
+                                    // }
+                                    return Column(
+                                      children: [
+                                        Container(
+                                          margin: const EdgeInsets.symmetric(horizontal: 20),
+                                          padding: const EdgeInsets.only(left: 10, top: 10, bottom: 10,right: 10),
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey.withOpacity(0.3),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                  spreadRadius: 0,
+                                                  blurRadius: 3,
+                                                  color: Colors.black.withOpacity(0.1))
+                                            ],
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text('Date'
+                                              ,style: TextStyle(fontSize: 12),
+                                              ),
+                                              Row(
+                                                children: [
+                                                  Text('Punchin' ,style: TextStyle(fontSize: 12),),
+                                                  Icon(PhosphorIcons.arrow_up,size: 15,color: Colors.green,)
+                                                ],
+                                              ),
+                                              Row(
+                                                children: [
+                                                  Text('Punchout' ,style: TextStyle(fontSize: 12),),
+                                                  Icon(PhosphorIcons.arrow_down,size: 15,color: Colors.red,)
+                                                ],
+                                              ),
+                                              Text('Working Hour' ,style: TextStyle(fontSize: 12),),
+                                              Text('Status' ,style: TextStyle(fontSize: 12),),
+                                            ],
+                                          )
+                                        ),
+                                        Expanded(
+                                          child: ValueListenableBuilder(
+                                            valueListenable: attendanceBloc.allAttendanceData,
+                                            builder: (context, allData, child) {
+                                              if(allData == null){
+                                                return Center(child: CircularProgressIndicator(strokeWidth: 2,));
+                                              }
+                                              if(allData.isEmpty){
+                                                return Center(child: Text("No data available"));
+                                              }
+                                            return ListView.builder(
+                                              physics: const ScrollPhysics(),
+                                              itemCount: allData.length,
+                                              // attendance.length,
+                                              itemBuilder: (_, index) {
+                                                return AttendanceList(data: allData[index]);
+                                              },
                                             );
-                                          },
-                                        );
-                                      },
-                                    ),
+                                          },),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            ),
 
                       ),
                     ),
@@ -597,9 +613,19 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 }
 
 class AttendanceList extends StatelessWidget {
-  // final int index;
-  // final List<Holiday> data;
-  const AttendanceList({super.key});
+  final Map data;
+  const AttendanceList({super.key,required this.data});
+
+  String calculateTimeGap() {
+    if(data["check_in"]!=null && data["checkout"] != null){
+      Duration timeGap = DateTime.parse(data["check_in"]).difference(DateTime.parse(data["checkout"]));
+      int hours = timeGap.inHours.abs();
+      int minutes = (timeGap.inMinutes - hours * 60).abs();
+      // int seconds = (timeGap.inSeconds - hours * 3600 - minutes * 60);
+      return "${hours.toString().padLeft(2,'0')}:${minutes.toString().padLeft(2, '0')}";
+    }
+    return "";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -626,7 +652,7 @@ class AttendanceList extends StatelessWidget {
                   Text(
                     // DateFormat.E().format(
                     //         DateTime.parse("${data[index].holidayDate}")) ??
-                        "Thu",
+                        DateFormat("EEE").format(DateTime.parse(data["mark_date"])),
                     style: const TextStyle(
                       fontSize: 11,
                       fontFamily: 'Poppins',
@@ -637,7 +663,7 @@ class AttendanceList extends StatelessWidget {
                     // DateTime.parse("${data[index].holidayDate}")
                     //         .day
                     //         .toString() ??
-                        "06",
+                    "${DateTime.parse(data["mark_date"]).day}",
                     style: const TextStyle(
                       fontSize: 19,
                       fontWeight: FontWeight.bold,
@@ -652,24 +678,24 @@ class AttendanceList extends StatelessWidget {
               //   width: 10,
               // ),
               Text(
-                // data[index].reason ?? 
-                "9:10 AM",
+                // data[index].reason ??
+                data["check_in"]!=null?DateFormat("h:mm a").format(DateTime.parse(data["check_in"])):"",
                 style: const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
                 ),
               ),
                Text(
-                // data[index].reason ?? 
-                "6:20 PM",
+                // data[index].reason ??
+                 data["checkout"]!=null?DateFormat("h:mm a").format(DateTime.parse(data["checkout"])):"",
                 style: const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
                 ),
               ),
                Text(
-                // data[index].reason ?? 
-                "9:15",
+                // data[index].reason ??
+                 calculateTimeGap(),
                 style: const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
@@ -682,8 +708,8 @@ class AttendanceList extends StatelessWidget {
                   borderRadius: BorderRadius.circular(2)
                 ),
                  child: Text(
-                  // data[index].reason ?? 
-                  "Present",
+                  // data[index].reason ??
+                  data["status_type"].toString().capitalizeFirstLetter(),
                   style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 14,

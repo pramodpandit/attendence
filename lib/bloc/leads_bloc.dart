@@ -25,14 +25,16 @@ import 'bloc.dart';
 class LeadsBloc extends Bloc {
   final LeadsRepository _repo;
   LeadsBloc(this._repo);
-  ValueNotifier<List?> balanceData = ValueNotifier(null);
+
+  ValueNotifier<String> leadType = ValueNotifier("total");
+  ValueNotifier<List?> leadData = ValueNotifier(null);
 
   //ValueNotifier<List> balanceData = ValueNotifier([]);
-  Future getLeadData() async {
+  Future getLeadData(String type) async {
 
     try {
-      var res = await _repo.leadsData();
-      balanceData.value = res.data['data'];
+      var res = await _repo.leadsData(type);
+      leadData.value = res.data;
       print('value is availble:${res.data}');
     } catch(e,s) {
       debugPrint('$e');
@@ -173,18 +175,52 @@ class LeadsBloc extends Bloc {
   //   }
   // }
 
+// all apis datas
+  ValueNotifier<List?> allLeadSource = ValueNotifier(null);
+  ValueNotifier<List?> allDesignationData = ValueNotifier(null);
+  ValueNotifier<List?> allDepartmentData = ValueNotifier(null);
+  ValueNotifier<List?> allClientData = ValueNotifier(null);
+  ValueNotifier<List?> allTechnologyData = ValueNotifier(null);
+  ValueNotifier<List?> allPortfolioCategory = ValueNotifier(null);
+// all apis data end
+
   GlobalKey<FormState> formState = GlobalKey<FormState>();
   ValueNotifier<bool> creating = ValueNotifier(false);
 
-  TextEditingController name = TextEditingController();
+  TextEditingController title = TextEditingController();
+  ValueNotifier<String?> source = ValueNotifier(null);
+  TextEditingController remark = TextEditingController();
+  ValueNotifier<String?> leadStatus = ValueNotifier(null);
+  ValueNotifier<String?> forLead = ValueNotifier(null);
+  ValueNotifier<String?> portfolioCat = ValueNotifier(null);
+  // branch
+  ValueNotifier<String?> designation = ValueNotifier(null);
+  ValueNotifier<String?> yourDepartment = ValueNotifier(null);
+  // manage by
+  TextEditingController requirements = TextEditingController();
+  ValueNotifier<String?> alreadyClient = ValueNotifier(null);
+  // if already client = yes
+  ValueNotifier<String?> selectClient = ValueNotifier(null);
+  // else if no
+  TextEditingController firstName = TextEditingController();
+  TextEditingController middleName = TextEditingController();
+  TextEditingController lastName = TextEditingController();
   TextEditingController email = TextEditingController();
+  TextEditingController alternateEmail = TextEditingController();
   TextEditingController phone = TextEditingController();
-  TextEditingController phone2 = TextEditingController();
-  TextEditingController requirement = TextEditingController();
+  TextEditingController alternatePhone = TextEditingController();
+  ValueNotifier<int?> clientGender = ValueNotifier(null);
+  TextEditingController address = TextEditingController();
+  ValueNotifier<String?> country = ValueNotifier(null);
+  ValueNotifier<String?> countryState = ValueNotifier(null);
+  ValueNotifier<String?> city = ValueNotifier(null);
+  TextEditingController pincode = TextEditingController();
+  ValueNotifier<String?> companyName = ValueNotifier(null);
+  // else end
+  ValueNotifier<List> preferenceTechnology = ValueNotifier([]);
+  TextEditingController probabilityConversion = TextEditingController();
+  TextEditingController lastFollowUp = TextEditingController();
 
-  ValueNotifier<File?> image = ValueNotifier(null);
-  // ValueNotifier<UserDetail?> employee = ValueNotifier(null);
-  ValueNotifier<ClientDetail?> client = ValueNotifier(null);
 
   String? selectedEmpId, clientId, imageURL;
 
@@ -200,8 +236,8 @@ class LeadsBloc extends Bloc {
     clientId = cid;
     for(ClientDetail e in clients.value) {
       if('${e.id}'==cid) {
-        client.value = e;
-        name.text = e.name ?? '';
+        // client.value = e;
+        // name.text = e.name ?? '';
         phone.text = e.phone ?? '';
         imageURL = e.image ?? '';
       }
@@ -210,41 +246,116 @@ class LeadsBloc extends Bloc {
 
   StreamController<String> createLeadController = StreamController.broadcast();
 
+  getLeadSourceData () async{
+    try{
+      ApiResponse2 res = await _repo.fetchLeadSource();
+      allLeadSource.value = res.data;
+    }catch(e){
+      allLeadSource.value = [];
+      showMessage(const MessageType.error("Some error occurred! Please try again!"));
+    }
+  }
+  getAllDesignationData () async{
+    try{
+      ApiResponse2 res = await _repo.fetchAllDesignationData();
+      allDesignationData.value = res.data;
+    }catch(e){
+      allDesignationData.value = [];
+      showMessage(const MessageType.error("Some error occurred! Please try again!"));
+    }
+  }
+  getAllDepartmentData () async{
+    try{
+      ApiResponse2 res = await _repo.fetchAllDepartmentData();
+      allDepartmentData.value = res.data;
+    }catch(e){
+      allDepartmentData.value = [];
+      showMessage(const MessageType.error("Some error occurred! Please try again!"));
+    }
+  }
+  getAllClientsData () async{
+    try{
+      ApiResponse2 res = await _repo.fetchAllClientsData();
+      allClientData.value = res.data;
+    }catch(e){
+      allClientData.value = [];
+      showMessage(const MessageType.error("Some error occurred! Please try again!"));
+    }
+  }
+  getTechnologyData () async{
+    try{
+      ApiResponse2 res = await _repo.fetchTechnologyData();
+      allTechnologyData.value = res.data;
+    }catch(e){
+      allTechnologyData.value = [];
+      showMessage(const MessageType.error("Some error occurred! Please try again!"));
+    }
+  }
+  getPortfolioCategoryData () async{
+    try{
+      ApiResponse2 res = await _repo.fetchPortfolioCategoryData();
+      allPortfolioCategory.value = res.data;
+    }catch(e){
+      allPortfolioCategory.value = [];
+      showMessage(const MessageType.error("Some error occurred! Please try again!"));
+    }
+  }
+
   createNewEmployee() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
     try {
-      if(await validateEmployee()) {
-        return;
-      }
-      if(creating.value) {
-        return;
-      }
+      // if(await validateEmployee()) {
+      //   return;
+      // }
+      // if(creating.value) {
+      //   return;
+      // }
       creating.value = true;
       String leadsJSON = "";
       Map<String, dynamic> lead = {
-        // "e_id": employee.value?.id,
-        "c_id": client.value?.id,
-        "name": name.text,
-        "phone": phone.text,
-        "phone2": phone2.text,
-        "email": email.text,
-        "requirement": requirement.text,
+        "getEmp": pref.getString("uid"),
+        "lead_title": title.text,
+        "source_id": source.value,
+        "remark": remark.text,
+        "status": leadStatus.value,
+        // "next_followup": email.text,
+        "leadfor": forLead.value,
+        "portfolio_cat" : portfolioCat.value,
+        "designation" : designation.value,
+        "department" : yourDepartment.value,
+        // "employee_id"
+        "requirement" : requirements.text,
+        "technology_skills" : preferenceTechnology.value.join(","),
+        "probability_conversion" : probabilityConversion.text,
+        "last_follow_up" : lastFollowUp.text,
       };
-      leadsJSON = jsonEncode(lead);
-      ApiResponse res = await _repo.createNewLead(leadsJSON, image: image.value);
+      if(alreadyClient.value!="yes"){
+        lead.addAll({
+          "client_id" : selectClient.value
+        });
+      }else{
+        lead.addAll({
+
+        });
+      }
+      // leadsJSON = jsonEncode(lead);
+      ApiResponse res = await _repo.createNewLead(lead);
+      print("the data is : ${res.data}");
       if(res.status) {
         showMessage(const MessageType.success("Employee Created Successfully"));
         createLeadController.add("SUCCESS");
-        name.clear();
+        // name.clear();
         phone.clear();
-        phone2.clear();
+        // phone2.clear();
         email.clear();
-        requirement.clear();
-        image.value = null;
+        // requirement.clear();
+        // image.value = null;
 
       } else {
         showMessage(MessageType.error(res.message));
       }
     } catch(e,s) {
+      print("the error is : $e");
       debugPrint('$e');
       debugPrintStack(stackTrace: s);
       showMessage(const MessageType.error("Some error occurred! Please try again!"));
@@ -371,18 +482,18 @@ class LeadsBloc extends Bloc {
     gender = data;
   }
 
-  TextEditingController leadTitleController = TextEditingController();
-  TextEditingController remarkController = TextEditingController();
-  TextEditingController requirementsController = TextEditingController();
-  TextEditingController nameController = TextEditingController();
-  TextEditingController emailController = TextEditingController();
-  TextEditingController alternativeEmailController = TextEditingController();
-  TextEditingController phoneController = TextEditingController();
-  TextEditingController alternativePhoneController = TextEditingController();
-  TextEditingController addressController = TextEditingController();
-  TextEditingController companyNameController = TextEditingController();
-  TextEditingController probabilityConversionController = TextEditingController();
-  ValueNotifier<DateTime?> lastFollowup = ValueNotifier(DateTime.now());
-  updateLastFollowup(DateTime value) => lastFollowup.value = value;
+  // TextEditingController leadTitleController = TextEditingController();
+  // TextEditingController remarkController = TextEditingController();
+  // TextEditingController requirementsController = TextEditingController();
+  // TextEditingController nameController = TextEditingController();
+  // TextEditingController emailController = TextEditingController();
+  // TextEditingController alternativeEmailController = TextEditingController();
+  // TextEditingController phoneController = TextEditingController();
+  // TextEditingController alternativePhoneController = TextEditingController();
+  // TextEditingController addressController = TextEditingController();
+  // TextEditingController companyNameController = TextEditingController();
+  // TextEditingController probabilityConversionController = TextEditingController();
+  // ValueNotifier<DateTime?> lastFollowup = ValueNotifier(DateTime.now());
+  // updateLastFollowup(DateTime value) => lastFollowup.value = value;
 
 }

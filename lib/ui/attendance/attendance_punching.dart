@@ -188,7 +188,7 @@ class _AttendancePunchingState extends State<AttendancePunching> {
               InkWell(
                 onTap: () async{
                   final ImagePicker picker = ImagePicker();
-                  XFile? image = await picker.pickImage(source: ImageSource.camera);
+                  XFile? image = await picker.pickImage(source: ImageSource.camera,preferredCameraDevice: CameraDevice.front,);
                   // setState(() {
                     bloc.imageFile.value = File(image!.path);
                   // });

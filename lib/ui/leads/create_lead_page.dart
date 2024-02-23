@@ -1,6 +1,9 @@
+import 'package:animations/animations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:office/bloc/leads_bloc.dart';
 import 'package:office/data/model/ClientDetail.dart';
+import 'package:office/ui/leads/technology_modal.dart';
 import 'package:office/ui/widget/app_button.dart';
 import 'package:office/ui/widget/app_dropdown.dart';
 import 'package:office/ui/widget/app_text_field.dart';
@@ -24,6 +27,7 @@ class CreateNewLeadPage extends StatefulWidget {
 
 class _CreateNewLeadPageState extends State<CreateNewLeadPage> {
   late final LeadsBloc bloc;
+  List selectedData = [];
   final countryPicker = const FlCountryCodePicker(
     favorites: ["US", 'IN'],
     favoritesIcon: Icon(PhosphorIcons.push_pin_bold),
@@ -33,6 +37,12 @@ class _CreateNewLeadPageState extends State<CreateNewLeadPage> {
   void initState() {
     bloc = context.read<LeadsBloc>();
     super.initState();
+    bloc.getLeadSourceData();
+    bloc.getAllDesignationData();
+    bloc.getAllDepartmentData();
+    bloc.getAllClientsData();
+    bloc.getTechnologyData();
+    bloc.getPortfolioCategoryData();
   }
 
   @override
@@ -44,58 +54,56 @@ class _CreateNewLeadPageState extends State<CreateNewLeadPage> {
       //   ),),
       //   backgroundColor: K.themeColorSecondary,
       // ),
-      body: Column(
-        children: [
-          Stack(
-            children: [
-              Container(
-                height: 100,
-                width: 1.sw,
-                decoration: const BoxDecoration(
-                    color: Color(0xFF009FE3),
-                    borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(20),
-                        bottomRight: Radius.circular(20))),
-                child: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      height: 56,
-                    ),
-                    Text(
-                      "Create New Lead",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18),
-                    ),
-                  ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Stack(
+              children: [
+                Container(
+                  height: 100,
+                  width: 1.sw,
+                  decoration: const BoxDecoration(
+                      color: Color(0xFF009FE3),
+                      borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(20),
+                          bottomRight: Radius.circular(20))),
+                  child: const Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        height: 56,
+                      ),
+                      Text(
+                        "Create New Lead",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              Positioned(
-                top: 56,
-                left: 10,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: const CircleAvatar(
-                    backgroundColor: Colors.white,
-                    radius: 15,
-                    child: Icon(
-                      Icons.arrow_back,
-                      size: 18,
+                Positioned(
+                  top: 56,
+                  left: 10,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: const CircleAvatar(
+                      backgroundColor: Colors.white,
+                      radius: 15,
+                      child: Icon(
+                        Icons.arrow_back,
+                        size: 18,
+                      ),
                     ),
                   ),
                 ),
-              ),
-
-
-            ],
-          ),
-          SingleChildScrollView(
-            child: Form(
+              ],
+            ),
+            Form(
               key: bloc.formState,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -103,14 +111,14 @@ class _CreateNewLeadPageState extends State<CreateNewLeadPage> {
                   children: [
                     Stack(
                       children: [
-                        ProfileImagePicker(
-                          path: bloc.imageURL ?? bloc.image.value?.path,
-                          onImageSelect: (v) {
-                            if(v.isNotEmpty) {
-                              bloc.image.value = File(v);
-                            }
-                          },
-                        ),
+                        // ProfileImagePicker(
+                        //   path: bloc.imageURL ?? bloc.image.value?.path,
+                        //   onImageSelect: (v) {
+                        //     if(v.isNotEmpty) {
+                        //       bloc.image.value = File(v);
+                        //     }
+                        //   },
+                        // ),
                         // const Positioned(
                         //   bottom: 5,
                         //   right: 0,
@@ -142,76 +150,450 @@ class _CreateNewLeadPageState extends State<CreateNewLeadPage> {
                     // ),
                     // const SizedBox(height: 10),
                     AppTextField(
-                      controller: bloc.name,
-                      title: 'Name',
+                      controller: bloc.title,
+                      title: 'Lead Title',
                       showTitle: false,
-                      validate: true,
                     ),
                     const SizedBox(height: 10),
+                    ValueListenableBuilder(
+                      valueListenable: bloc.allLeadSource,
+                      builder: (context, allLeadSource, child) {
+                        if(allLeadSource == null){
+                          return AppDropdown(
+                            items: [
+                              DropdownMenuItem(child: Text("Select Source"),value: "",enabled: false,)
+                            ],
+                            onChanged: (value) {
+                              bloc.source.value = value;
+                            },
+                            value: "",
+                            hintText: "Source",
+                          );
+                        }
+                      return AppDropdown(
+                        items: allLeadSource.map((e) => DropdownMenuItem<String>(child: Text(e['name']),value: e['id'].toString(),)).toList(),
+                        onChanged: (value) {
+                        bloc.source.value = value.toString();
+                      },
+                        value: allLeadSource[0]['id'].toString(),
+                        hintText: "Source",
+                      );
+                    },),
+                    const SizedBox(height: 10,),
                     AppTextField(
-                      controller: bloc.phone,
-                      title: 'Number',
+                      controller: bloc.remark,
+                      title: 'Remark',
                       showTitle: false,
-                      validate: true,
-                      inputFormatters: [
-                        LengthLimitingTextInputFormatter(10),
-                        FilteringTextInputFormatter.digitsOnly,
-                      ],
-                      keyboardType: TextInputType.phone,
                     ),
+                    const SizedBox(height: 10,),
+                    AppDropdown(items: [
+                      DropdownMenuItem(child: Text("Select Status",style: TextStyle(color: Colors.grey),),value: "",enabled: false),
+                      DropdownMenuItem(child: Text("Open"),value: "open",),
+                      DropdownMenuItem(child: Text("Dead"),value: "dead",),
+                      DropdownMenuItem(child: Text("Converted"),value: "converted",)
+                    ], onChanged: (value) {
+                      bloc.leadStatus.value = value;
+                    },
+                      value: "",
+                      hintText: "Select Status",
+                    ),
+                    const SizedBox(height: 10,),
+                    AppDropdown(items: [
+                      DropdownMenuItem(child: Text("Lead for",style: TextStyle(color: Colors.grey),),value: "",enabled: false,),
+                      DropdownMenuItem(child: Text("On Product"),value: "1",),
+                      DropdownMenuItem(child: Text("Offsite"),value: "0",)
+                    ], onChanged: (value) {
+                      bloc.forLead.value = value;
+                    },
+                      value: "",
+                      hintText: "Source",
+                    ),
+                    ValueListenableBuilder(
+                      valueListenable: bloc.forLead,
+                      builder: (context, forLead, child) {
+                        if(forLead == "1") {
+                          return Column(
+                            children: [
+                              const SizedBox(height: 10,),
+                              ValueListenableBuilder(
+                                valueListenable: bloc.allPortfolioCategory,
+                                builder: (context, allPortfolioCat, child) {
+                                  if(allPortfolioCat == null){
+                                    return AppDropdown(
+                                      items: [
+                                        DropdownMenuItem(child: Text("Select Source"),value: "",enabled: false,)
+                                      ],
+                                      onChanged: (value) {
+                                        bloc.portfolioCat.value = value;
+                                      },
+                                      value: "",
+                                      hintText: "Source",
+                                    );
+                                  }
+                                  return AppDropdown(
+                                    items: allPortfolioCat.map((e) => DropdownMenuItem<String>(child: Text(e['name']),value: e['id'].toString(),)).toList(),
+                                    onChanged: (value) {
+                                      bloc.portfolioCat.value = value.toString();
+                                    },
+                                    value: allPortfolioCat[0]['id'].toString(),
+                                    hintText: "Portfolio Category",
+                                  );
+                                },),
+                            ],
+                          );
+                        }
+                        return Offstage();
+                    },),
+                    const SizedBox(height: 10,),
+                    ValueListenableBuilder(
+                      valueListenable: bloc.allDesignationData,
+                      builder: (context, allDesignationData, child) {
+                        if(allDesignationData == null){
+                          return AppDropdown(
+                            items: [
+                              DropdownMenuItem(child: Text("Select Designation",style: TextStyle(color: Colors.grey),),value: "",enabled: false,)
+                            ],
+                            onChanged: (value) {
+                              bloc.designation.value = value;
+                            },
+                            value: "",
+                            hintText: "Select Designation",
+                          );
+                        }
+                        return AppDropdown(
+                          items: allDesignationData.map((e) => DropdownMenuItem<String>(child: Text(e['name']),value: e['id'].toString(),)).toList(),
+                          onChanged: (value) {
+                            bloc.designation.value = value.toString();
+                          },
+                          value: allDesignationData[0]['id'].toString(),
+                          hintText: "Select Designation",
+                        );
+                      },),
+                    const SizedBox(height: 10,),
+                    ValueListenableBuilder(
+                      valueListenable: bloc.allDepartmentData,
+                      builder: (context, allDepartmentData, child) {
+                        if(allDepartmentData == null){
+                          return AppDropdown(
+                            items: [
+                              DropdownMenuItem(child: Text("Select Department",style: TextStyle(color: Colors.grey),),value: "",enabled: false,)
+                            ],
+                            onChanged: (value) {
+                              bloc.yourDepartment.value = value;
+                            },
+                            value: "",
+                            hintText: "Select Department",
+                          );
+                        }
+                        return AppDropdown(
+                          items: allDepartmentData.map((e) => DropdownMenuItem<String>(child: Text(e['name']),value: e['id'].toString(),)).toList(),
+                          onChanged: (value) {
+                            bloc.yourDepartment.value = value.toString();
+                          },
+                          value: allDepartmentData[0]['id'].toString(),
+                          hintText: "Select Department",
+                        );
+                      },),
                     const SizedBox(height: 10),
                     AppTextField(
-                      controller: bloc.phone2,
-                      title: 'Phone number 2',
+                      controller: bloc.requirements,
+                      maxLines: 5,
+                      title: 'Requirements',
                       showTitle: false,
-                      // validate: true,
-                      inputFormatters: [
-                        LengthLimitingTextInputFormatter(10),
-                        FilteringTextInputFormatter.digitsOnly,
-                      ],
-                      keyboardType: TextInputType.phone,
                     ),
+                    const SizedBox(height: 10,),
+                    AppDropdown(
+                      items: [
+                        DropdownMenuItem(child: Text("Select",style: TextStyle(color: Colors.grey),),value: "",enabled: false,),
+                        DropdownMenuItem(child: Text("Yes"),value: "yes",),
+                        DropdownMenuItem(child: Text("No"),value: "no",)
+                    ], onChanged: (value) {
+                      bloc.alreadyClient.value = value;
+                    },
+                      value: bloc.alreadyClient.value ?? "",
+                      hintText: "Already a client",
+                    ),
+                    ValueListenableBuilder(
+                      valueListenable: bloc.alreadyClient,
+                      builder: (context, alreadyClient, child) {
+                        if(alreadyClient == "yes"){
+                          return Column(
+                            children: [
+                              const SizedBox(height: 10,),
+                              ValueListenableBuilder(
+                                valueListenable: bloc.allClientData,
+                                builder: (context, allClientData, child) {
+                                  if(allClientData == null){
+                                    return AppDropdown(
+                                      items: [
+                                        DropdownMenuItem(child: Text("Select Client",style: TextStyle(color: Colors.grey),),value: "",enabled: false,)
+                                      ],
+                                      onChanged: (value) {
+                                        bloc.selectClient.value = value;
+                                      },
+                                      value: "",
+                                      hintText: "Select Client",
+                                    );
+                                  }
+                                  return AppDropdown(
+                                    items: allClientData.map((e) => DropdownMenuItem<String>(child: Text("${e['sarname'] ?? ''} ${e['first_name'] ?? ''} ${e['middle_name'] ?? ''} ${e['last_name'] ?? ''}"),value: e['id'].toString(),)).toList(),
+                                    onChanged: (value) {
+                                      bloc.selectClient.value = value.toString();
+                                    },
+                                    value: allClientData[0]['id'].toString(),
+                                    hintText: "Select Client",
+                                  );
+                                },),
+                            ],
+                          );
+                        }else if(alreadyClient == "no"){
+                          return Column(
+                            children: [
+                              const SizedBox(height: 10,),
+                              AppTextField(
+                                controller: bloc.firstName,
+                                title: 'First Name',
+                                showTitle: false,
+                              ),
+                              const SizedBox(height: 10),
+                              AppTextField(
+                                controller: bloc.middleName,
+                                title: 'Middle name',
+                                showTitle: false,
+                              ),
+                              const SizedBox(height: 10),
+                              AppTextField(
+                                controller: bloc.lastName,
+                                title: 'Last name',
+                                showTitle: false,
+                              ),
+                              const SizedBox(height: 10),
+                              AppTextField(
+                                controller: bloc.email,
+                                title: 'Email',
+                                showTitle: false,
+                              ),
+                              const SizedBox(height: 10),
+                              AppTextField(
+                                controller: bloc.alternateEmail,
+                                title: 'Alternate Email',
+                                showTitle: false,
+                              ),
+                              const SizedBox(height: 10),
+                              AppTextField(
+                                controller: bloc.phone,
+                                title: 'Phone',
+                                showTitle: false,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                  LengthLimitingTextInputFormatter(10)
+                                ],
+                                keyboardType: TextInputType.number,
+                              ),
+                              const SizedBox(height: 10),
+                              AppTextField(
+                                controller: bloc.alternatePhone,
+                                title: 'Alternate Phone',
+                                showTitle: false,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                  LengthLimitingTextInputFormatter(10)
+                                ],
+                                keyboardType: TextInputType.number,
+                              ),
+                              const SizedBox(height: 10),
+                              AppDropdown(
+                                items: [
+                                  DropdownMenuItem(child: Text("Gender"),value: "1",)
+                                ], onChanged: (value) {
+                                bloc.clientGender.value = value;
+                              },
+                                value: "1",
+                                hintText: "Source",
+                              ),
+                              const SizedBox(height: 10),
+                              AppTextField(
+                                controller: bloc.address,
+                                title: 'Address',
+                                showTitle: false,
+                              ),
+                              const SizedBox(height: 10),
+                              AppDropdown(
+                                items: [
+                                  DropdownMenuItem(child: Text("Country"),value: "1",)
+                                ], onChanged: (value) {
+                                bloc.country.value = value;
+                              },
+                                value: "1",
+                                hintText: "Source",
+                              ),
+                              const SizedBox(height: 10),
+                              AppDropdown(
+                                items: [
+                                  DropdownMenuItem(child: Text("State"),value: "1",)
+                                ], onChanged: (value) {
+                                bloc.countryState.value = value;
+                              },
+                                value: "1",
+                                hintText: "Source",
+                              ),
+                              const SizedBox(height: 10),
+                              AppDropdown(
+                                items: [
+                                  DropdownMenuItem(child: Text("City"),value: "1",)
+                                ], onChanged: (value) {
+                                bloc.city.value = value;
+                              },
+                                value: "1",
+                                hintText: "Source",
+                              ),
+                              const SizedBox(height: 10),
+                              AppDropdown(
+                                items: [
+                                  DropdownMenuItem(child: Text("Company Name"),value: "1",)
+                                ], onChanged: (value) {
+                                bloc.companyName.value = value;
+                              },
+                                value: "1",
+                                hintText: "Source",
+                              ),
+                            ],
+                          );
+                        }
+                        return Offstage();
+                    },),
+                    const SizedBox(height: 10),
+                    Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text("Select Technology",style: GoogleFonts.dmSans(fontWeight: FontWeight.w500),)),
+                    const SizedBox(height: 5),
+                    ValueListenableBuilder(
+                      valueListenable: bloc.allTechnologyData,
+                      builder: (context, List? allTechnologyData, child) {
+                        if(allTechnologyData == null){
+                          return Align(
+                            alignment: Alignment.centerLeft,
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(minHeight: 50),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 5),
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade200,
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Wrap(
+                                      spacing: 5,
+                                      children: [],
+                                    ),
+                                    InkWell(
+                                      onTap: () {
+                                        showDialog(
+                                          barrierDismissible: true,
+                                          context: context,
+                                          builder: (context) {
+                                            return Padding(
+                                              padding: const EdgeInsets.all(50.0),
+                                              child: ClipRRect(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                  child: TechnologyModal(allData: [],leadsBloc: bloc,)),
+                                            );
+                                          },);
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(right: 5.0),
+                                        child: Text("Select",style: GoogleFonts.lato(color: Colors.grey),),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+                      return Align(
+                        alignment: Alignment.centerLeft,
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(minHeight: 50),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 5),
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade200,
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: ValueListenableBuilder(
+                                    valueListenable: bloc.preferenceTechnology,
+                                    builder: (context, technology, child) {
+                                      selectedData = technology;
+                                    return Wrap(
+                                      spacing: 5,
+                                      children: bloc.preferenceTechnology.value.map((e) =>
+                                          Chip(label: Text(e['name']),onDeleted: () {
+                                            bloc.preferenceTechnology.value.remove(e);
+                                            selectedData.remove(e);
+                                            setState(() { });
+                                          },
+                                            deleteIconColor: Colors.red.shade800,
+                                          ),).toList(),
+                                    );
+                                  },),
+                                ),
+                                InkWell(
+                                    onTap: () {
+                                      showDialog(
+                                        barrierDismissible: true,
+                                        context: context,
+                                        builder: (context) {
+                                        return Padding(
+                                          padding: const EdgeInsets.all(50.0),
+                                          child: ClipRRect(
+                                              borderRadius: BorderRadius.circular(10),
+                                              child: TechnologyModal(allData: allTechnologyData,leadsBloc: bloc,)),
+                                        );
+                                      },);
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(right: 5.0),
+                                      child: Text("Select",style: GoogleFonts.lato(color: Colors.grey),),
+                                    ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },),
                     const SizedBox(height: 10),
                     AppTextField(
-                      controller: bloc.requirement,
-                      title: 'Lead requirement',
+                      controller: bloc.probabilityConversion,
+                      title: 'Probability Conversion',
                       showTitle: false,
-                      validate: true,
+                      keyboardType: TextInputType.number,
                     ),
                     const SizedBox(height: 10),
-                    // Consumer<SharedPreferences>(
-                    //   builder: (context, pref, _) {
-                    //     bool isAdmin = pref.getBool('isAdmin')==true;
-                    //     if(isAdmin) {
-                    //       return Column(
-                    //         children: [
-                    //           ValueListenableBuilder(
-                    //             valueListenable: bloc.employees,
-                    //             builder: (context, List<UserDetail> employees, _) {
-                    //               return AppDropdown(
-                    //                 value: bloc.selectedEmpId,
-                    //                 onChanged: (v) => bloc.updateEmployee(v!),
-                    //                 items: employees.map((e) => DropdownMenuItem(
-                    //                     value: '${e.id}',
-                    //                     child: Text('${e.name}'))).toList(),
-                    //                 hintText: 'Select Employee',
-                    //               );
-                    //             },
-                    //           ),
-                    //           const SizedBox(height: 10),
-                    //         ],
-                    //       );
-                    //     }
-                    //     return const SizedBox(height: 0);
-                    //   }
-                    // ),
-                    AppTextField(
-                      controller: bloc.email,
-                      title: 'Email',
-                      showTitle: false,
-                      validate: true,
-                      keyboardType: TextInputType.emailAddress,
-                      validator: (v) => v!.isEmpty ? null : !Validate.emailValidation.hasMatch(v) ? "Please enter valid email" : null,
+                    InkWell(
+                      onTap: () {
+                        showDatePicker(context: context,
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(3000)).then((value) => value !=null ?bloc.lastFollowUp.text = value.toString().split(" ").first: null);
+                      },
+                      child: AppTextField(
+                        controller: bloc.lastFollowUp,
+                        title: 'Last follow up date',
+                        showTitle: false,
+                        enabled: false,
+                        keyboardType: TextInputType.number,
+                      ),
                     ),
                     const SizedBox(height: 10),
                     ValueListenableBuilder(
@@ -231,8 +613,8 @@ class _CreateNewLeadPageState extends State<CreateNewLeadPage> {
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
