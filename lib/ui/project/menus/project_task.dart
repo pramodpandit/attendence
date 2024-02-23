@@ -49,7 +49,7 @@ class _ProjectTaskState extends State<ProjectTask> {
                 }
                 return  Padding(
                   padding: const EdgeInsets.only(
-                      left: 25, right: 25, top: 10, bottom: 10),
+                      left: 5, right: 5, top: 10, bottom: 10),
                   child: ListView.builder(
                       itemCount: projectTask.length,
                       shrinkWrap: true,

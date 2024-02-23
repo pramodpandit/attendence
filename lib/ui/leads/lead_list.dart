@@ -206,7 +206,6 @@ class _LeadListState extends State<LeadList> {
                       },
                     );
                   },
-
                 ),
               ),
             ],

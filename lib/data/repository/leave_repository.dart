@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 import 'package:office/data/model/LeaveCategory.dart';
 import 'package:office/data/model/LeaveRecord.dart';
@@ -44,7 +47,7 @@ class LeaveRepository {
     return resp;
   }
 
-  Future<ApiResponse> applyForLeave(String title, String description, DateTime startDate, String typeId, String durationType, {DateTime? endDate}) async{
+  Future<ApiResponse> applyForLeave(String title, String description, DateTime startDate, String typeId, String durationType, {DateTime? endDate,File? image}) async{
     SharedPreferences _pref = await SharedPreferences.getInstance();
     Map<String, dynamic> data = {
       "user_id": _pref.getString('uid'),
@@ -57,7 +60,39 @@ class LeaveRepository {
     if(endDate!=null) {
       data['end_date'] = DateFormat("yyyy-MM-dd").format(endDate);
     }
-    var response= await _api.postRequest("leave/apply", data);
+    if(image!=null){
+      data['attachment'] = await MultipartFile.fromFile(image!.path,
+          filename: image.path.split('/').last);
+    }
+    var response= await _api.postRequest("leave/apply", data,withFile: true);
+    if(response==null) {
+      throw ApiException.fromString("response null");
+    }
+    return ApiResponse.fromJson(response);
+  }
+
+  Future<ApiResponse> EditForLeave(int id,String title, String description,String imageblank, DateTime startDate, String typeId, String durationType, {DateTime? endDate,File? image}) async{
+    SharedPreferences _pref = await SharedPreferences.getInstance();
+    Map<String, dynamic> data = {
+      "id":id,
+      "user_id": _pref.getString('uid'),
+      "title": title,
+      "leave_category_id": typeId,
+      "reason": description,
+      "leave_start_date": DateFormat("yyyy-MM-dd").format(startDate),
+      "duration_type": durationType,
+    };
+    if(endDate!=null) {
+      data['end_date'] = DateFormat("yyyy-MM-dd").format(endDate);
+    }
+    if(image==null){
+      data['attachment'] = imageblank;
+    }
+    if(image!=null){
+      data['attachment'] = await MultipartFile.fromFile(image!.path,
+          filename: image.path.split('/').last);
+    }
+    var response= await _api.postRequest("leave/edit", data,withFile: true);
     if(response==null) {
       throw ApiException.fromString("response null");
     }
@@ -79,12 +114,48 @@ class LeaveRepository {
 
     var response = await _api.postRequest("leaves_count", {
       "user_id": _pref.getString('uid'),
-
     });
 
     if (response == null) {
       ApiException.fromString("response null");
     }
     return ApiResponse2.fromJson(response,response);
+  }
+  Future<ApiResponse2> CancelLeave(int id) async {
+    SharedPreferences _pref = await SharedPreferences.getInstance();
+
+    var response = await _api.postRequest("leave/leave_cancle", {
+      "user_id": _pref.getString('uid'),
+      "id": id,
+    },);
+    if (response == null) {
+      ApiException.fromString("response null");
+    }
+    return ApiResponse2.fromJson(response);
+  }
+  Future<ApiResponse2> ApprovedLeave(int id) async {
+    SharedPreferences _pref = await SharedPreferences.getInstance();
+
+    var response = await _api.postRequest("leave/leave_approved", {
+      "user_id": _pref.getString('uid'),
+      "id": id,
+    },);
+    if (response == null) {
+      ApiException.fromString("response null");
+    }
+    return ApiResponse2.fromJson(response);
+  }
+  Future<ApiResponse2> AddRemark(int id,String remark) async {
+    SharedPreferences _pref = await SharedPreferences.getInstance();
+
+    var response = await _api.postRequest("leave/remark", {
+      "user_id": _pref.getString('uid'),
+      "id": id,
+      "remark":remark
+    },);
+    if (response == null) {
+      ApiException.fromString("response null");
+    }
+    return ApiResponse2.fromJson(response);
   }
 }

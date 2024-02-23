@@ -31,7 +31,9 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../bill/add_bill.dart';
 import '../leave/employee_leave.dart';
+import '../leave/leave_request/leave_page_hr.dart';
 import '../payroll/sallary.dart';
+import '../work_from_home/work_from_home_more_details.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -221,11 +223,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             },
                           ),
                           if (bloc.hasAccess(department, 3,'1'))BoxContainer(
+                            heading: "Leaves Request",
+                            image: "images/calendar1.png",
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => const LeavesRecordsPagehr()));
+                            },
+                          ),
+
+                          if (bloc.hasAccess(department, 3,'1'))BoxContainer(
                             heading: "Work from home",
                             image: "images/calendar1.png",
                             onTap: () {
                               Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => const WorkFromHomePage()));
+                                  builder: (context) => const WorkFromHomeMoreDetailPage()));
                             },
                           ),
                           if (bloc.hasAccess(department, 29,'1'))BoxContainer(

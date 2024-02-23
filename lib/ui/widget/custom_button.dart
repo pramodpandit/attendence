@@ -66,7 +66,7 @@ class CustomButton2 extends StatelessWidget {
         tittle,
         style: const TextStyle(
           fontWeight: FontWeight.w500,
-          fontSize: 20,
+          fontSize: 19,
           letterSpacing: 1.2,
           color: Colors.white,
         ),

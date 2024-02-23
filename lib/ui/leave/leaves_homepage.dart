@@ -359,16 +359,8 @@ class _LeavesHomePageState extends State<LeavesHomePage> {
                                                           horizontal: 8,
                                                           vertical: 6),
                                                       decoration: BoxDecoration(
-                                                        color: leaves[index]
-                                                            .status! ==
-                                                            "approve"
-                                                            ? const Color(
-                                                            0xff4BCD36)
-                                                            : leaves[index]
-                                                            .status! ==
-                                                            "pending"
-                                                            ? Colors.yellow
-                                                            : Colors.red,
+                                                        color: leaves[index].status! == "approve" ? const Color(0xff4BCD36)
+                                                            : leaves[index].status! == "pending" ? Colors.yellow : Colors.red,
                                                         borderRadius:
                                                         BorderRadius
                                                             .circular(8),

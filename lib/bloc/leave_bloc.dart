@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:office/bloc/property_notifier.dart';
@@ -19,6 +20,10 @@ class LeaveBloc extends Bloc {
   //#region -Leaves
 
   ValueNotifier<int> recordIndex = ValueNotifier(0);
+  TextEditingController remark = TextEditingController();
+  ValueNotifier<bool> isLoadingDownload = ValueNotifier(false);
+
+
   updateRecordIndex(int index) {
     if(leaveRecordsState.value==LoadingState.loading) {
       return;
@@ -66,10 +71,16 @@ class LeaveBloc extends Bloc {
 
   //#region -Apply Leave
   StreamController<String> leaveController = StreamController.broadcast();
+  StreamController<String> leaveEditController = StreamController.broadcast();
   TextEditingController reasonTitle = TextEditingController();
+  TextEditingController filepath = TextEditingController();
   TextEditingController reason = TextEditingController();
+  TextEditingController reasonEdit= TextEditingController();
+  TextEditingController reasonTitleEdit = TextEditingController();
   ValueNotifier<DateTime?> startDate = ValueNotifier(null);
+  ValueNotifier<DateTime?> startDateEdit = ValueNotifier(null);
   ValueNotifier<DateTime?> endDate = ValueNotifier(null);
+  ValueNotifier<DateTime?> endDateEdit = ValueNotifier(null);
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   List<Map<String, dynamic>> durationType = [
@@ -89,7 +100,9 @@ class LeaveBloc extends Bloc {
     selectedDurationType.value = value;
   }
   updateStartDate(DateTime value) => startDate.value = value;
+  updateStartEditDate(DateTime value) => startDateEdit.value = value;
   updateEndDate(DateTime value) => endDate.value = value;
+  updateEndEditDate(DateTime value) => endDateEdit.value = value;
 
   ValueNotifier<bool> requesting = ValueNotifier(false);
   applyForLeave() async {
@@ -117,7 +130,7 @@ class LeaveBloc extends Bloc {
         return;
       }
       requesting.value = true;
-      ApiResponse res = await _repo.applyForLeave(reasonTitle.text, reason.text, startDate.value!, selectedLeaveCategory!, selectedDurationType.value!, endDate: endDate.value);
+      ApiResponse res = await _repo.applyForLeave(reasonTitle.text, reason.text, startDate.value!, selectedLeaveCategory!, selectedDurationType.value!, endDate: endDate.value,image: image);
       if(res.status) {
         leaveController.sink.add("LEAVE_REQUESTED");
         startDate.value=null;
@@ -126,9 +139,11 @@ class LeaveBloc extends Bloc {
         selectedLeaveCategory = null;
         reasonTitle.clear();
         reason.clear();
+        filepath.clear();
+        image = null;
         showMessage(const MessageType.success("Leave requested successfully!"));
       } else {
-        showMessage(MessageType.success(res.message));
+        showMessage(MessageType.error(res.message.toString()));
       }
     } catch(e,s) {
       debugPrint("$e");
@@ -138,7 +153,57 @@ class LeaveBloc extends Bloc {
       requesting.value = false;
     }
   }
+
+  ValueNotifier<int?> leaveId = ValueNotifier(null);
   //#endregion
+  EditForLeave() async {
+    try {
+      if(requesting.value) {
+        return;
+      }
+      if(!formKey.currentState!.validate()) {
+        return;
+      }
+      if(startDateEdit.value==null) {
+        showMessage(const MessageType.success("Please enter date!"));
+        return;
+      }
+      if(selectedDurationType.value==null) {
+        showMessage(const MessageType.success("Please select duration type!"));
+        return;
+      }
+      if(selectedLeaveCategory==null) {
+        showMessage(const MessageType.success("Please select leave category!"));
+        return;
+      }
+      if(selectedDurationType.value=="multiple" && endDateEdit.value==null) {
+        showMessage(const MessageType.success("Please enter date!"));
+        return;
+      }
+      requesting.value = true;
+      ApiResponse res = await _repo.EditForLeave(leaveId.value!.toInt(),reasonTitleEdit.text, reasonEdit.text,filepath.text, startDateEdit.value!, selectedLeaveCategory!, selectedDurationType.value!, endDate: endDateEdit.value,image: image);
+      if(res.status) {
+        leaveEditController.sink.add("LEAVE_Edit");
+        startDate.value=null;
+        endDate.value=null;
+        selectedDurationType.value = null;
+        selectedLeaveCategory = null;
+        reasonTitle.clear();
+        reason.clear();
+        filepath.clear();
+        image = null;
+        showMessage(const MessageType.success("Leave edit successfully!"));
+      } else {
+        showMessage(MessageType.error(res.message.toString()));
+      }
+    } catch(e,s) {
+      debugPrint("$e");
+      debugPrintStack(stackTrace: s);
+      showMessage(MessageType.success('$e'));
+    } finally {
+      requesting.value = false;
+    }
+  }
 
 //#region -Response Leave
   ValueNotifier<bool> isResponseApproveLoad = ValueNotifier(false);
@@ -181,6 +246,63 @@ class LeaveBloc extends Bloc {
     } catch(e,s) {
       debugPrint('$e');
       debugPrintStack(stackTrace: s);
+    }
+  }
+  ValueNotifier<bool> isCancelLoading = ValueNotifier(false);
+  ValueNotifier<bool> isApprovedLoading = ValueNotifier(false);
+  StreamController<String> CancelStream = StreamController.broadcast();
+  File? image;
+
+  CanelLeave(int id) async {
+    try {
+      isCancelLoading.value = true;
+      var result = await _repo.CancelLeave(id);
+      if (result.status ==true) {
+        CancelStream.sink.add('Post');
+        showMessage(MessageType.success("Cancel leave successful"));
+      } else {
+        showMessage(MessageType.error("Something went wrong"));
+      }
+    } catch (e, s) {
+      debugPrint("$e");
+      debugPrint("$s");
+    } finally {
+      isCancelLoading.value = false;
+    }
+  }
+  ApprovedLeave(int id) async {
+    try {
+      isApprovedLoading.value = true;
+      var result = await _repo.ApprovedLeave(id);
+      if (result.status ==true) {
+        CancelStream.sink.add('Post');
+        showMessage(MessageType.success("success"));
+      } else {
+        showMessage(MessageType.error("Something went wrong"));
+      }
+    } catch (e, s) {
+      debugPrint("$e");
+      debugPrint("$s");
+    } finally {
+      isApprovedLoading.value = false;
+    }
+  }
+  AddRemarkLeave(int id) async {
+    try {
+      isResponseApproveLoad.value = true;
+      var result = await _repo.AddRemark(id,remark.text);
+      if (result.status ==true) {
+        CancelStream.sink.add('Post');
+        showMessage(MessageType.success("success"));
+        remark.clear();
+      } else {
+        showMessage(MessageType.error("Something went wrong"));
+      }
+    } catch (e, s) {
+      debugPrint("$e");
+      debugPrint("$s");
+    } finally {
+      isResponseApproveLoad.value = false;
     }
   }
 }

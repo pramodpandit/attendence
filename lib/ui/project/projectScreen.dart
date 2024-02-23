@@ -120,6 +120,8 @@ class _ProjectScreenState extends State<ProjectScreen> {
                     itemBuilder: (context, index) {
                       var data = projectData[index];
                       List imageList = projectData[index]["user_pic"]["user_p"];
+                      var date = projectData[index]["deadline_date"].toString().split('-');
+
                       return GestureDetector(
                         onTap: () {
                           Navigator.of(context).push(MaterialPageRoute(
@@ -129,7 +131,8 @@ class _ProjectScreenState extends State<ProjectScreen> {
                           margin: const EdgeInsets.only(left: 25,right: 25,bottom: 25),
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           decoration: BoxDecoration(
-                              color: Colors.white,
+                            border: Border.all(color:projectData[index]['deadline'].toString()=='no'?Colors.white:DateTime.now().year >= int.parse(date[0]) || DateTime.now().month >= int.parse(date[1]) || DateTime.now().day >= int.parse(date[2]) ?Colors.red:Colors.white ),
+                              color:Colors.white,
                               borderRadius: BorderRadius.circular(10),
                               boxShadow: [
                                 BoxShadow(
@@ -176,7 +179,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                                             bloc.selectedProjects.value == "todo"?
                                             'In Process':
                                             bloc.selectedProjects.value == "incomplete"?
-                                                "Not Completed":
+                                                "Incomplete":
                                                 bloc.selectedProjects.value == "complete"?
                                                     "Completed": projectData[index]["status"],
                                             style: TextStyle(fontSize: 11,color: Colors.green.shade400),)
@@ -189,7 +192,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                                           const SizedBox(
                                             width: 10,
                                           ),
-                                          Text(projectData[index]["created_date"].toString().splitBefore(" "),style: TextStyle(fontSize: 11,color: Colors.redAccent.withOpacity(0.9)),)
+                                          Text('${projectData[index]["start_date"].toString()}${projectData[index]['deadline']=='no'?'':' - ${projectData[index]['deadline_date']}'}',style: TextStyle(fontSize: 11,color: Colors.redAccent.withOpacity(0.9)),)
                                         ],
                                       ),
                                       const SizedBox(height: 8,),
@@ -223,13 +226,13 @@ class _ProjectScreenState extends State<ProjectScreen> {
                                 ],
                               ),
                               const Divider(),
-                              const Row(
+                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  TaskContent(tittle: '15', icon: Icons.offline_bolt_outlined,),
-                                  TaskContent(tittle: '5', icon: Icons.error_outline,color: Colors.blue,),
-                                  TaskContent(tittle: '5', icon: Icons.check_circle_outline,color: Colors.green,),
-                                  TaskContent(tittle: '5', icon: Icons.cancel_outlined,color: Colors.red,),
+                                  TaskContent(tittle: '${projectData[index]['user_project_task']['project_task_totle']}', icon: Icons.offline_bolt_outlined,),
+                                  TaskContent(tittle: '${projectData[index]['user_project_task']['project_task_doing']}', icon: Icons.error_outline,color: Colors.blue,),
+                                  TaskContent(tittle: '${projectData[index]['user_project_task']['project_task_complete']}', icon: Icons.check_circle_outline,color: Colors.green,),
+                                  TaskContent(tittle: '${projectData[index]['user_project_task']['project_task_incomplete']}', icon: Icons.cancel_outlined,color: Colors.red,),
 
                                 ],
                               ),
