@@ -90,7 +90,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                   value: "doing",
                   items: [
                     DropdownMenuItem(child: Text("Doing"),value: "doing",),
-                    DropdownMenuItem(child: Text("Total"),value: "total",),
+                    DropdownMenuItem(child: Text("All"),value: "total",),
                     DropdownMenuItem(child: Text("Incomplete"),value: "incomplete",),
                     DropdownMenuItem(child: Text("Complete"),value: "complete",)
                   ],

@@ -99,18 +99,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             SizedBox(
                               height: 56,
                             ),
-                            InkWell(
-                              onTap: (){
-                                // Navigator.push(context, MaterialPageRoute(builder: (context)=>sallary()));
-                              },
-                              child: Text(
-                                "Profile",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18),
-                              ),
+                            Text(
+                              "Profile",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18),
                             ),
                           ],
                         ),
@@ -287,6 +282,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             onTap: () {
                               Navigator.of(context).push(MaterialPageRoute(
                                   builder: (context) => const NoticeBoardScreen()));
+                            },
+                          ),
+                          if (bloc.hasAccess(department, 7,'1'))BoxContainer(
+                            heading: "Payroll Salary",
+                            image: "images/board.png",
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => const sallary()));
                             },
                           ),
                           if (bloc.hasAccess(department, 8,'1'))BoxContainer(

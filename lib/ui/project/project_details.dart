@@ -19,6 +19,7 @@ import '../../bloc/project_bloc.dart';
 import '../../data/model/user.dart';
 import '../../data/repository/project_repo.dart';
 import '../widget/stack_user_list.dart';
+import 'menus/project_expenses.dart';
 
 class ProjectDetails extends StatefulWidget {
   final User user;
@@ -39,6 +40,7 @@ class _ProjectDetailsState extends State<ProjectDetails> {
     "Task",
     "Files",
     "Comment",
+    "Expenses",
     // "Timesheet",
     "Notes",
     "Credentials",
@@ -66,6 +68,7 @@ class _ProjectDetailsState extends State<ProjectDetails> {
       ProjectTask(data:dataa),
       ProjectFiles(data: dataa),
       ProjectComments(data: dataa),
+      ProjectExpenses(data: dataa),
       // const ProjectTimeSheet(),
       ProjectNotesList(data:dataa),
       ProjectCredentialList(data:dataa),
@@ -78,6 +81,7 @@ class _ProjectDetailsState extends State<ProjectDetails> {
   }
   @override
   Widget build(BuildContext context) {
+    var date = dataa["deadline_date"].toString().split('-');
     return Scaffold(
       body: Column(
         children: [
@@ -133,6 +137,7 @@ class _ProjectDetailsState extends State<ProjectDetails> {
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       decoration: BoxDecoration(
                           color: Colors.white,
+                          border: Border.all(color:dataa['deadline'].toString()=='no'?Colors.white:DateTime.now().year >= int.parse(date[0]) || DateTime.now().month >= int.parse(date[1]) || DateTime.now().day >= int.parse(date[2]) ?Colors.red:Colors.white),
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: [
                             BoxShadow(

@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../../bloc/project_bloc.dart';
 import '../../../data/repository/project_repo.dart';
+import 'Add_project/Add_Comment.dart';
 
 class ProjectComments extends StatefulWidget {
   final data;
@@ -65,7 +66,7 @@ class _ProjectCommentsState extends State<ProjectComments> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "${data['first_name']} ${data['l_name']}",
+                              "${data['first_name']} ${data['l_name']==null?data['m_name']==null?'':data['m_name']:data['l_name']}",
                               style: TextStyle(fontWeight: FontWeight.w500),
                             ),
                             SizedBox(
@@ -115,6 +116,13 @@ class _ProjectCommentsState extends State<ProjectComments> {
                     borderRadius: BorderRadius.all(Radius.circular(5.0))
                 ),
                 onPressed: () async{
+                  var result =await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                      builder: (_) => Provider.value(
+                      value: bloc,
+                      child: Add_Comment( projectid: widget.data['id'],)
+                      )));
                 },
                 backgroundColor: const  Color(0xFF009FE3),
                 label: AnimatedSwitcher(

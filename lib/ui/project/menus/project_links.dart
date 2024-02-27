@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../bloc/project_bloc.dart';
 import '../../../data/repository/project_repo.dart';
 import '../../../utils/message_handler.dart';
+import 'Add_project/Add_Links.dart';
 
 class ProjectLinks extends StatefulWidget {
   final data;
@@ -175,6 +176,14 @@ class _ProjectLinksState extends State<ProjectLinks> {
                     borderRadius: BorderRadius.all(Radius.circular(5.0))
                 ),
                 onPressed: () async{
+                  var result =await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => Provider.value(
+                              value: bloc,
+                              child: Add_Links( projectid: widget.data['id'],branch_id: widget.data['business_address'],)
+                          )));
+
                 },
                 backgroundColor: const  Color(0xFF009FE3),
                 label: AnimatedSwitcher(
