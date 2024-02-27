@@ -162,7 +162,7 @@ class _LeadListState extends State<LeadList> {
                                 ),
                                 const SizedBox(height: 10,),
                                  DetailsContainer(
-                                  title:"${data['createdby_fname']} ${data['createdby_lname']}",
+                                  title:"${data['createdby_fname'] ?? ''} ${data['createdby_lname'] ?? ''}",
                                   //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
                                   heading: 'Created By', isHtml: false,
                                 ),
@@ -184,7 +184,7 @@ class _LeadListState extends State<LeadList> {
                                 ),
                                 const SizedBox(height: 10,),
                                  DetailsContainer(
-                                  title:"${data['clientsurname']} ${data['clientfirstname'] } ${data['clientlastname']}",
+                                  title:"${data['clientsurname'] ?? ''} ${data['clientfirstname'] ?? ''} ${data['clientlastname'] ?? ''}",
                                   //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
                                   heading: 'Client Name', isHtml: false,
                                 ),

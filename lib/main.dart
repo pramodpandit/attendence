@@ -178,15 +178,15 @@ class MyApp extends StatelessWidget {
                 colorSchemeSeed: Colors.blue,
                 scaffoldBackgroundColor: K.themeColorBg,
                 appBarTheme: const AppBarTheme(
-                  backgroundColor: K.themeColorBg,
+                  backgroundColor: Color(0xFF009FE3),
+                  foregroundColor: Colors.white,
                   systemOverlayStyle: SystemUiOverlayStyle.dark,
                   titleTextStyle: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
-                      fontFamily: K.fontFamily,
-                      color: K.themeColorPrimary),
+                      fontFamily: K.fontFamily,),
                   iconTheme:
-                      IconThemeData(color: K.themeColorPrimary, size: 22),
+                      IconThemeData(color: Colors.white,size: 22),
                   centerTitle: true,
                 ),
                 useMaterial3: true,

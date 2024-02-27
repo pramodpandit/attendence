@@ -2,8 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:office/bloc/leads_bloc.dart';
 import 'package:office/data/model/user.dart';
+import 'package:office/data/repository/lead_repository.dart';
+import 'package:office/ui/leads/leadMenus/lead_branches.dart';
+import 'package:office/ui/leads/leadMenus/lead_files.dart';
+import 'package:office/ui/leads/leadMenus/lead_links.dart';
+import 'package:office/ui/leads/leadMenus/lead_logs.dart';
+import 'package:office/ui/leads/leadMenus/lead_notes.dart';
+import 'package:office/ui/leads/leadMenus/lead_overview.dart';
+import 'package:office/ui/leads/leadMenus/lead_technology.dart';
 import 'package:office/ui/project/menus/logs.dart';
+import 'package:provider/provider.dart';
 
 import '../profile/menus/basic_info.dart';
 import '../project/menus/project_files.dart';
@@ -21,26 +31,37 @@ class LeadDetails extends StatefulWidget {
 }
 
 class _LeadDetailsState extends State<LeadDetails> {
+  late LeadsBloc bloc;
   ValueNotifier<int> selectedMenuIndex = ValueNotifier(0);
-  List<String> projectMenus = [
+  List<String> leadMenus = [
     "Overview",
     "Files",
-    "Notes",
     "Links",
-    "Members",
-    "Logs/Follow"
+    "Logs/Follows",
+    "Notes",
+    "Technology",
+    "Branches",
   ];
-  List<Widget> projectMenusWidgets = [
-    // ProjectOverview(),
-    // const ProjectFiles(),
-    // const ProjectNotesList(),
-    // const ProjectLinks(),
-    // const ProjectMembers(),
-    // const Logs(),
-  ];
+  List<Widget> projectMenusWidgets = [];
 
   selectMenu(int index){
     selectedMenuIndex.value =index;
+  }
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    bloc = LeadsBloc(context.read<LeadsRepository>());
+    projectMenusWidgets = [
+      LeadOverview(data : widget.data['id']),
+      LeadFiles(data : widget.data['id']),
+      LeadLinks(data : widget.data['id']),
+      LeadLogs(data : widget.data['id']),
+      LeadNotes(data : widget.data['id']),
+      LeadTechnology(data : widget.data['id']),
+      LeadBranches(data : widget.data['id']),
+    ];
+
   }
   @override
   Widget build(BuildContext context) {
@@ -114,7 +135,7 @@ class _LeadDetailsState extends State<LeadDetails> {
                           const SizedBox(height: 5,),
                           const SizedBox(height: 10,),
                           DetailsContainer(
-                            title:"${widget.data['createdby_fname']} ${widget.data['createdby_lname']}",
+                            title:"${widget.data['createdby_fname'] ?? ''} ${widget.data['createdby_lname'] ?? ''}",
                             //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
                             heading: 'Created By', isHtml: false,
                           ),
@@ -136,7 +157,7 @@ class _LeadDetailsState extends State<LeadDetails> {
                           ),
                           const SizedBox(height: 10,),
                           DetailsContainer(
-                            title:"${widget.data['clientsurname']} ${widget.data['clientfirstname'] } ${widget.data['clientlastname']}",
+                            title:"${widget.data['clientsurname'] ?? ''} ${widget.data['clientfirstname'] ?? ''} ${widget.data['clientlastname'] ?? ''}",
                             //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
                             heading: 'Client Name', isHtml: false,
                           ),
@@ -169,7 +190,7 @@ class _LeadDetailsState extends State<LeadDetails> {
                       shrinkWrap: true,
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       scrollDirection: Axis.horizontal,
-                      itemCount: projectMenus.length,
+                      itemCount: leadMenus.length,
                       itemBuilder: (context, index) {
                         return Row(
                           children: [
@@ -189,7 +210,7 @@ class _LeadDetailsState extends State<LeadDetails> {
                                     borderRadius: BorderRadius.circular(
                                         10.0)),
                                 child: Text(
-                                  projectMenus[index],
+                                  leadMenus[index],
                                   style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,

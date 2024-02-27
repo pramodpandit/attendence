@@ -43,6 +43,7 @@ class _CreateNewLeadPageState extends State<CreateNewLeadPage> {
     bloc.getAllClientsData();
     bloc.getTechnologyData();
     bloc.getPortfolioCategoryData();
+    bloc.getAllCountryData();
   }
 
   @override
@@ -166,8 +167,8 @@ class _CreateNewLeadPageState extends State<CreateNewLeadPage> {
                             onChanged: (value) {
                               bloc.source.value = value;
                             },
-                            value: "",
-                            hintText: "Source",
+                            value: null,
+                            hintText: "Select Source",
                           );
                         }
                       return AppDropdown(
@@ -175,8 +176,8 @@ class _CreateNewLeadPageState extends State<CreateNewLeadPage> {
                         onChanged: (value) {
                         bloc.source.value = value.toString();
                       },
-                        value: allLeadSource[0]['id'].toString(),
-                        hintText: "Source",
+                        value: bloc.source.value,
+                        hintText: "Select Source",
                       );
                     },),
                     const SizedBox(height: 10,),
@@ -187,26 +188,50 @@ class _CreateNewLeadPageState extends State<CreateNewLeadPage> {
                     ),
                     const SizedBox(height: 10,),
                     AppDropdown(items: [
-                      DropdownMenuItem(child: Text("Select Status",style: TextStyle(color: Colors.grey),),value: "",enabled: false),
                       DropdownMenuItem(child: Text("Open"),value: "open",),
                       DropdownMenuItem(child: Text("Dead"),value: "dead",),
                       DropdownMenuItem(child: Text("Converted"),value: "converted",)
                     ], onChanged: (value) {
                       bloc.leadStatus.value = value;
                     },
-                      value: "",
+                      value: bloc.leadStatus.value,
                       hintText: "Select Status",
                     ),
+                    ValueListenableBuilder(
+                      valueListenable: bloc.leadStatus,
+                      builder: (context, status, child) {
+                        if(status != "open"){
+                          return Offstage();
+                        }
+                      return Column(
+                        children: [
+                          const SizedBox(height: 10),
+                          InkWell(
+                            onTap: () {
+                              showDatePicker(context: context,
+                                  firstDate: DateTime(2000),
+                                  lastDate: DateTime(3000)).then((value) => value !=null ?bloc.nextFollowUp.text = value.toString().split(" ").first.split("-").reversed.join("-"): null);
+                            },
+                            child: AppTextField(
+                              controller: bloc.nextFollowUp,
+                              title: 'Next follow up date',
+                              showTitle: false,
+                              enabled: false,
+                              keyboardType: TextInputType.number,
+                            ),
+                          ),
+                        ],
+                      );
+                    },),
                     const SizedBox(height: 10,),
                     AppDropdown(items: [
-                      DropdownMenuItem(child: Text("Lead for",style: TextStyle(color: Colors.grey),),value: "",enabled: false,),
                       DropdownMenuItem(child: Text("On Product"),value: "1",),
                       DropdownMenuItem(child: Text("Offsite"),value: "0",)
                     ], onChanged: (value) {
                       bloc.forLead.value = value;
                     },
-                      value: "",
-                      hintText: "Source",
+                      value: bloc.forLead.value,
+                      hintText: "Lead for",
                     ),
                     ValueListenableBuilder(
                       valueListenable: bloc.forLead,
@@ -221,13 +246,12 @@ class _CreateNewLeadPageState extends State<CreateNewLeadPage> {
                                   if(allPortfolioCat == null){
                                     return AppDropdown(
                                       items: [
-                                        DropdownMenuItem(child: Text("Select Source"),value: "",enabled: false,)
                                       ],
                                       onChanged: (value) {
                                         bloc.portfolioCat.value = value;
                                       },
-                                      value: "",
-                                      hintText: "Source",
+                                      value: null,
+                                      hintText: "Portfolio Category",
                                     );
                                   }
                                   return AppDropdown(
@@ -235,7 +259,7 @@ class _CreateNewLeadPageState extends State<CreateNewLeadPage> {
                                     onChanged: (value) {
                                       bloc.portfolioCat.value = value.toString();
                                     },
-                                    value: allPortfolioCat[0]['id'].toString(),
+                                    value: bloc.portfolioCat.value,
                                     hintText: "Portfolio Category",
                                   );
                                 },),
@@ -251,12 +275,11 @@ class _CreateNewLeadPageState extends State<CreateNewLeadPage> {
                         if(allDesignationData == null){
                           return AppDropdown(
                             items: [
-                              DropdownMenuItem(child: Text("Select Designation",style: TextStyle(color: Colors.grey),),value: "",enabled: false,)
                             ],
                             onChanged: (value) {
                               bloc.designation.value = value;
                             },
-                            value: "",
+                            value: null,
                             hintText: "Select Designation",
                           );
                         }
@@ -265,7 +288,7 @@ class _CreateNewLeadPageState extends State<CreateNewLeadPage> {
                           onChanged: (value) {
                             bloc.designation.value = value.toString();
                           },
-                          value: allDesignationData[0]['id'].toString(),
+                          value: bloc.designation.value,
                           hintText: "Select Designation",
                         );
                       },),
@@ -276,12 +299,11 @@ class _CreateNewLeadPageState extends State<CreateNewLeadPage> {
                         if(allDepartmentData == null){
                           return AppDropdown(
                             items: [
-                              DropdownMenuItem(child: Text("Select Department",style: TextStyle(color: Colors.grey),),value: "",enabled: false,)
                             ],
                             onChanged: (value) {
                               bloc.yourDepartment.value = value;
                             },
-                            value: "",
+                            value: bloc.yourDepartment.value,
                             hintText: "Select Department",
                           );
                         }
@@ -290,7 +312,7 @@ class _CreateNewLeadPageState extends State<CreateNewLeadPage> {
                           onChanged: (value) {
                             bloc.yourDepartment.value = value.toString();
                           },
-                          value: allDepartmentData[0]['id'].toString(),
+                          value: bloc.yourDepartment.value,
                           hintText: "Select Department",
                         );
                       },),
@@ -304,19 +326,18 @@ class _CreateNewLeadPageState extends State<CreateNewLeadPage> {
                     const SizedBox(height: 10,),
                     AppDropdown(
                       items: [
-                        DropdownMenuItem(child: Text("Select",style: TextStyle(color: Colors.grey),),value: "",enabled: false,),
-                        DropdownMenuItem(child: Text("Yes"),value: "yes",),
-                        DropdownMenuItem(child: Text("No"),value: "no",)
+                        DropdownMenuItem(child: Text("Yes"),value: "1",),
+                        DropdownMenuItem(child: Text("No"),value: "0",)
                     ], onChanged: (value) {
                       bloc.alreadyClient.value = value;
                     },
-                      value: bloc.alreadyClient.value ?? "",
+                      value: bloc.alreadyClient.value,
                       hintText: "Already a client",
                     ),
                     ValueListenableBuilder(
                       valueListenable: bloc.alreadyClient,
                       builder: (context, alreadyClient, child) {
-                        if(alreadyClient == "yes"){
+                        if(alreadyClient == "1"){
                           return Column(
                             children: [
                               const SizedBox(height: 10,),
@@ -326,12 +347,11 @@ class _CreateNewLeadPageState extends State<CreateNewLeadPage> {
                                   if(allClientData == null){
                                     return AppDropdown(
                                       items: [
-                                        DropdownMenuItem(child: Text("Select Client",style: TextStyle(color: Colors.grey),),value: "",enabled: false,)
                                       ],
                                       onChanged: (value) {
                                         bloc.selectClient.value = value;
                                       },
-                                      value: "",
+                                      value: bloc.selectClient.value,
                                       hintText: "Select Client",
                                     );
                                   }
@@ -340,13 +360,13 @@ class _CreateNewLeadPageState extends State<CreateNewLeadPage> {
                                     onChanged: (value) {
                                       bloc.selectClient.value = value.toString();
                                     },
-                                    value: allClientData[0]['id'].toString(),
+                                    value: bloc.selectClient.value,
                                     hintText: "Select Client",
                                   );
                                 },),
                             ],
                           );
-                        }else if(alreadyClient == "no"){
+                        }else if(alreadyClient == "0"){
                           return Column(
                             children: [
                               const SizedBox(height: 10,),
@@ -404,12 +424,14 @@ class _CreateNewLeadPageState extends State<CreateNewLeadPage> {
                               const SizedBox(height: 10),
                               AppDropdown(
                                 items: [
-                                  DropdownMenuItem(child: Text("Gender"),value: "1",)
+                                  DropdownMenuItem(child: Text("Male"),value: "male",),
+                                  DropdownMenuItem(child: Text("Female"),value: "female",),
+                                  DropdownMenuItem(child: Text("Other"),value: "other",),
                                 ], onChanged: (value) {
                                 bloc.clientGender.value = value;
                               },
-                                value: "1",
-                                hintText: "Source",
+                                value: bloc.clientGender.value,
+                                hintText: "Select Gender",
                               ),
                               const SizedBox(height: 10),
                               AppTextField(
@@ -418,44 +440,86 @@ class _CreateNewLeadPageState extends State<CreateNewLeadPage> {
                                 showTitle: false,
                               ),
                               const SizedBox(height: 10),
-                              AppDropdown(
-                                items: [
-                                  DropdownMenuItem(child: Text("Country"),value: "1",)
-                                ], onChanged: (value) {
-                                bloc.country.value = value;
-                              },
-                                value: "1",
-                                hintText: "Source",
+                              ValueListenableBuilder(
+                                valueListenable: bloc.allCountryData,
+                                builder: (context, allCountryData, child) {
+                                  if(allCountryData == null){
+                                    return AppDropdown(
+                                      items: [],
+                                      onChanged: (value) {},
+                                      value: null,
+                                      hintText: "Select Country",
+                                    );
+                                  }
+                                  return AppDropdown(
+                                    items: allCountryData.map((e) => DropdownMenuItem<String>(child: Text(e['name']),value: e['id'].toString(),)).toList(),
+                                    onChanged: (value) {
+                                      bloc.country.value = value.toString();
+                                      bloc.getAllStateData(value.toString());
+                                    },
+                                    value: bloc.country.value,
+                                    hintText: "Select Country"
+                                  );
+                                },),
+                              const SizedBox(height: 10),
+                              ValueListenableBuilder(
+                                valueListenable: bloc.allStateData,
+                                builder: (context, allStateData, child) {
+                                  if(allStateData == null){
+                                    return AppDropdown(
+                                      items: [],
+                                      onChanged: (value) {},
+                                      value: null,
+                                      hintText: "Select State",
+                                    );
+                                  }
+                                  return AppDropdown(
+                                      items: allStateData.map((e) => DropdownMenuItem<String>(child: Text(e['name']),value: e['id'].toString(),)).toList(),
+                                      onChanged: (value) {
+                                        bloc.countryState.value = value.toString();
+                                        bloc.getAllCityData(bloc.country.value! ,value.toString());
+                                      },
+                                      value: bloc.countryState.value,
+                                      hintText: "Select State"
+                                  );
+                                },),
+                              const SizedBox(height: 10),
+                              ValueListenableBuilder(
+                                valueListenable: bloc.allCityData,
+                                builder: (context, allCityData, child) {
+                                  if(allCityData == null){
+                                    return AppDropdown(
+                                      items: [],
+                                      onChanged: (value) {},
+                                      value: null,
+                                      hintText: "Select City",
+                                    );
+                                  }
+                                  return AppDropdown(
+                                      items: allCityData!.map((e) => DropdownMenuItem<String>(child: Text(e['name']),value: e['id'].toString(),)).toList(),
+                                      onChanged: (value) {
+                                        bloc.city.value = value.toString();
+                                      },
+                                      value: bloc.city.value,
+                                      hintText: "Select City"
+                                  );
+                                },),
+                              const SizedBox(height: 10),
+                              AppTextField(
+                                controller: bloc.pincode,
+                                title: 'Pincode',
+                                showTitle: false,
+                                keyboardType: TextInputType.number,
                               ),
                               const SizedBox(height: 10),
                               AppDropdown(
                                 items: [
-                                  DropdownMenuItem(child: Text("State"),value: "1",)
-                                ], onChanged: (value) {
-                                bloc.countryState.value = value;
-                              },
-                                value: "1",
-                                hintText: "Source",
-                              ),
-                              const SizedBox(height: 10),
-                              AppDropdown(
-                                items: [
-                                  DropdownMenuItem(child: Text("City"),value: "1",)
-                                ], onChanged: (value) {
-                                bloc.city.value = value;
-                              },
-                                value: "1",
-                                hintText: "Source",
-                              ),
-                              const SizedBox(height: 10),
-                              AppDropdown(
-                                items: [
-                                  DropdownMenuItem(child: Text("Company Name"),value: "1",)
+                                  DropdownMenuItem(child: Text("Aarvy Technologies"),value: "Aarvy Technologies",)
                                 ], onChanged: (value) {
                                 bloc.companyName.value = value;
                               },
-                                value: "1",
-                                hintText: "Source",
+                                value: bloc.companyName.value,
+                                hintText: "Select Company",
                               ),
                             ],
                           );
@@ -585,7 +649,7 @@ class _CreateNewLeadPageState extends State<CreateNewLeadPage> {
                       onTap: () {
                         showDatePicker(context: context,
                             firstDate: DateTime(2000),
-                            lastDate: DateTime(3000)).then((value) => value !=null ?bloc.lastFollowUp.text = value.toString().split(" ").first: null);
+                            lastDate: DateTime(3000)).then((value) => value !=null ?bloc.lastFollowUp.text = value.toString().split(" ").first.split("-").reversed.join("-"): null);
                       },
                       child: AppTextField(
                         controller: bloc.lastFollowUp,

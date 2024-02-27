@@ -71,6 +71,35 @@ class LeadsRepository {
       throw Exception('data is not avaible ${e.toString()}');
     }
   }
+  Future<ApiResponse2> fetchAllCountryData()async{
+    try{
+      var response = await _api.getRequest("get-country");
+      return ApiResponse2.fromJson(response,response['data']);
+    }catch(e){
+      throw Exception('data is not avaible ${e.toString()}');
+    }
+  }
+  Future<ApiResponse2> fetchAllStateData(String countryId)async{
+    try{
+      var response = await _api.getRequest("get-state",data: {
+        "country_id" : countryId,
+      });
+      return ApiResponse2.fromJson(response,response['data']);
+    }catch(e){
+      throw Exception('data is not avaible ${e.toString()}');
+    }
+  }
+  Future<ApiResponse2> fetchAllCityData(String countryId, String stateId)async{
+    try{
+      var response = await _api.getRequest("get-city",data: {
+        "country_id" : countryId,
+        "state_id" : stateId,
+      });
+      return ApiResponse2.fromJson(response,response['data']);
+    }catch(e){
+      throw Exception('data is not avaible ${e.toString()}');
+    }
+  }
 
   Future<ApiResponse2> leadsData(String type) async {
     try{
@@ -83,6 +112,28 @@ class LeadsRepository {
         ApiException.fromString("response null");
       }
       return ApiResponse2.fromJson(response,response["data"]["lead"][type]);
+    }catch(e){
+      print("data is not avaible ${e.toString()}");
+      throw Exception('data is not avaible ${e.toString()}');
+    }
+
+  }
+
+  Future<ApiResponse2> specificLeadData(String leadId,String type) async {
+    try{
+      SharedPreferences _pref = await SharedPreferences.getInstance();
+      var response= await _api.getRequest("leads_details",data: {
+        "emp_id" : _pref.getString("uid"),
+        "lead_id" : leadId,
+      });
+      if (response == null) {
+        ApiException.fromString("response null");
+      }
+      print("the dat is ${response['totaldata']['lead_details'][type]}");
+      if(type == "user"){
+        return ApiResponse2.fromJson(response,[response['totaldata']['lead_details'][type]]);
+      }
+      return ApiResponse2.fromJson(response,response['totaldata']['lead_details'][type]);
     }catch(e){
       print("data is not avaible ${e.toString()}");
       throw Exception('data is not avaible ${e.toString()}');

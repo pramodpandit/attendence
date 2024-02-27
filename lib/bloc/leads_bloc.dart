@@ -28,6 +28,8 @@ class LeadsBloc extends Bloc {
 
   ValueNotifier<String> leadType = ValueNotifier("total");
   ValueNotifier<List?> leadData = ValueNotifier(null);
+  ValueNotifier<List?> specificLeadData = ValueNotifier(null);
+  ValueNotifier<int> downloadLoading = ValueNotifier(-1);
 
   //ValueNotifier<List> balanceData = ValueNotifier([]);
   Future getLeadData(String type) async {
@@ -38,6 +40,16 @@ class LeadsBloc extends Bloc {
       print('value is availble:${res.data}');
     } catch(e,s) {
       debugPrint('$e');
+      debugPrintStack(stackTrace: s);
+    }
+  }
+  Future getSpecificLeadData(String leadId, String type) async {
+
+    try {
+      var res = await _repo.specificLeadData(leadId,type);
+      specificLeadData.value = res.data;
+    } catch(e,s) {
+      debugPrint('the main error : $e');
       debugPrintStack(stackTrace: s);
     }
   }
@@ -182,6 +194,9 @@ class LeadsBloc extends Bloc {
   ValueNotifier<List?> allClientData = ValueNotifier(null);
   ValueNotifier<List?> allTechnologyData = ValueNotifier(null);
   ValueNotifier<List?> allPortfolioCategory = ValueNotifier(null);
+  ValueNotifier<List?> allCountryData = ValueNotifier(null);
+  ValueNotifier<List?> allStateData = ValueNotifier(null);
+  ValueNotifier<List?> allCityData = ValueNotifier(null);
 // all apis data end
 
   GlobalKey<FormState> formState = GlobalKey<FormState>();
@@ -191,6 +206,7 @@ class LeadsBloc extends Bloc {
   ValueNotifier<String?> source = ValueNotifier(null);
   TextEditingController remark = TextEditingController();
   ValueNotifier<String?> leadStatus = ValueNotifier(null);
+  TextEditingController nextFollowUp = TextEditingController();
   ValueNotifier<String?> forLead = ValueNotifier(null);
   ValueNotifier<String?> portfolioCat = ValueNotifier(null);
   // branch
@@ -209,7 +225,7 @@ class LeadsBloc extends Bloc {
   TextEditingController alternateEmail = TextEditingController();
   TextEditingController phone = TextEditingController();
   TextEditingController alternatePhone = TextEditingController();
-  ValueNotifier<int?> clientGender = ValueNotifier(null);
+  ValueNotifier<String?> clientGender = ValueNotifier(null);
   TextEditingController address = TextEditingController();
   ValueNotifier<String?> country = ValueNotifier(null);
   ValueNotifier<String?> countryState = ValueNotifier(null);
@@ -220,7 +236,6 @@ class LeadsBloc extends Bloc {
   ValueNotifier<List> preferenceTechnology = ValueNotifier([]);
   TextEditingController probabilityConversion = TextEditingController();
   TextEditingController lastFollowUp = TextEditingController();
-
 
   String? selectedEmpId, clientId, imageURL;
 
@@ -300,6 +315,33 @@ class LeadsBloc extends Bloc {
       showMessage(const MessageType.error("Some error occurred! Please try again!"));
     }
   }
+  getAllCountryData () async{
+    try{
+      ApiResponse2 res = await _repo.fetchAllCountryData();
+      allCountryData.value = res.data;
+    }catch(e){
+      allCountryData.value = [];
+      showMessage(const MessageType.error("Some error occurred! Please try again!"));
+    }
+  }
+  getAllStateData (String countryId) async{
+    try{
+      ApiResponse2 res = await _repo.fetchAllStateData(countryId);
+      allStateData.value = res.data;
+    }catch(e){
+      allStateData.value = [];
+      showMessage(const MessageType.error("Some error occurred! Please try again!"));
+    }
+  }
+  getAllCityData (String countryId, String stateId) async{
+    try{
+      ApiResponse2 res = await _repo.fetchAllCityData(countryId,stateId);
+      allCityData.value = res.data;
+    }catch(e){
+      allCityData.value = [];
+      showMessage(const MessageType.error("Some error occurred! Please try again!"));
+    }
+  }
 
   createNewEmployee() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
@@ -318,29 +360,50 @@ class LeadsBloc extends Bloc {
         "source_id": source.value,
         "remark": remark.text,
         "status": leadStatus.value,
-        // "next_followup": email.text,
+        "client_info" : alreadyClient.value,
         "leadfor": forLead.value,
-        "portfolio_cat" : portfolioCat.value,
         "designation" : designation.value,
         "department" : yourDepartment.value,
-        // "employee_id"
+        "employee_id" : pref.getString("uid"),
         "requirement" : requirements.text,
-        "technology_skills" : preferenceTechnology.value.join(","),
+        "technology_skills" : preferenceTechnology.value.map((e) => e['id']).toList().join(","),
         "probability_conversion" : probabilityConversion.text,
         "last_follow_up" : lastFollowUp.text,
       };
-      if(alreadyClient.value!="yes"){
+      if(leadStatus.value == "open"){
+        lead.addAll({
+          "next_followup": nextFollowUp.text,
+        });
+      }
+      if(forLead.value == "1"){
+        lead.addAll({
+          "portfolio_cat" : portfolioCat.value,
+        });
+      }
+      if(alreadyClient.value=="1"){
         lead.addAll({
           "client_id" : selectClient.value
         });
-      }else{
+      }else if(alreadyClient.value == "0"){
         lead.addAll({
-
+          "first_name": firstName.text,
+          "middle_name" : middleName.text,
+          "last_name" : lastName.text,
+          "email" : email.text,
+          "alternate_email" : alternateEmail.text,
+          "phone" : phone.text,
+          "alternate_phone" : alternatePhone.text,
+          "address" : address.text,
+          "gender" : clientGender.value,
+          "c_name" : companyName.value,
+          "country_id" : country.value,
+          "state_id" : countryState.value,
+          "city_id" : city.value,
+          "pincode" : pincode.text,
         });
       }
-      // leadsJSON = jsonEncode(lead);
+      // print("the data is : $lead");
       ApiResponse res = await _repo.createNewLead(lead);
-      print("the data is : ${res.data}");
       if(res.status) {
         showMessage(const MessageType.success("Employee Created Successfully"));
         createLeadController.add("SUCCESS");
