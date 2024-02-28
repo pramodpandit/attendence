@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:office/bloc/leads_bloc.dart';
+import 'package:office/bloc/project_bloc.dart';
+import 'package:office/data/repository/project_repo.dart';
 import 'package:office/ui/widget/app_dropdown.dart';
 import 'package:office/ui/widget/app_text_field.dart';
+import 'package:office/ui/widget/custom_button.dart';
+import 'package:provider/provider.dart';
 
 class AddLeadLogs extends StatefulWidget {
   final int leadId;
@@ -181,140 +185,324 @@ class _AddLeadLogsState extends State<AddLeadLogs> {
                             return Offstage();
                           },),
                         ValueListenableBuilder(
-                          valueListenable: widget.bloc.projectConvert,
-                          builder: (context, projectConvert, child) {
-                            if(projectConvert == null) {
-                              return Offstage();
-                            }
-                            if(projectConvert == "yes"){
-                              return Column(
-                                children: [
-                                  const SizedBox(height: 10),
-                                  AppDropdown(
-                                    items: const [
-                                      DropdownMenuItem(value: "specific", child: Text("Specific")),
-                                      DropdownMenuItem(value: "everyone", child: Text("Everyone")),
-                                    ],
-                                    onChanged: (value) {
-                                      widget.bloc.branch.value = value;
-                                    },
-                                    value: widget.bloc.branch.value,
-                                    hintText: "Branch",
-                                  ),
-                           // one missing
-                                  const SizedBox(height: 10),
-                                  ValueListenableBuilder(
-                                    valueListenable: widget.bloc.allProjectTypes,
-                                    builder: (context, allProjectTypes, child) {
-                                      if(allProjectTypes == null){
+                          valueListenable: widget.bloc.logStatus,
+                          builder: (context, logStatus, child) {
+                          return ValueListenableBuilder(
+                            valueListenable: widget.bloc.projectConvert,
+                            builder: (context, projectConvert, child) {
+                              if(projectConvert == null) {
+                                return Offstage();
+                              }
+                              if(projectConvert == "yes" && logStatus == "converted"){
+                                return Column(
+                                  children: [
+                                    const SizedBox(height: 10),
+                                    AppDropdown(
+                                      items: const [
+                                        DropdownMenuItem(value: "specific", child: Text("Specific")),
+                                        DropdownMenuItem(value: "everyone", child: Text("Everyone")),
+                                      ],
+                                      onChanged: (value) {
+                                        widget.bloc.branchType.value = value;
+                                      },
+                                      value: widget.bloc.branchType.value,
+                                      hintText: "Branch Type",
+                                    ),
+                                    ValueListenableBuilder(
+                                      valueListenable: widget.bloc.branchType,
+                                      builder: (context, branchType, child) {
+                                        if(branchType == null){
+                                          return Offstage();
+                                        }
+                                        if(branchType == "specific"){
+                                          return Column(
+                                            children: [
+                                              const SizedBox(height: 10),
+                                              ValueListenableBuilder(
+                                                valueListenable: widget.bloc.allBranchData,
+                                                 builder: (context, allBranchData, child) {
+                                                  if(allBranchData == null){
+                                                    return AppDropdown(
+                                                      items: [],
+                                                      onChanged: (value) {
+                                                        widget.bloc.branchId.value = value;
+                                                      },
+                                                      value: null,
+                                                      hintText: "Branch",
+                                                    );
+                                                  }
+                                                return AppDropdown(
+                                                  items: allBranchData.map((e) => DropdownMenuItem<String>(value: e['id'].toString(),child: Text(e['title']),)).toList(),
+                                                  onChanged: (value) {
+                                                    widget.bloc.branchId.value = value;
+                                                  },
+                                                  value: widget.bloc.projectType.value,
+                                                  hintText: "Branch",
+                                                );
+                                              },),
+                                              const SizedBox(height: 10),
+                                              ValueListenableBuilder(
+                                                valueListenable: widget.bloc.allEmployeeData,
+                                                builder: (context, allEmployeeData, child) {
+                                                  if(allEmployeeData == null){
+                                                    return AppDropdown(
+                                                      items: [],
+                                                      onChanged: (value) {
+                                                        widget.bloc.employeeId.value = value;
+                                                      },
+                                                      value: null,
+                                                      hintText: "Employee",
+                                                    );
+                                                  }
+                                                return AppDropdown(
+                                                  items: allEmployeeData.map((e) => DropdownMenuItem<String>(value: e['id'].toString(),child: Text("${e['first_name'] ?? ''} ${e['middle_name'] ?? ''} ${e['last_name'] ?? ''}"),)).toList(),
+                                                  onChanged: (value) {
+                                                    widget.bloc.employeeId.value = value;
+                                                  },
+                                                  value: widget.bloc.employeeId.value,
+                                                  hintText: "Employee",
+                                                );
+                                              },)
+                                            ],
+                                          );
+                                        }
+                                        if(branchType == "everyone"){
+                                          ValueListenableBuilder(
+                                            valueListenable: widget.bloc.allEmployeeData,
+                                            builder: (context, allEmployeeData, child) {
+                                              if(allEmployeeData == null){
+                                                return AppDropdown(
+                                                  items: [],
+                                                  onChanged: (value) {
+                                                    widget.bloc.employeeId.value = value;
+                                                  },
+                                                  value: null,
+                                                  hintText: "Employee",
+                                                );
+                                              }
+                                              return AppDropdown(
+                                                items: allEmployeeData.map((e) => DropdownMenuItem<String>(value: e['id'].toString(),child: Text("${e['first_name'] ?? ''} ${e['middle_name'] ?? ''} ${e['last_name'] ?? ''}"),)).toList(),
+                                                onChanged: (value) {
+                                                  widget.bloc.employeeId.value = value;
+                                                },
+                                                value: widget.bloc.employeeId.value,
+                                                hintText: "Employee",
+                                              );
+                                            },);
+                                        }
+                                        return Offstage();
+                                      },),
+                                    const SizedBox(height: 10),
+                                    ValueListenableBuilder(
+                                      valueListenable: widget.bloc.allProjectTypes,
+                                      builder: (context, allProjectTypes, child) {
+                                        if(allProjectTypes == null){
+                                          return AppDropdown(
+                                            items: const [],
+                                            onChanged: (value) {
+                                              widget.bloc.projectType.value = value;
+                                            },
+                                            value: null,
+                                            hintText: "Project Type",
+                                          );
+                                        }
                                         return AppDropdown(
-                                          items: const [],
+                                          items: allProjectTypes.map((e) => DropdownMenuItem<String>(child: Text(e['name']),value: e['id'].toString(),)).toList(),
                                           onChanged: (value) {
                                             widget.bloc.projectType.value = value;
+                                            widget.bloc.shortCode.text = allProjectTypes.where((element) => element['id'].toString() == value.toString()).toList()[0]['short_code'];
                                           },
-                                          value: null,
+                                          value: widget.bloc.projectType.value,
                                           hintText: "Project Type",
                                         );
-                                      }
-                                    return AppDropdown(
-                                      items: allProjectTypes.map((e) => DropdownMenuItem<String>(child: Text(e['name']),value: e['id'].toString(),)).toList(),
-                                      onChanged: (value) {
-                                        widget.bloc.projectType.value = value;
-                                        widget.bloc.shortCode.text = allProjectTypes.where((element) => element['id'].toString() == value.toString()).toList()[0]['short_code'];
-                                      },
-                                      value: widget.bloc.projectType.value,
-                                      hintText: "Project Type",
-                                    );
-                                  },),
-                                  const SizedBox(height: 10),
-                                  AppTextField(
-                                    controller: widget.bloc.shortCode,
-                                    title: "Short code",
-                                    showTitle: false,
-                                  ),
-                                  const SizedBox(height: 10),
-                                  AppTextField(
-                                    controller: widget.bloc.projectCode,
-                                    title: "Project code",
-                                    showTitle: false,
-                                  ),
-                                  const SizedBox(height: 10),
-                                  InkWell(
-                                    onTap: () {
-                                      showDatePicker(context: context, firstDate: DateTime(2000),lastDate: DateTime(3000)).then((value){
-                                        if(value != null){
-                                          widget.bloc.startDate.text = value.toString().split(" ").first;
-                                        }
-                                      });
-                                    },
-                                    child: AppTextField(
-                                      controller: widget.bloc.startDate,
-                                      title: "Start date",
+                                      },),
+                                    const SizedBox(height: 10),
+                                    AppTextField(
+                                      controller: widget.bloc.shortCode,
+                                      title: "Short code",
                                       showTitle: false,
-                                      enabled: false,
                                     ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  AppDropdown(
-                                    items: const [
-                                      DropdownMenuItem(value: "yes", child: Text("Yes")),
-                                      DropdownMenuItem(value: "no", child: Text("No")),
-                                    ],
-                                    onChanged: (value) {
-                                      widget.bloc.deadline.value = value;
-                                    },
-                                    value: widget.bloc.deadline.value,
-                                    hintText: "Deadline",
-                                  ),
-                                  ValueListenableBuilder(
-                                    valueListenable: widget.bloc.deadline,
-                                    builder: (context, deadline, child) {
-                                      if(deadline == null){
-                                        return Offstage();
-                                      }
-                                      if(deadline == "yes"){
-                                        return Column(
-                                          children: [
-                                            const SizedBox(height: 10),
-                                            InkWell(
-                                              onTap: () {
-                                                showDatePicker(context: context, firstDate: DateTime(2000),lastDate: DateTime(3000)).then((value){
-                                                  if(value != null){
-                                                    widget.bloc.deadlineDate.text = value.toString().split(" ").first;
-                                                  }
-                                                });
-                                              },
-                                              child: AppTextField(
-                                                controller: widget.bloc.deadlineDate,
-                                                title: "Deadline date",
-                                                showTitle: false,
-                                                enabled: false,
+                                    const SizedBox(height: 10),
+                                    AppTextField(
+                                      controller: widget.bloc.projectCode,
+                                      title: "Project code",
+                                      showTitle: false,
+                                    ),
+                                    const SizedBox(height: 10),
+                                    InkWell(
+                                      onTap: () {
+                                        showDatePicker(context: context, firstDate: DateTime(2000),lastDate: DateTime(3000)).then((value){
+                                          if(value != null){
+                                            widget.bloc.startDate.text = value.toString().split(" ").first;
+                                          }
+                                        });
+                                      },
+                                      child: AppTextField(
+                                        controller: widget.bloc.startDate,
+                                        title: "Start date",
+                                        showTitle: false,
+                                        enabled: false,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    AppDropdown(
+                                      items: const [
+                                        DropdownMenuItem(value: "yes", child: Text("Yes")),
+                                        DropdownMenuItem(value: "no", child: Text("No")),
+                                      ],
+                                      onChanged: (value) {
+                                        widget.bloc.deadline.value = value;
+                                      },
+                                      value: widget.bloc.deadline.value,
+                                      hintText: "Deadline",
+                                    ),
+                                    ValueListenableBuilder(
+                                      valueListenable: widget.bloc.deadline,
+                                      builder: (context, deadline, child) {
+                                        if(deadline == null){
+                                          return Offstage();
+                                        }
+                                        if(deadline == "yes"){
+                                          return Column(
+                                            children: [
+                                              const SizedBox(height: 10),
+                                              InkWell(
+                                                onTap: () {
+                                                  showDatePicker(context: context, firstDate: DateTime(2000),lastDate: DateTime(3000)).then((value){
+                                                    if(value != null){
+                                                      widget.bloc.deadlineDate.text = value.toString().split(" ").first;
+                                                    }
+                                                  });
+                                                },
+                                                child: AppTextField(
+                                                  controller: widget.bloc.deadlineDate,
+                                                  title: "Deadline date",
+                                                  showTitle: false,
+                                                  enabled: false,
+                                                ),
                                               ),
-                                            ),
-                                          ],
-                                        );
-                                      }
-                                      return Offstage();
-                                  },),
-                                  const SizedBox(height: 10),
-                                  AppTextField(
+                                            ],
+                                          );
+                                        }
+                                        return Offstage();
+                                      },),
+                                    const SizedBox(height: 10),
+                                    AppTextField(
                                       controller: widget.bloc.projectSummary,
                                       title: "Project summary",
-                                    showTitle: false,
-                                    maxLines: 4,
-                                  ),
-                                  const SizedBox(height: 10),
-                                  AppTextField(
-                                    controller: widget.bloc.notes,
-                                    title: "Notes",
-                                    showTitle: false,
-                                    maxLines: 4,
-                                  ),
-                                ],
-                              );
-                            }
-                            return Offstage();
-                          },),
+                                      showTitle: false,
+                                      maxLines: 4,
+                                    ),
+                                    const SizedBox(height: 10),
+                                    AppTextField(
+                                      controller: widget.bloc.notes,
+                                      title: "Notes",
+                                      showTitle: false,
+                                      maxLines: 4,
+                                    ),
+                                    const SizedBox(height: 10),
+                                    ValueListenableBuilder(
+                                      valueListenable: widget.bloc.allCurrencyData,
+                                      builder: (context, allCurrencyData, child) {
+                                        if(allCurrencyData == null){
+                                          return AppDropdown(
+                                            items: const [],
+                                            onChanged: (value) {
+                                              widget.bloc.currency.value = value;
+                                            },
+                                            value: null,
+                                            hintText: "Select Currency",
+                                          );
+                                        }
+                                        return AppDropdown(
+                                          items: allCurrencyData.map((e) => DropdownMenuItem<String>(child: Text(e['name']),value: e['id'].toString(),)).toList(),
+                                          onChanged: (value) {
+                                            widget.bloc.currency.value = value;
+                                          },
+                                          value: widget.bloc.projectType.value,
+                                          hintText: "Select Currency",
+                                        );
+                                      },),
+                                    const SizedBox(height: 10),
+                                    AppDropdown(
+                                      items: const [
+                                        DropdownMenuItem(value: "hourly", child: Text("Hourly")),
+                                        DropdownMenuItem(value: "daily", child: Text("Daily")),
+                                        DropdownMenuItem(value: "onetime", child: Text("One Time")),
+                                        DropdownMenuItem(value: "monthly", child: Text("Monthly")),
+                                        DropdownMenuItem(value: "taskbased", child: Text("Task Based")),
+                                      ],
+                                      onChanged: (value) {
+                                        widget.bloc.projectCostType.value = value;
+                                      },
+                                      value: widget.bloc.projectCostType.value,
+                                      hintText: "Select project cost type",
+                                    ),
+                                    const SizedBox(height: 10),
+                                    AppTextField(
+                                      controller: widget.bloc.amount,
+                                      title: "Amount",
+                                      showTitle: false,
+                                    ),
+                                    const SizedBox(height: 10),
+                                    AppDropdown(
+                                      items: const [
+                                        DropdownMenuItem(value: "yes", child: Text("Yes")),
+                                        DropdownMenuItem(value: "no", child: Text("No")),
+                                      ],
+                                      onChanged: (value) {
+                                        widget.bloc.withTax.value = value;
+                                      },
+                                      value: widget.bloc.withTax.value,
+                                      hintText: "With Tax",
+                                    ),
+                                    ValueListenableBuilder(
+                                      valueListenable: widget.bloc.withTax,
+                                      builder: (context, withTax, child) {
+                                        if(withTax == null){
+                                          return Offstage();
+                                        }
+                                        if(withTax == "yes"){
+                                          return Column(
+                                            children: [
+                                              const SizedBox(height: 10),
+                                              AppTextField(
+                                                controller: widget.bloc.taxPercentage,
+                                                title: "Tax percentage",
+                                                showTitle: false,
+                                              ),
+                                            ],
+                                          );
+                                        }
+                                        return Offstage();
+                                      },)
+                                  ],
+                                );
+                              }
+                              return Offstage();
+                            },);
+                        },),
+                        const SizedBox(height: 10),
+                        ValueListenableBuilder(
+                          valueListenable: widget.bloc.addLogsLoading,
+                          builder: (BuildContext context, bool loading,
+                              Widget? child) {
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                loading
+                                    ? CircularProgressIndicator()
+                                    : CustomButton2(
+                                    onPressed: () {
+                                      if (formKey.currentState!.validate()) {
+                                        widget.bloc.addLeadLogs(widget.leadId.toString());
+                                      }
+                                    },
+                                    tittle: 'Add Logs'),
+                              ],
+                            );
+                          },
+                        ),
                       ]
                     ),
                   ),
