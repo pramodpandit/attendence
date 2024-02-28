@@ -37,6 +37,7 @@ class _UserProfileState extends State<UserProfile> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
      menusWidgets = [
       // ListView.builder(
       //   itemCount: 7,
@@ -174,7 +175,7 @@ class _UserProfileState extends State<UserProfile> {
                                         decoration: BoxDecoration(
                                             borderRadius: BorderRadius.circular(5),
                                             image: DecorationImage(
-                                                image: NetworkImage(
+                                                image: NetworkImage(userdata['image']==null? 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png':
                                                     "https://freeze.talocare.co.in/public/${userdata['image']}"),
                                                 fit: BoxFit.cover)),
                                       ),
@@ -183,7 +184,7 @@ class _UserProfileState extends State<UserProfile> {
                                 );
                               },
                               child: ClipOval(
-                                child: Image.network(
+                                child: Image.network(userdata['image']==null?'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png':
                                   "https://freeze.talocare.co.in/public/${userdata['image']}",
                                   fit: BoxFit.cover,
                                 ),
@@ -471,7 +472,6 @@ class AboutInfo extends StatefulWidget {
 
 class _AboutInfoState extends State<AboutInfo> {
   late ProjectBloc bloc;
-
   @override
   void initState() {
     // TODO: implement initState
@@ -501,8 +501,7 @@ class _AboutInfoState extends State<AboutInfo> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('About',style: TextStyle(fontWeight: FontWeight.w700),),
-                Html(data: userdata['about_us']),
-
+                Html(data: userdata['about_us']??''),
                 // DetailsContainer(
                 //   title: userdata['about_us'],
                 //   heading: 'About', isHtml: true,

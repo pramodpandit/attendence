@@ -121,14 +121,14 @@ class ProjectRepository {
     return ApiResponse2.fromJson(response,response);
   }
 
-  Future<ApiResponse2> AddLink(String Comment,String private,int Projectid,String title) async {
+  Future<ApiResponse2> AddLink(String Comment,String private,int Projectid,String title,int linktype) async {
     var response = await _api.postRequest("project/post-link-add", {
       "user_id": prefs.getString('uid'),
       "other_link_info":Comment,
       "privates": private,
       "project_id":Projectid,
       "links":title,
-      "link_type":4
+      "link_type":linktype
     });
 
     if (response == null) {
@@ -145,13 +145,38 @@ class ProjectRepository {
     }
     return ApiResponse2.fromJson(response,response);
   }
-  Future<ApiResponse2> getlinkList()async{
-    var response=await _api.getRequest("project/projectetype-list");
+  Future<ApiResponse2> AddExpense(String Price,String description,String private,int Projectid,String itemName,date,int categoryType,int Currency,File image,String MultipleMember,int paymentType) async {
+    print(image);
+    var response = await _api.postRequest("project/post-add-expense", {
+      "user_id": prefs.getString('uid'),
+      "description":description,
+      "privates": private,
+      "proj_id":Projectid,
+      "item_name":itemName,
+      "price":Price,
+      "purchase_date":date,
+      "project_payment_type":paymentType,
+      "exp_category":categoryType,
+      "currency":Currency,
+      "files":await MultipartFile.fromFile(image!.path,
+          filename: image.path.split('/').last),
+      "employee_id":MultipleMember
+    },withFile: true);
+
     if (response == null) {
       ApiException.fromString("response null");
     }
     return ApiResponse2.fromJson(response,response);
   }
+
+  Future<ApiResponse2> getlinkList()async{
+    var response=await _api.getRequest("project/linktype-list");
+    if (response == null) {
+      ApiException.fromString("response null");
+    }
+    return ApiResponse2.fromJson(response,response);
+  }
+
   Future<ApiResponse2> getexpenseCurrency()async{
     var response=await _api.getRequest("project/projectcurrency-list");
     if (response == null) {
@@ -167,13 +192,10 @@ class ProjectRepository {
     return ApiResponse2.fromJson(response,response);
   }
   Future<ApiResponse2> getexpensepaymentType()async{
-    var response=await _api.getRequest("project/projectetype-list");
+    var response=await _api.getRequest("project/paymenttype-list");
     if (response == null) {
       ApiException.fromString("response null");
     }
     return ApiResponse2.fromJson(response,response);
   }
-
-
-
 }

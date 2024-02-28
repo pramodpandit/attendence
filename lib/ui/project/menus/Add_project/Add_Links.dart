@@ -5,6 +5,7 @@ import 'package:nb_utils/nb_utils.dart';
 import 'package:office/ui/widget/custom_button.dart';
 import 'package:provider/provider.dart';
 import '../../../../bloc/project_bloc.dart';
+import '../../../widget/app_dropdown.dart';
 
 class Add_Links extends StatefulWidget {
   final int projectid;
@@ -28,6 +29,8 @@ class _Add_LinksState extends State<Add_Links> {
     bloc = context.read<ProjectBloc>();
     super.initState();
     bloc.Comment.text = '';
+    bloc.selectedLinktype = null;
+    bloc.fetchLinktype();
     bloc.fetchAddMemberLit(int.parse(widget.branch_id));
     bloc.linkSteam.stream.listen((event) {
       if (event == 'notes') {
@@ -108,42 +111,21 @@ class _Add_LinksState extends State<Add_Links> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Flexible(child: Text('Link Type',style: TextStyle(fontSize: 13,fontWeight: FontWeight.w700),)),
-                            Flexible(
-                              child: DropdownButtonFormField<String>(
-                                icon: const Icon(
-                                  Icons.keyboard_arrow_down_sharp,
-                                  color: Colors.grey,
-                                ),
-                                iconSize: 24,
-                                elevation: 16,
-                                style: const TextStyle(color: Colors.black, fontSize: 15),
-                                decoration: InputDecoration(
-                                  filled: true,
-                                  fillColor: Colors.grey[200],
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(color: Color(0xffF4F5F7)),
-                                    borderRadius: BorderRadius.circular(8),
+                            ValueListenableBuilder(
+                              valueListenable: bloc.linketype,
+                              builder: (context, linktype, child) {
+
+                                return  Flexible(
+                                  child:  AppDropdown(
+                                    items: linktype!.map((e) => DropdownMenuItem(value: '${e['id']}', child: Text(e['name']??""))
+                                    ).toList(),
+                                    onChanged: (v) {bloc.updatelink(v);},
+                                    value: bloc.selectedLinktype,
+                                    hintText: "Select",
                                   ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(color: Color(0xffF2F2F2)),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 12, horizontal: 10),
-                                  hintText: "Select",
-                                  hintStyle:
-                                  TextStyle(color: Colors.black.withOpacity(0.6), fontSize: 15,fontWeight: FontWeight.w500),
-                                ),
-                                onChanged: (String? data) {
-                                  bloc.addLinkType.value  = data;
-                                  },
-                                items: bloc.LinksType.map<DropdownMenuItem<String>>((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value,style: const TextStyle(color: Colors.black,fontWeight: FontWeight.w500),),
-                                  );
-                                }).toList(),
-                              ),
+                                );
+                              },
+
                             ),
                           ],
                         ),
@@ -151,14 +133,10 @@ class _Add_LinksState extends State<Add_Links> {
                         const SizedBox(
                           height: 10,
                         ),
-                        const Text(
-                          "Links",
-                          style: TextStyle(
-                              fontWeight: FontWeight.w700,
+                        const Text("Links", style: TextStyle(fontWeight: FontWeight.w700,
                               // color: ,
                               fontSize: 13,
-
-                          ),
+                        ),
                         ),
                         10.height,
                         TextFormField(

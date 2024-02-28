@@ -233,7 +233,6 @@ class _ProjectScreenState extends State<ProjectScreen> {
                                   TaskContent(tittle: '${projectData[index]['user_project_task']['project_task_doing']}', icon: Icons.error_outline,color: Colors.blue,),
                                   TaskContent(tittle: '${projectData[index]['user_project_task']['project_task_complete']}', icon: Icons.check_circle_outline,color: Colors.green,),
                                   TaskContent(tittle: '${projectData[index]['user_project_task']['project_task_incomplete']}', icon: Icons.cancel_outlined,color: Colors.red,),
-
                                 ],
                               ),
                               const SizedBox(height: 10,)

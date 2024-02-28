@@ -157,9 +157,8 @@ class _Add_CredientalsState extends State<Add_Credientals> {
                         10.height,
                         ValueListenableBuilder(
                           valueListenable: bloc.addCredialSpecificMember, builder: (context, validation, child) {
-
-                          if(validation.toString() == 'Yes'){
-                            return     Column(
+                            if(validation.toString() == 'Yes'){
+                            return Column(
                               children: [
                                 const Padding(
                                   padding: EdgeInsets.only(left: 1),
@@ -187,7 +186,6 @@ class _Add_CredientalsState extends State<Add_Credientals> {
                                       selectedOptionIcon: const Icon(Icons.check_circle),
                                     );
                                   },
-
                                 ),
                               ],
                             );
@@ -327,7 +325,6 @@ class _Add_CredientalsState extends State<Add_Credientals> {
                         const SizedBox(
                           height: 20,
                         ),
-
                         ValueListenableBuilder(
                           valueListenable: bloc.addCredientalLoading,
                           builder: (BuildContext context, bool loading,
@@ -351,10 +348,8 @@ class _Add_CredientalsState extends State<Add_Credientals> {
                                             bloc.addCrediental(widget.projectid,light==true?'yes':'no',data);
                                           }
                                         }
-
                                       }
-
-                                    },
+                                      },
                                     tittle: 'Add Crediental'),
                               ],
                             );

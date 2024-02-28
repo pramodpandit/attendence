@@ -170,7 +170,6 @@ class _Add_FilesState extends State<Add_Files> {
                         InkWell(
                           onTap: (){
                             openFilePicker();
-                            // _openImagePicker(ImageSource.gallery);
                           },
                           child: Container(
                           height: 50,
@@ -236,14 +235,10 @@ class _Add_FilesState extends State<Add_Files> {
                             ),
                           ],
                         ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-
+                        const SizedBox(height: 20,),
                         ValueListenableBuilder(
                           valueListenable: bloc.addfileLoading,
-                          builder: (BuildContext context, bool loading,
-                              Widget? child) {
+                          builder: (BuildContext context, bool loading, Widget? child) {
                             return Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
