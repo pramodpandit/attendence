@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
@@ -10,7 +9,7 @@ import 'package:office/utils/message_handler.dart';
 import 'package:provider/provider.dart';
 import '../../../../bloc/project_bloc.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:office/ui/widget/app_text_field.dart';
+import '../../../widget/app_dropdown.dart';
 
 
 
@@ -37,13 +36,20 @@ class _Add_ExpensesState extends State<Add_Expenses> {
   void initState() {
     bloc = context.read<ProjectBloc>();
     super.initState();
-    bloc.fileName.text = '';
+    bloc.itemName.text = '';
+    bloc.expensesFile =null;
+    bloc.descriptionExpenses.text = '';
+    bloc.price.text = '';
+    bloc.UpdateCurrency= null;
+    bloc.fetchCurrencyType();
+    bloc.fetchexpensesCategory();
+    bloc.fetchexpensePaymentType();
     bloc.fetchAddMemberLit(int.parse(widget.branch_id));
     bloc.msgController?.stream.listen((event) {
       AppMessageHandler().showSnackBar(context, event);
     });
-    bloc.fileStream.stream.listen((event) {
-      if (event == 'streamFiles') {
+    bloc.ExpensesStream.stream.listen((event) {
+      if (event == 'sucess') {
         bloc.fetchProjectsDetails(widget.projectid);
         Navigator.pop(context);
       }
@@ -124,21 +130,103 @@ class _Add_ExpensesState extends State<Add_Expenses> {
                               ],
                             ),
                           ),
-                          10.height,
+                          5.height,
                           Container(
                             height: 50,
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
+                              color: Colors.grey.shade200,
                                 borderRadius: BorderRadius.circular(10.0),
                                 border: Border.all(
                                     width: 1, color: const Color(0xff777777))),
                             child: TextFormField(
                               style: const TextStyle(color: Colors.black),
                               keyboardType: TextInputType.multiline,
-                              controller: bloc.fileName,
+                              controller: bloc.itemName,
                               decoration: const InputDecoration(
                                 border: InputBorder.none,
                                 hintText: "Item Name",
+                                focusColor: Colors.white,
+                                counterStyle: TextStyle(color: Colors.white),
+                                hintStyle: TextStyle(
+                                    color: Color(0xff777777),
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w300,
+                                    fontFamily: "Poppins"),
+                              ),
+                              onFieldSubmitted: (value) {
+                                bloc.fileName.text = value;
+                              },
+                              validator: (value) {
+                                if (value.toString().isEmpty) {
+                                  bloc.showMessage(MessageType.error("Please enter your file name."));
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                          10.height,
+                          const Padding(
+                            padding: EdgeInsets.only(left: 1),
+                            child: Row(
+                              children: [
+                                Text("Currency", style: TextStyle(fontSize: 13,fontWeight: FontWeight.w500)),
+                                Text("*", style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)
+                              ],
+                            ),
+                          ),
+                          5.height,
+                          ValueListenableBuilder(
+                            valueListenable: bloc.Currency,
+                            builder: (context, currency, child) {
+                              if(currency ==null){
+                                return  AppDropdown(
+                                  items: [],
+                                  onChanged: (v) {bloc.updateCurrency(v);},
+                                  value: null,
+                                  hintText: "Select",
+                                );
+                              }
+                              if(currency.isEmpty){
+                                return SizedBox(
+                                    height: MediaQuery.of(context).size.height * 0.7,
+                                    child: Center(child: Text("No data available")));
+                              }
+                              return  AppDropdown(
+                                items: currency!.map((e) => DropdownMenuItem(value: '${e['id']}', child: Text(e['name']??""))
+                                ).toList(),
+                                onChanged: (v) {bloc.updateCurrency(v);},
+                                value: bloc.UpdateCurrency,
+                                hintText: "Select",
+                              );
+                            },
+
+                          ),
+                          10.height,
+                          const Padding(
+                            padding: EdgeInsets.only(left: 1),
+                            child: Row(
+                              children: [
+                                Text("Price", style: TextStyle(fontSize: 13,fontWeight: FontWeight.w500)),
+                                Text("*", style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)
+                              ],
+                            ),
+                          ),
+                          Container(
+                            height: 50,
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                                color: Colors.grey.shade200,
+                                borderRadius: BorderRadius.circular(10.0),
+                                border: Border.all(
+                                    width: 1, color: const Color(0xff777777))),
+                            child: TextFormField(
+                              style: const TextStyle(color: Colors.black),
+                              keyboardType: TextInputType.multiline,
+                              controller: bloc.price,
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Price",
                                 focusColor: Colors.white,
                                 counterStyle: TextStyle(color: Colors.white),
                                 hintStyle: TextStyle(
@@ -183,6 +271,7 @@ class _Add_ExpensesState extends State<Add_Expenses> {
                                     height: 50,
                                     padding: const EdgeInsets.symmetric(horizontal: 20),
                                     decoration: BoxDecoration(
+                                      color: Colors.grey.shade200,
                                      border: Border.all(color: Colors.grey),
                                       borderRadius: BorderRadius.all(Radius.circular(5)),
                                     ),
@@ -216,9 +305,18 @@ class _Add_ExpensesState extends State<Add_Expenses> {
                             valueListenable: bloc.allProjectsMemberList,
                             builder: (context, member, child) {
                               if(member ==null){
-                                return SizedBox(
-                                    height: MediaQuery.of(context).size.height * 0.7,
-                                    child: Center(child: CircularProgressIndicator()));
+                                return MultiSelectDropDown(
+
+                                  controller: _controller,
+                                  onOptionSelected: (List<ValueItem> selectedOptions) {
+                                  },
+                                  options: [],
+                                  selectionType: SelectionType.multi,
+                                  chipConfig: const ChipConfig(wrapType: WrapType.scroll),
+                                  dropdownHeight: 300,
+                                  optionTextStyle: const TextStyle(fontSize: 16),
+                                  selectedOptionIcon: const Icon(Icons.check_circle),
+                                );
                               }
                               if(member.isEmpty){
                                 return SizedBox(
@@ -226,6 +324,10 @@ class _Add_ExpensesState extends State<Add_Expenses> {
                                     child: Center(child: Text("No data available")));
                               }
                               return MultiSelectDropDown(
+
+                                fieldBackgroundColor: Colors.grey.shade200,
+
+
                                 controller: _controller,
                                 onOptionSelected: (List<ValueItem> selectedOptions) {
                                 },
@@ -241,6 +343,81 @@ class _Add_ExpensesState extends State<Add_Expenses> {
                           ),
                         ],
                       ),
+
+                          10.height,
+                          const Padding(
+                            padding: EdgeInsets.only(left: 1),
+                            child: Row(
+                              children: [
+                                Text("Expense Category", style: TextStyle(fontSize: 13,fontWeight: FontWeight.w500)),
+                                Text("*", style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)
+                              ],
+                            ),
+                          ),
+                          5.height,
+                          ValueListenableBuilder(
+                            valueListenable: bloc.CategoryExpenses,
+                            builder: (context, Category, child) {
+                              if(Category ==null){
+                                return  AppDropdown(
+                                  items: [],
+                                  onChanged: (v) {bloc.updateCurrency(v);},
+                                  value: null,
+                                  hintText: "Select",
+                                );
+                              }
+                              if(Category.isEmpty){
+                                return SizedBox(
+                                    height: MediaQuery.of(context).size.height * 0.7,
+                                    child: Center(child: Text("No data available")));
+                              }
+                              return  AppDropdown(
+                                items: Category!.map((e) => DropdownMenuItem(value: '${e['id']}', child: Text(e['name']??""))
+                                ).toList(),
+                                onChanged: (v) {bloc.updateCategory.value = v;},
+                                value: bloc.updateCategory.value,
+                                hintText: "Select",
+                              );
+                            },
+
+                          ),
+                          10.height,
+                          const Padding(
+                            padding: EdgeInsets.only(left: 1),
+                            child: Row(
+                              children: [
+                                Text("Payment Type", style: TextStyle(fontSize: 13,fontWeight: FontWeight.w500)),
+                                Text("*", style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)
+                              ],
+                            ),
+                          ),
+                          5.height,
+                          ValueListenableBuilder(
+                            valueListenable: bloc.PaymentType,
+                            builder: (context, paymentType, child) {
+                              if(paymentType ==null){
+                                return  AppDropdown(
+                                  items: [],
+                                  onChanged: (v) {bloc.updateCurrency(v);},
+                                  value: null,
+                                  hintText: "Select",
+                                );
+                              }
+                              if(paymentType.isEmpty){
+                                return SizedBox(
+                                    height: MediaQuery.of(context).size.height * 0.7,
+                                    child: Center(child: Text("No data available")));
+                              }
+                              return  AppDropdown(
+                                items: paymentType!.map((e) => DropdownMenuItem(value: '${e['id']}', child: Text(e['name']??""))
+                                ).toList(),
+                                onChanged: (v) {bloc.updatePaymentType.value = v;},
+                                value: bloc.updatePaymentType.value,
+                                hintText: "Select",
+                              );
+                            },
+
+                          ),
                           10.height,
                           const Text(
                             "Description:",
@@ -255,13 +432,14 @@ class _Add_ExpensesState extends State<Add_Expenses> {
                             height: 200,
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
+                              color: Colors.grey.shade200,
                                 borderRadius: BorderRadius.circular(20.0),
                                 border: Border.all(
                                     width: 1, color: const Color(0xff777777))),
                             child: TextFormField(
                               style: const TextStyle(color: Colors.black),
                               keyboardType: TextInputType.multiline,
-                              controller: bloc.description,
+                              controller: bloc.descriptionExpenses,
                               maxLines: null,
                               decoration: const InputDecoration(
                                 border: InputBorder.none,
@@ -305,6 +483,7 @@ class _Add_ExpensesState extends State<Add_Expenses> {
                               height: 50,
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
+                                color: Colors.grey.shade200,
                                   borderRadius: BorderRadius.circular(10.0),
                                   border: Border.all(
                                       width: 1, color: const Color(0xff777777))),
@@ -368,7 +547,6 @@ class _Add_ExpensesState extends State<Add_Expenses> {
                           const SizedBox(
                             height: 20,
                           ),
-                    
                           ValueListenableBuilder(
                             valueListenable: bloc.addfileLoading,
                             builder: (BuildContext context, bool loading,
@@ -380,11 +558,12 @@ class _Add_ExpensesState extends State<Add_Expenses> {
                                       ? CircularProgressIndicator()
                                       : CustomButton2(
                                       onPressed: () {
+                                        var data  = _controller.selectedOptions.map((e) => e.value).toList().join(',');
                                         if (formKey.currentState!.validate()) {
-                                          bloc.addFiles(widget.projectid,light?'yes':'no');
+                                          bloc.AddExpenses(widget.projectid,light?'yes':'no',data);
                                         }
                                       },
-                                      tittle: 'Add Files'),
+                                      tittle: 'Add Expenses'),
                                 ],
                               );
                             },
@@ -405,7 +584,7 @@ class _Add_ExpensesState extends State<Add_Expenses> {
     filePickerResult = await FilePicker.platform.pickFiles(
     );
     galleryFile = File(filePickerResult!.files.single.path!);
-    bloc.image = galleryFile;
+    bloc.expensesFile = galleryFile;
     bloc.filepath.text = galleryFile!.path.split('/').last;
   }
 }

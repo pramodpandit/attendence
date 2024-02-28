@@ -81,8 +81,6 @@ class _ProjectExpensesState extends State<ProjectExpenses> {
                           ),
                           child:  Column(
                             children: [
-
-
                               const SizedBox(height: 10,),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
@@ -108,7 +106,6 @@ class _ProjectExpensesState extends State<ProjectExpenses> {
                               ),
                               const SizedBox(height: 10,),
                               Html(data: data['description']),
-
                               Row(
                                 children: [
                                   const Expanded(child: Row()),
@@ -129,16 +126,16 @@ class _ProjectExpensesState extends State<ProjectExpenses> {
                                                 )
                                               ]
                                           ),
-                                          child: InkWell(
+                                          child:data['file']==null || data['file'] ==''?Offstage(): InkWell(
                                             onTap: () async{
                                               bloc.isLoadingDownload.value = index;
-                                              FileDownloader.downloadFile(url: 'https://freeze.talocare.co.in/public/${data['file']}',name: data['file'].toString().split('/').last,onDownloadCompleted: (path) {
+                                                FileDownloader.downloadFile(url: 'https://freeze.talocare.co.in/public/${data['file']}',name: data['file'].toString().split('/').last,onDownloadCompleted: (path) {
                                                 bloc.showMessage(MessageType.success('File Downloaded'));
                                                 bloc.isLoadingDownload.value = -1;
                                               },
                                               );
                                             },
-                                            child: downloadLoading == index?SizedBox(width: 20,height:20,child: CircularProgressIndicator()): Icon(
+                                            child: downloadLoading == index? SizedBox(width: 20,height:20,child: CircularProgressIndicator()): Icon(
                                               Icons.download,
                                               color: Colors.black,
                                               size: 20,
@@ -157,7 +154,6 @@ class _ProjectExpensesState extends State<ProjectExpenses> {
                       }),
                 );
               },),
-
           ],
         ),
       ),

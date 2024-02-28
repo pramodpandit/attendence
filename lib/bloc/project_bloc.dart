@@ -217,14 +217,20 @@ String? selectedEmpId;
   StreamController<String> linkSteam = StreamController.broadcast();
 
 
+  ValueNotifier<List?> linketype = ValueNotifier(null);
+  String? selectedLinktype;
+
+  updatelink(String empId) {
+    selectedLinktype= empId;
+  }
 
   fetchLinktype() async{
     try{
       // isUserDetailLoad.value = true;
       var result = await repo.getlinkList();
       if(result.status && result.data != null){
-        userDetail.value = result.data["data"];
-        print("the all projects are : ${userDetail.value}");
+        linketype.value = result.data["data"];
+        print("the all projects are : ${linketype.value}");
       }
     }catch (e, s) {
       print(e);
@@ -234,9 +240,8 @@ String? selectedEmpId;
   addlink(int id,String private) async {
     try {
       addLinLoading.value = true;
-      var result = await repo.AddLink(other.text,private, id,links.text);
+      var result = await repo.AddLink(other.text,private, id,links.text,int.parse(selectedLinktype!));
       if(result.status == true){
-        // print("${result.status} ${result.message}");
         linkSteam.sink.add('notes');
       }else{
         showMessage(MessageType.error("Something went wrong"));
@@ -264,46 +269,82 @@ String? selectedEmpId;
     }
   }
   TextEditingController itemName = TextEditingController();
+  File? expensesFile;
   TextEditingController price = TextEditingController();
+  TextEditingController descriptionExpenses = TextEditingController();
   ValueNotifier<DateTime?> PurchaseDate = ValueNotifier(null);
   updateDateStart(DateTime value) => PurchaseDate.value = value;
+  ValueNotifier<List?> Currency = ValueNotifier(null);
+  String? UpdateCurrency;
+  StreamController<String> ExpensesStream = StreamController.broadcast();
+  ValueNotifier<bool> addExpenseLoading  = ValueNotifier(false);
+
+
+  AddExpenses(int id,String private,String data) async {
+    try {
+      addExpenseLoading.value = true;
+      var date = PurchaseDate.value.toString().split(' ');
+      addLinLoading.value = true;
+      var result = await repo.AddExpense(price.text, descriptionExpenses.text, private, id, itemName.text, date[0], int.parse(updateCategory.value!), int.parse(UpdateCurrency!), expensesFile!, data, int.parse(updatePaymentType.value!));
+      if(result.status == true){
+        ExpensesStream.sink.add('sucess');
+      }else{
+        showMessage(MessageType.error("${result.message}"));
+      }
+    } catch (e, s) {
+      debugPrint("$e");
+      debugPrint("$s");
+    } finally {
+      addExpenseLoading.value = false;
+    }
+  }
+
+updateCurrency(String data){
+  UpdateCurrency = data;
+}
   fetchCurrencyType() async{
     try{
       // isUserDetailLoad.value = true;
       var result = await repo.getexpenseCurrency();
       if(result.status && result.data != null){
-        userDetail.value = result.data["data"];
-        print("the all projects are : ${userDetail.value}");
+        Currency.value = result.data["data"];
+        print("the all projects are : ${Currency.value}");
       }
     }catch (e, s) {
       print(e);
       print(s);
     }
   }
+  ValueNotifier<List?> CategoryExpenses = ValueNotifier(null);
+ValueNotifier<String?> updateCategory = ValueNotifier(null);
   fetchexpensesCategory() async{
     try{
       // isUserDetailLoad.value = true;
       var result = await repo.getexpenseCategory();
       if(result.status && result.data != null){
-        userDetail.value = result.data["data"];
-        print("the all projects are : ${userDetail.value}");
+        CategoryExpenses.value = result.data["data"];
+        print("the all projects are : ${CategoryExpenses.value}");
       }
     }catch (e, s) {
       print(e);
       print(s);
     }
   }
+  ValueNotifier<List?> PaymentType = ValueNotifier(null);
+  ValueNotifier<String?> updatePaymentType = ValueNotifier(null);
+
   fetchexpensePaymentType() async{
     try{
       // isUserDetailLoad.value = true;
       var result = await repo.getexpensepaymentType();
       if(result.status && result.data != null){
-        userDetail.value = result.data["data"];
-        print("the all projects are : ${userDetail.value}");
+        PaymentType.value = result.data["data"];
+        //print("the all projects are : ${userDetail.value}");
       }
     }catch (e, s) {
       print(e);
       print(s);
     }
   }
+
 }

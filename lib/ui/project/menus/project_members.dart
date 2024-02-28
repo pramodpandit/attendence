@@ -90,7 +90,7 @@ class _ProjectMembersState extends State<ProjectMembers> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          "${data['first_name']} ${data['l_name']==null?data['m_name']:data['l_name']}",
+                                          "${data['first_name']??''} ${data['l_name']==null?data['m_name']??'':data['l_name']??''}",
                                           style: TextStyle(fontWeight: FontWeight.bold,fontSize: 15),
                                         ),
                                       ],
@@ -118,6 +118,21 @@ class _ProjectMembersState extends State<ProjectMembers> {
             child: ValueListenableBuilder(
               valueListenable: bloc.allProjectsMemberList,
               builder: (context, member, child) {
+                if(member ==null){
+                  return AppDropdown(
+                    items:[],
+                    onChanged: (v) {bloc.updateEmployee(v);
+                    print(v);
+                    },
+                    value: null,
+                    hintText: "Choose Designation",
+                  );
+                }
+                if(member.isEmpty){
+                  return SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.7,
+                      child: Center(child: Text("No data available")));
+                }
                 return FloatingActionButton.extended(
                     shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.all(Radius.circular(5.0))
@@ -147,10 +162,8 @@ class _ProjectMembersState extends State<ProjectMembers> {
                                       bloc.addMember(widget.data['id']);
                                       bloc.selectedEmpId = null;
                                       bloc.fetchProjectsDetails(widget.data['id']);
-
                                       Navigator.pop(context);
-
-                                    }, child: isLoading?CircularProgressIndicator():Text('Add',style: TextStyle(color: Colors.white),));
+                                      }, child: isLoading?CircularProgressIndicator():Text('Add',style: TextStyle(color: Colors.white),));
                               },
                             ),
                           ],

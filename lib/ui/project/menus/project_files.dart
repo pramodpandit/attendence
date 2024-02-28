@@ -32,7 +32,6 @@ class _ProjectFilesState extends State<ProjectFiles> {
       AppMessageHandler().showSnackBar(context, event);
     });
   }
- // var downloadLoading = -1;
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +112,7 @@ class _ProjectFilesState extends State<ProjectFiles> {
                                                 )
                                               ]
                                           ),
-                                          child: InkWell(
+                                          child: data['file'] ==null || data['file'] == ''?Offstage():InkWell(
                                             onTap: () async{
                                               bloc.isLoadingDownload.value = index;
                                               FileDownloader.downloadFile(url: 'https://freeze.talocare.co.in/public/${data['file']}',name: data['file'].toString().split('/').last,onDownloadCompleted: (path) {

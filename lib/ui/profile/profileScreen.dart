@@ -69,8 +69,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           return  ValueListenableBuilder(
               valueListenable: bloc.userDetail,
               builder: (context, user, _) {
-                var department =
-                    user!.departmentaccess;
+
                 if (user == null) {
                   return Column(
                     children: [
@@ -83,6 +82,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ],
                   );
                 }
+                var department =
+                    user!.departmentaccess;
               return Column(
                 children: [
                   Stack(
