@@ -7,35 +7,33 @@ import 'package:office/ui/widget/app_dropdown.dart';
 import 'package:office/ui/widget/custom_button.dart';
 import 'package:provider/provider.dart';
 import '../../../../bloc/project_bloc.dart';
+import '../../../../data/repository/lead_repository.dart';
 
-class AddLeadLinks extends StatefulWidget {
+class AddLeadNotes extends StatefulWidget {
   final int leadId;
-  final LeadsBloc bloc;
-  const AddLeadLinks({Key? key, required this.leadId,required this.bloc}) : super(key: key);
-
+  final  LeadsBloc bloc;
+  const AddLeadNotes({Key? key, required this.leadId, required this.bloc,}) : super(key: key);
   @override
-  State<AddLeadLinks> createState() => _AddLeadLinksState();
+  State<AddLeadNotes> createState() => _AddLeadNotesState();
 }
 
-class _AddLeadLinksState extends State<AddLeadLinks> {
+class _AddLeadNotesState extends State<AddLeadNotes> {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   bool light = false;
   final MultiSelectController _controller = MultiSelectController();
 
-
-  @override
+@override
   void initState() {
+    // TODO: implement initState
     super.initState();
-    widget.bloc.getAllLinkTypes();
+    widget.bloc.titleNotes.text ='';
+    widget.bloc.descriptionNotes.text ='';
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: const MyAppBar(
-      //   title: "Give Feedback",
-      // ),
       body: Stack(
         children: [
           Container(
@@ -53,7 +51,7 @@ class _AddLeadLinksState extends State<AddLeadLinks> {
                   height: 56,
                 ),
                 Text(
-                  "Add Link",
+                  "Add Notes",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: Colors.white,
@@ -97,42 +95,9 @@ class _AddLeadLinksState extends State<AddLeadLinks> {
                         const SizedBox(
                           height: 10,
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Flexible(child: Text('Link Type',style: TextStyle(fontSize: 13,fontWeight: FontWeight.w700),)),
-                            Flexible(
-                              child: ValueListenableBuilder(
-                                valueListenable: widget.bloc.allLinkTypes,
-                                builder: (context, allLinkType, child) {
-                                  if(allLinkType == null){
-                                    return AppDropdown(
-                                      items: [],
-                                      onChanged: (value) {
 
-                                      },
-                                      value: null,
-                                      hintText: "Select",
-                                    );
-                                  }
-                                return AppDropdown(
-                                  items: widget.bloc.allLinkTypes.value!.map((e) => DropdownMenuItem<String>(child: Text(e['name']), value: e['id'].toString(),)).toList(),
-                                  onChanged: (value) {
-                                    widget.bloc.linkType.value = value;
-                                  },
-                                  value: widget.bloc.linkType.value,
-                                  hintText: "Select",
-                                );
-                              },)
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(
-                          height: 10,
-                        ),
                         const Text(
-                          "Links",
+                          "Title",
                           style: TextStyle(
                             fontWeight: FontWeight.w700,
                             // color: ,
@@ -143,7 +108,7 @@ class _AddLeadLinksState extends State<AddLeadLinks> {
                         10.height,
                         TextFormField(
                           style: const TextStyle(color: Colors.black),
-                          controller: widget.bloc.link,
+                          controller: widget.bloc.titleNotes,
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: const Color(0xffffffff),
@@ -192,7 +157,7 @@ class _AddLeadLinksState extends State<AddLeadLinks> {
                           height: 10,
                         ),
                         const Text(
-                          "Other",
+                          "Description",
                           style: TextStyle(
                             fontWeight: FontWeight.w700,
                             // color: ,
@@ -209,7 +174,7 @@ class _AddLeadLinksState extends State<AddLeadLinks> {
                           child: TextFormField(
                             style: const TextStyle(color: Colors.black),
                             keyboardType: TextInputType.multiline,
-                            controller: widget.bloc.other,
+                            controller:widget.bloc.descriptionNotes,
                             maxLines: null,
                             decoration: const InputDecoration(
                               border: InputBorder.none,
@@ -223,7 +188,7 @@ class _AddLeadLinksState extends State<AddLeadLinks> {
                                   fontFamily: "Poppins"),
                             ),
                             onFieldSubmitted: (value) {
-                              widget.bloc.other.text = value;
+                            widget.bloc.other.text = value;
                             },
                             validator: (value) {
                               if (value.toString().isEmpty) {
@@ -248,14 +213,15 @@ class _AddLeadLinksState extends State<AddLeadLinks> {
                                     : CustomButton2(
                                     onPressed: () {
                                       if (formKey.currentState!.validate()) {
-                                        widget.bloc.addLeadLink(widget.leadId.toString()).then((value){
-                                          Navigator.pop(context);
-                                          widget.bloc.specificLeadData.value = null;
-                                          widget.bloc.getSpecificLeadData(widget.leadId.toString(),"lead_links");
-                                        });
+                                       widget.bloc.AddNotes(widget.leadId).then((value){
+                                         Navigator.pop(context);
+
+                                         widget.bloc.specificLeadData.value = null;
+                                         widget.bloc.getSpecificLeadData(widget.leadId.toString(),"lead_notes");
+                                       });
                                       }
                                     },
-                                    tittle: 'Add Links'),
+                                    tittle: 'Add Notes'),
                               ],
                             );
                           },

@@ -11,12 +11,7 @@ import 'package:office/ui/leads/leadMenus/add_pages/add_lead_links.dart';
 import 'package:office/utils/message_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../../bloc/profile_bloc.dart';
-import '../../../bloc/project_bloc.dart';
-import '../../../data/model/user.dart';
-import '../../../data/repository/profile_repo.dart';
-import '../../../data/repository/project_repo.dart';
-import '../../profile/menus/basic_info.dart';
+
 
 class LeadLinks extends StatefulWidget {
   final data;

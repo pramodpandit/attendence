@@ -4,6 +4,7 @@ import 'package:office/ui/project/menus/logs.dart';
 import 'package:office/ui/project/menus/project_files.dart';
 import 'package:office/ui/project/menus/project_overview.dart';
 
+import '../../data/model/Task_list.dart';
 import '../project/menus/project_comment.dart';
 import '../project/menus/project_credentials.dart';
 import '../project/menus/project_links.dart';
@@ -11,7 +12,8 @@ import '../project/menus/project_members.dart';
 import '../project/menus/project_notes_list.dart';
 
 class TaskDetails extends StatefulWidget {
-  const TaskDetails({Key? key}) : super(key: key);
+  final TaskData data;
+  const TaskDetails({Key? key, required this.data}) : super(key: key);
 
   @override
   State<TaskDetails> createState() => _TaskDetailsState();
@@ -118,15 +120,15 @@ class _TaskDetailsState extends State<TaskDetails> {
                                     color: Colors.transparent,
                                   ),
                                   padding: EdgeInsets.symmetric(horizontal: 10),
-                                  child: const Column(
+                                  child: Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       SizedBox(height: 10,),
                                       Row(mainAxisAlignment: MainAxisAlignment.end,
                                         children: [
-                                          Text("In Process",
-                                            style: TextStyle(
+                                          Text("${widget.data.status}",
+                                            style: const TextStyle(
                                                 fontFamily: "Poppins",
                                                 fontSize: 11,
                                                 fontWeight: FontWeight.w600,
@@ -135,7 +137,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                                         ],),
                                       Expanded(
                                         child: Text(
-                                          "UI/UX Team Huddle",
+                                          "${widget.data.title}",
                                           // "The prevalence of trauma related disorders in children and adolescents affected by forest fires.",
                                           style: TextStyle(
                                               fontFamily: "Poppins",

@@ -244,7 +244,11 @@ class _AddLeadFilesState extends State<AddLeadFiles> {
                                     : CustomButton2(
                                     onPressed: () {
                                       if (formKey.currentState!.validate()) {
-                                        widget.bloc.addNewLeadFiles(widget.leadId,light?"on":"off");
+                                        widget.bloc.addNewLeadFiles(widget.leadId,light?"on":"off").then((value){
+                                          Navigator.pop(context);
+                                          widget.bloc.specificLeadData.value = null;
+                                          widget.bloc.getSpecificLeadData(widget.leadId.toString(),"lead_file_details");
+                                        });;
                                       }
                                     },
                                     tittle: 'Add Files'),

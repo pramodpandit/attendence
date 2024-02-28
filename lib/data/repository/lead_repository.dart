@@ -118,6 +118,26 @@ class LeadsRepository {
     }
 
   }
+  Future<ApiResponse2> Add(String url,Map<String,dynamic> data,) async {
+    try{
+      SharedPreferences _pref = await SharedPreferences.getInstance();
+      // Map<String, dynamic> data = {
+      //   "user_id": _pref.getString('uid'),
+      //   "lead_id":id,
+      //   "title":title,
+      //   "description":descripton
+      // };
+      var response= await _api.postRequest(url,data);
+      if (response == null) {
+        ApiException.fromString("response null");
+      }
+      return ApiResponse2.fromJson(response,response["data"]);
+    }catch(e){
+      print("data is not avaible ${e.toString()}");
+      throw Exception('data is not avaible ${e.toString()}');
+    }
+  }
+
 
   Future<ApiResponse2> specificLeadData(String leadId,String type) async {
     try{

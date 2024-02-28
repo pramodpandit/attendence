@@ -8,7 +8,6 @@ import 'package:office/ui/leave/leaves_page.dart';
 import 'package:office/ui/notification/notification_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-
 import '../../bloc/notice_bloc.dart';
 import '../../bloc/profile_bloc.dart';
 import '../../bloc/task_bloc.dart';
@@ -457,7 +456,7 @@ class _DashBoardState extends State<DashBoard> {
                                             if(data.status =='doing'){
                                               return GestureDetector(
                                                   onTap: () {
-                                                    Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const TaskDetails()));
+                                                    Navigator.of(context).push(MaterialPageRoute(builder: (context)=>TaskDetails(data: data,)));
                                                   },
                                                   child:  SizedBox(
                                                     height: 120,
