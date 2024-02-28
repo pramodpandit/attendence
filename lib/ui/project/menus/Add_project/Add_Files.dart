@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nb_utils/nb_utils.dart';
-import 'package:office/bloc/leads_bloc.dart';
 import 'package:office/ui/widget/custom_button.dart';
 import 'package:office/utils/message_handler.dart';
 import 'package:provider/provider.dart';
@@ -12,16 +11,17 @@ import 'package:office/ui/widget/app_text_field.dart';
 
 
 
-class AddLeadFiles extends StatefulWidget {
-  final int leadId;
-  final LeadsBloc bloc;
-  const AddLeadFiles({Key? key, required this.leadId,required this.bloc}) : super(key: key);
+class Add_Files extends StatefulWidget {
+  final String branch_id;
+  final int projectid;
+  const Add_Files({Key? key, required this.projectid, required this.branch_id}) : super(key: key);
 
   @override
-  State<AddLeadFiles> createState() => _AddLeadFilesState();
+  State<Add_Files> createState() => _Add_FilesState();
 }
 
-class _AddLeadFilesState extends State<AddLeadFiles> {
+class _Add_FilesState extends State<Add_Files> {
+  late ProjectBloc bloc;
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   int _selectedValue = 1;
   bool light = false;
@@ -31,10 +31,17 @@ class _AddLeadFilesState extends State<AddLeadFiles> {
 
   @override
   void initState() {
+    bloc = context.read<ProjectBloc>();
     super.initState();
-    widget.bloc.fileName.text = '';
-    widget.bloc.msgController?.stream.listen((event) {
+    bloc.fileName.text = '';
+    bloc.msgController?.stream.listen((event) {
       AppMessageHandler().showSnackBar(context, event);
+    });
+    bloc.fileStream.stream.listen((event) {
+      if (event == 'streamFiles') {
+        bloc.fetchProjectsDetails(widget.projectid);
+        Navigator.pop(context);
+      }
     });
   }
 
@@ -126,7 +133,7 @@ class _AddLeadFilesState extends State<AddLeadFiles> {
                           child: TextFormField(
                             style: const TextStyle(color: Colors.black),
                             keyboardType: TextInputType.multiline,
-                            controller: widget.bloc.fileName,
+                            controller: bloc.fileName,
                             decoration: const InputDecoration(
                               border: InputBorder.none,
                               hintText: "File Name",
@@ -139,11 +146,11 @@ class _AddLeadFilesState extends State<AddLeadFiles> {
                                   fontFamily: "Poppins"),
                             ),
                             onFieldSubmitted: (value) {
-                              widget.bloc.fileName.text = value;
+                              bloc.fileName.text = value;
                             },
                             validator: (value) {
                               if (value.toString().isEmpty) {
-                                widget.bloc.showMessage(MessageType.error("Please enter your file name."));
+                               bloc.showMessage(MessageType.error("Please enter your file name."));
                               }
                               return null;
                             },
@@ -163,41 +170,42 @@ class _AddLeadFilesState extends State<AddLeadFiles> {
                         InkWell(
                           onTap: (){
                             openFilePicker();
+                            // _openImagePicker(ImageSource.gallery);
                           },
                           child: Container(
-                            height: 50,
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10.0),
-                                border: Border.all(
-                                    width: 1, color: const Color(0xff777777))),
-                            child: TextFormField(
-                              enabled: false,
-                              style: const TextStyle(color: Colors.black),
-                              keyboardType: TextInputType.multiline,
-                              controller: widget.bloc.filepath,
-                              decoration: const InputDecoration(
-                                border: InputBorder.none,
-                                hintText: "Choose File",
-                                focusColor: Colors.white,
-                                counterStyle: TextStyle(color: Colors.white),
-                                hintStyle: TextStyle(
-                                    color: Color(0xff777777),
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w300,
-                                    fontFamily: "Poppins"),
-                              ),
-                              onFieldSubmitted: (value) {
-                                widget.bloc.filepath.text = value;
-                              },
-                              validator: (value) {
-                                if (value.toString().isEmpty) {
-                                  widget.bloc.showMessage(MessageType.error('Please select file'));
-                                }
-                                return null;
-                              },
+                          height: 50,
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10.0),
+                              border: Border.all(
+                                  width: 1, color: const Color(0xff777777))),
+                          child: TextFormField(
+                            enabled: false,
+                            style: const TextStyle(color: Colors.black),
+                            keyboardType: TextInputType.multiline,
+                            controller: bloc.filepath,
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              hintText: "Choose File",
+                              focusColor: Colors.white,
+                              counterStyle: TextStyle(color: Colors.white),
+                              hintStyle: TextStyle(
+                                  color: Color(0xff777777),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w300,
+                                  fontFamily: "Poppins"),
                             ),
+                            onFieldSubmitted: (value) {
+                              bloc.filepath.text = value;
+                            },
+                            validator: (value) {
+                              if (value.toString().isEmpty) {
+                                bloc.showMessage(MessageType.error('Please select file'));
+                              }
+                              return null;
+                            },
                           ),
+                        ),
                         ),
                         10.height,
                         const SizedBox(
@@ -233,7 +241,7 @@ class _AddLeadFilesState extends State<AddLeadFiles> {
                         ),
 
                         ValueListenableBuilder(
-                          valueListenable: widget.bloc.addfileLoading,
+                          valueListenable: bloc.addfileLoading,
                           builder: (BuildContext context, bool loading,
                               Widget? child) {
                             return Row(
@@ -244,7 +252,7 @@ class _AddLeadFilesState extends State<AddLeadFiles> {
                                     : CustomButton2(
                                     onPressed: () {
                                       if (formKey.currentState!.validate()) {
-                                        widget.bloc.addNewLeadFiles(widget.leadId,light?"on":"off");
+                                        bloc.addFiles(widget.projectid,light?'yes':'no');
                                       }
                                     },
                                     tittle: 'Add Files'),
@@ -266,7 +274,7 @@ class _AddLeadFilesState extends State<AddLeadFiles> {
   Future<void> openFilePicker() async{
     filePickerResult = await FilePicker.platform.pickFiles();
     galleryFile = File(filePickerResult!.files.single.path!);
-    widget.bloc.image = galleryFile;
-    widget.bloc.filepath.text = galleryFile!.path.split('/').last;
+    bloc.image = galleryFile;
+    bloc.filepath.text = galleryFile!.path.split('/').last;
   }
 }

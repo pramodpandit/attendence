@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:office/bloc/leads_bloc.dart';
 import 'package:office/data/repository/lead_repository.dart';
+import 'package:office/ui/leads/leadMenus/add_pages/add_lead_links.dart';
 import 'package:office/utils/message_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -178,6 +179,7 @@ class _LeadLinksState extends State<LeadLinks> {
                     borderRadius: BorderRadius.all(Radius.circular(5.0))
                 ),
                 onPressed: () async{
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => AddLeadLinks(bloc: bloc,leadId: widget.data),));
                 },
                 backgroundColor: const  Color(0xFF009FE3),
                 label: AnimatedSwitcher(

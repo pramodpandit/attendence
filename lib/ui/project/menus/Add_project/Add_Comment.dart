@@ -1,40 +1,34 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:nb_utils/nb_utils.dart';
-import 'package:office/bloc/leads_bloc.dart';
+import 'package:office/bloc/feedback_bloc.dart';
 import 'package:office/ui/widget/custom_button.dart';
-import 'package:office/utils/message_handler.dart';
 import 'package:provider/provider.dart';
 import '../../../../bloc/project_bloc.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:office/ui/widget/app_text_field.dart';
 
-
-
-class AddLeadFiles extends StatefulWidget {
-  final int leadId;
-  final LeadsBloc bloc;
-  const AddLeadFiles({Key? key, required this.leadId,required this.bloc}) : super(key: key);
+class Add_Comment extends StatefulWidget {
+  final int projectid;
+  const Add_Comment({Key? key, required this.projectid}) : super(key: key);
 
   @override
-  State<AddLeadFiles> createState() => _AddLeadFilesState();
+  State<Add_Comment> createState() => _Add_CommentState();
 }
 
-class _AddLeadFilesState extends State<AddLeadFiles> {
+class _Add_CommentState extends State<Add_Comment> {
+  late ProjectBloc bloc;
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   int _selectedValue = 1;
   bool light = false;
-  FilePickerResult? filePickerResult;
-  File? galleryFile;
-
 
   @override
   void initState() {
+    bloc = context.read<ProjectBloc>();
     super.initState();
-    widget.bloc.fileName.text = '';
-    widget.bloc.msgController?.stream.listen((event) {
-      AppMessageHandler().showSnackBar(context, event);
+    bloc.Comment.text = '';
+    bloc.CommentStream.stream.listen((event) {
+      if (event == 'Comment') {
+        bloc.fetchProjectsDetails(widget.projectid);
+        Navigator.pop(context);
+      }
     });
   }
 
@@ -61,7 +55,7 @@ class _AddLeadFilesState extends State<AddLeadFiles> {
                   height: 56,
                 ),
                 Text(
-                  "Add Files",
+                  "Give Comment",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: Colors.white,
@@ -106,30 +100,21 @@ class _AddLeadFilesState extends State<AddLeadFiles> {
                         const SizedBox(
                           height: 10,
                         ),
-                        const Padding(
-                          padding: EdgeInsets.only(left: 10),
-                          child: Row(
-                            children: [
-                              Text("File Name", style: TextStyle(fontSize: 13)),
-                              Text("*", style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)
-                            ],
-                          ),
-                        ),
-                        10.height,
                         Container(
-                          height: 50,
+                          height: 200,
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10.0),
+                              borderRadius: BorderRadius.circular(20.0),
                               border: Border.all(
                                   width: 1, color: const Color(0xff777777))),
                           child: TextFormField(
                             style: const TextStyle(color: Colors.black),
                             keyboardType: TextInputType.multiline,
-                            controller: widget.bloc.fileName,
+                            controller: bloc.Comment,
+                            maxLines: null,
                             decoration: const InputDecoration(
                               border: InputBorder.none,
-                              hintText: "File Name",
+                              hintText: "Write here...",
                               focusColor: Colors.white,
                               counterStyle: TextStyle(color: Colors.white),
                               hintStyle: TextStyle(
@@ -139,67 +124,16 @@ class _AddLeadFilesState extends State<AddLeadFiles> {
                                   fontFamily: "Poppins"),
                             ),
                             onFieldSubmitted: (value) {
-                              widget.bloc.fileName.text = value;
+                              bloc.Comment.text = value;
                             },
                             validator: (value) {
                               if (value.toString().isEmpty) {
-                                widget.bloc.showMessage(MessageType.error("Please enter your file name."));
+                                return "Please enter your Comment.";
                               }
                               return null;
                             },
                           ),
                         ),
-                        10.height,
-                        const Padding(
-                          padding: EdgeInsets.only(left: 10),
-                          child: Row(
-                            children: [
-                              Text("Upload By", style: TextStyle(fontSize: 13)),
-                              Text("*", style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)
-                            ],
-                          ),
-                        ),
-                        10.height,
-                        InkWell(
-                          onTap: (){
-                            openFilePicker();
-                          },
-                          child: Container(
-                            height: 50,
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10.0),
-                                border: Border.all(
-                                    width: 1, color: const Color(0xff777777))),
-                            child: TextFormField(
-                              enabled: false,
-                              style: const TextStyle(color: Colors.black),
-                              keyboardType: TextInputType.multiline,
-                              controller: widget.bloc.filepath,
-                              decoration: const InputDecoration(
-                                border: InputBorder.none,
-                                hintText: "Choose File",
-                                focusColor: Colors.white,
-                                counterStyle: TextStyle(color: Colors.white),
-                                hintStyle: TextStyle(
-                                    color: Color(0xff777777),
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w300,
-                                    fontFamily: "Poppins"),
-                              ),
-                              onFieldSubmitted: (value) {
-                                widget.bloc.filepath.text = value;
-                              },
-                              validator: (value) {
-                                if (value.toString().isEmpty) {
-                                  widget.bloc.showMessage(MessageType.error('Please select file'));
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
-                        ),
-                        10.height,
                         const SizedBox(
                           height: 10,
                         ),
@@ -233,7 +167,7 @@ class _AddLeadFilesState extends State<AddLeadFiles> {
                         ),
 
                         ValueListenableBuilder(
-                          valueListenable: widget.bloc.addfileLoading,
+                          valueListenable: bloc.addCommentLoading,
                           builder: (BuildContext context, bool loading,
                               Widget? child) {
                             return Row(
@@ -244,10 +178,10 @@ class _AddLeadFilesState extends State<AddLeadFiles> {
                                     : CustomButton2(
                                     onPressed: () {
                                       if (formKey.currentState!.validate()) {
-                                        widget.bloc.addNewLeadFiles(widget.leadId,light?"on":"off");
+                                        bloc.addComment(widget.projectid,light==true?'yes':'no');
                                       }
                                     },
-                                    tittle: 'Add Files'),
+                                    tittle: 'Add Comment'),
                               ],
                             );
                           },
@@ -262,11 +196,5 @@ class _AddLeadFilesState extends State<AddLeadFiles> {
         ],
       ),
     );
-  }
-  Future<void> openFilePicker() async{
-    filePickerResult = await FilePicker.platform.pickFiles();
-    galleryFile = File(filePickerResult!.files.single.path!);
-    widget.bloc.image = galleryFile;
-    widget.bloc.filepath.text = galleryFile!.path.split('/').last;
   }
 }

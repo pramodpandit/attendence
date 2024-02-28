@@ -407,4 +407,54 @@ class LeadsRepository {
     return resp;
   }
 
+  Future<ApiResponse> createNewLeadFile(Map<String,dynamic> data) async{
+    var response= await _api.postRequest("lead/add_files",data);
+    if(response==null){
+      throw ApiException.fromString("response null");
+    }
+    return ApiResponse.fromJson(response,response['data']);
+  }
+
+  Future<ApiResponse2> getLinkList() async{
+    var response= await _api.getRequest("linktypes");
+    if(response==null){
+      throw ApiException.fromString("response null");
+    }
+    return ApiResponse2.fromJson(response,response['data']);
+  }
+
+  Future<ApiResponse2> AddLink(String leadId, String linkType, String links, String other) async {
+    var response = await _api.postRequest("lead/add_links", {
+      "user_id": prefs.getString('uid'),
+      "lead_id":leadId,
+      "link_type":linkType,
+      "links":links,
+      "other_link_info":other,
+    });
+
+    if (response == null) {
+      ApiException.fromString("response null");
+    }
+    return ApiResponse2.fromJson(response,response);
+  }
+
+  // lead logs
+
+  Future<ApiResponse2> fetchAllProjectTypeList() async{
+    var response= await _api.getRequest("project/projectetype-list");
+    if(response==null){
+      throw ApiException.fromString("response null");
+    }
+    return ApiResponse2.fromJson(response,response['data']);
+  }
+  Future<ApiResponse2> fetchAllCurrencyList() async{
+    var response= await _api.getRequest("project/projectcurrency-list");
+    if(response==null){
+      throw ApiException.fromString("response null");
+    }
+    return ApiResponse2.fromJson(response,response['data']);
+  }
+
+  // lead logs end
+
 }

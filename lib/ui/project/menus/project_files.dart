@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../../../bloc/project_bloc.dart';
 import '../../../data/repository/project_repo.dart';
 import '../../../utils/message_handler.dart';
+import 'Add_project/Add_Files.dart';
 
 class ProjectFiles extends StatefulWidget {
   final data;
@@ -166,6 +167,15 @@ class _ProjectFilesState extends State<ProjectFiles> {
                     borderRadius: BorderRadius.all(Radius.circular(5.0))
                 ),
                 onPressed: () async{
+                  var result =await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => Provider.value(
+                        value: bloc,
+                        child: Add_Files(branch_id: widget.data['business_address'],projectid:widget.data['id']),
+                      ),
+                    ),
+                  );
                 },
                 backgroundColor: const  Color(0xFF009FE3),
                 label: AnimatedSwitcher(

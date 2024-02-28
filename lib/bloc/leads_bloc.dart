@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:office/data/model/ClientDetail.dart';
 import 'package:office/data/model/LeadDetail.dart';
 import 'package:office/data/model/lead_for.dart';
@@ -426,6 +427,147 @@ class LeadsBloc extends Bloc {
       creating.value = false;
     }
   }
+
+  File? image;
+  TextEditingController filepath = TextEditingController();
+  TextEditingController fileName = TextEditingController();
+  StreamController<String> fileStream = StreamController.broadcast();
+  ValueNotifier<bool> addfileLoading  = ValueNotifier(false);
+
+  addNewLeadFiles(int leadId,String private)async{
+    addfileLoading.value = true;
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    try {
+      Map<String, dynamic> data = {
+        "user_id": pref.getString("uid"),
+        "lead_id" : leadId,
+        "file_name" : fileName.text,
+        "files" : await MultipartFile.fromFile(image!.path,
+            filename: image!.path.split('/').last),
+        "privates" : private,
+      };
+      ApiResponse res = await _repo.createNewLeadFile(data);
+      if(res.status) {
+        showMessage(const MessageType.success("File Created Successfully"));
+      } else {
+        showMessage(MessageType.error(res.message));
+      }
+    } catch(e,s) {
+      print("the error is : $e");
+      debugPrint('$e');
+      debugPrintStack(stackTrace: s);
+      showMessage(const MessageType.error("Some error occurred! Please try again!"));
+    }finally{
+      addfileLoading.value = false;
+    }
+  }
+
+  // link all data
+  ValueNotifier<List?> allLinkTypes = ValueNotifier(null);
+
+  // link all data end
+
+  ValueNotifier<String?> linkType = ValueNotifier(null);
+  TextEditingController link = TextEditingController();
+  TextEditingController other = TextEditingController();
+  ValueNotifier<bool> addLinkLoading  = ValueNotifier(false);
+  StreamController<String> linkSteam = StreamController.broadcast();
+
+  getAllLinkTypes() async{
+    try{
+      // isUserDetailLoad.value = true;
+      var result = await _repo.getLinkList();
+      if(result.status && result.data != null){
+        allLinkTypes.value = result.data;
+      }
+    }catch (e, s) {
+      print(e);
+      print(s);
+    }
+  }
+
+  addLeadLink(String leadId) async {
+    try {
+      addLinkLoading.value = true;
+      var result = await _repo.AddLink(leadId,linkType.value!,link.text,other.text);
+      if(result.status == true){
+        showMessage(MessageType.success(result.message.toString()));
+        linkSteam.sink.add('notes');
+      }else{
+        showMessage(MessageType.error("Something went wrong"));
+      }
+    } catch (e, s) {
+      debugPrint("$e");
+      debugPrint("$s");
+    } finally {
+      addLinkLoading.value = false;
+    }
+  }
+
+
+
+  // lead logs all data notifiers
+  ValueNotifier<List?> allProjectTypes = ValueNotifier(null);
+  ValueNotifier<List?> allCurrencyData = ValueNotifier(null);
+  // lead logs all data notifiers end
+
+  // lead logs
+  ValueNotifier<String?> logStatus = ValueNotifier(null);
+  // if logStatus open
+  TextEditingController nextFollowUpDate = TextEditingController();
+  TextEditingController nextFollowUpTime = TextEditingController();
+  // if logStatus open end
+  TextEditingController message = TextEditingController();
+  // if(log status converted)
+  ValueNotifier<String?> projectConvert = ValueNotifier(null);
+  // if(log projectConvert yes )
+  ValueNotifier<String?> branch = ValueNotifier(null);
+  ValueNotifier<String?> projectType = ValueNotifier(null);
+  TextEditingController shortCode = TextEditingController();
+  TextEditingController projectCode = TextEditingController();
+  TextEditingController startDate = TextEditingController();
+  ValueNotifier<String?> deadline = ValueNotifier(null);
+  // if deadline yes
+  TextEditingController deadlineDate = TextEditingController();
+  // if deadline yes end
+  TextEditingController projectSummary = TextEditingController();
+  TextEditingController notes = TextEditingController();
+  ValueNotifier<String?> currency = ValueNotifier(null);
+  ValueNotifier<String?> projectCostType = ValueNotifier(null);
+  TextEditingController amount = TextEditingController();
+  ValueNotifier<String?> withTax = ValueNotifier(null);
+  // if withTax yes
+  TextEditingController taxPercentage = TextEditingController();
+  // if withTax yes end
+
+  getAllCurrencyData() async{
+    try{
+      // isUserDetailLoad.value = true;
+      var result = await _repo.fetchAllCurrencyList();
+      if(result.status && result.data != null){
+        allCurrencyData.value = result.data;
+      }
+    }catch (e, s) {
+      print(e);
+      print(s);
+    }
+  }
+
+  getAllProjectTypes() async{
+    try{
+      // isUserDetailLoad.value = true;
+      var result = await _repo.fetchAllProjectTypeList();
+      if(result.status && result.data != null){
+        allProjectTypes.value = result.data;
+      }
+    }catch (e, s) {
+      print(e);
+      print(s);
+    }
+  }
+
+  // leadLogs end
+
   Future<bool> validateEmployee() async {
     if(formState.currentState!.validate()) {
       // if(image.value==null) {
