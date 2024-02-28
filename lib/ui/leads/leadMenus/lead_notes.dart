@@ -9,13 +9,10 @@ import 'package:office/bloc/leads_bloc.dart';
 import 'package:office/data/repository/lead_repository.dart';
 import 'package:office/utils/message_handler.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
-import '../../../bloc/profile_bloc.dart';
-import '../../../bloc/project_bloc.dart';
-import '../../../data/model/user.dart';
-import '../../../data/repository/profile_repo.dart';
-import '../../../data/repository/project_repo.dart';
-import '../../profile/menus/basic_info.dart';
+
+import 'add_pages/add_lead_notes.dart';
+
+
 
 class LeadNotes extends StatefulWidget {
   final data;
@@ -167,6 +164,16 @@ class _LeadNotesState extends State<LeadNotes> {
                     borderRadius: BorderRadius.all(Radius.circular(5.0))
                 ),
                 onPressed: () async{
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>AddLeadNotes(leadId:widget.data,bloc: bloc,)));
+               // var data =   await Navigator.push(
+               //      context,
+               //      MaterialPageRoute(
+               //        builder: (_) => Provider.value(
+               //          value: bloc,
+               //          child: AddLeadNotes(leadId:  widget.data),
+               //        ),
+               //      ),
+               //    );
                 },
                 backgroundColor: const  Color(0xFF009FE3),
                 label: AnimatedSwitcher(

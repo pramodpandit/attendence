@@ -159,7 +159,7 @@ class _ProjectCredentialListState extends State<ProjectCredentialList> {
                     borderRadius: BorderRadius.all(Radius.circular(5.0))
                 ),
                 onPressed: () async{
-                  var result =await Navigator.push(
+                 await Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (_) => Provider.value(

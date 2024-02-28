@@ -45,7 +45,6 @@ class LeadsBloc extends Bloc {
     }
   }
   Future getSpecificLeadData(String leadId, String type) async {
-
     try {
       var res = await _repo.specificLeadData(leadId,type);
       specificLeadData.value = res.data;
@@ -462,6 +461,71 @@ class LeadsBloc extends Bloc {
     }
   }
 
+  // lead add Notes
+  TextEditingController titleNotes = TextEditingController();
+  TextEditingController descriptionNotes = TextEditingController();
+  StreamController<String> NotesStream = StreamController.broadcast();
+
+  Future<void> AddNotes(int id,) async {
+    SharedPreferences _pref = await SharedPreferences.getInstance();
+    try {
+      Map<String, dynamic> data = {
+        "user_id": _pref.getString('uid'),
+        "lead_id":id,
+        "title":titleNotes.text,
+        "description":descriptionNotes.text
+      };
+      addfileLoading.value = true;
+      var result = await _repo.Add('lead/add_notes',data);
+      if(result.status == true){
+        NotesStream.sink.add('streamNotes');
+      }
+      showMessage(MessageType.error("Something went wrong"));
+    } catch (e, s) {
+      debugPrint("$e");
+      debugPrint("$s");
+    } finally {
+      addfileLoading.value = false;
+    }
+  }
+
+  // add branch in lead
+TextEditingController cname = TextEditingController();
+TextEditingController c_address = TextEditingController();
+TextEditingController c_phone = TextEditingController();
+TextEditingController c_email = TextEditingController();
+TextEditingController cp_name = TextEditingController();
+TextEditingController cp_mobile = TextEditingController();
+TextEditingController cp_email = TextEditingController();
+TextEditingController cp_location = TextEditingController();
+  Future<void> AddBranch(int id,) async {
+    SharedPreferences _pref = await SharedPreferences.getInstance();
+    try {
+      Map<String, dynamic> data = {
+        "user_id": _pref.getString('uid'),
+        "lead_id":id,
+        "c_name":cname.text,
+        "c_address":c_address.text,
+        "c_phone":c_phone.text,
+        "c_email":c_email.text,
+        "cp_name":cp_name.text,
+        "cp_mobile":cp_mobile.text,
+        "cp_email":cp_email.text,
+        "cp_location":cp_location.text,
+      };
+      addfileLoading.value = true;
+      var result = await _repo.Add('lead/add_branches',data);
+      if(result.status == true){
+        NotesStream.sink.add('streamNotes');
+      }
+      showMessage(MessageType.error("Something went wrong"));
+    } catch (e, s) {
+      debugPrint("$e");
+      debugPrint("$s");
+    } finally {
+      addfileLoading.value = false;
+    }
+  }
   // link all data
   ValueNotifier<List?> allLinkTypes = ValueNotifier(null);
 
@@ -486,7 +550,7 @@ class LeadsBloc extends Bloc {
     }
   }
 
-  addLeadLink(String leadId) async {
+  Future<void> addLeadLink(String leadId) async {
     try {
       addLinkLoading.value = true;
       var result = await _repo.AddLink(leadId,linkType.value!,link.text,other.text);
@@ -503,6 +567,8 @@ class LeadsBloc extends Bloc {
       addLinkLoading.value = false;
     }
   }
+
+
 
 
 

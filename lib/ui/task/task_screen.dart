@@ -261,7 +261,7 @@ class _AllTaskState extends State<AllTask> {
                     }else{
                       return GestureDetector(
                         onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const TaskDetails()));
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>TaskDetails(data: data,)));
                         },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -421,7 +421,7 @@ class _pendingTaskState extends State<pendingTask> {
                 if(data.status =='incomplete'){
                   return GestureDetector(
                     onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const TaskDetails()));
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context)=> TaskDetails(data: data,)));
                     },
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -593,7 +593,7 @@ class _ongoingTaskState extends State<ongoingTask> {
                     if(data.status =='doing'){
                       return InkWell(
                         onTap: (){
-                          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const TaskDetails()));
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>TaskDetails(data: data,)));
                         },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -757,15 +757,15 @@ class _completedState extends State<completedTask> {
                 );
               }
               return ListView.builder(
-                  itemCount: bloc.feedbackData.length,
+                  itemCount:  bloc.feedbackData.where((element) => element.status=="complete").toList().length,
                   shrinkWrap: true,
                   physics: const ScrollPhysics(),
                   itemBuilder: (context,index){
-                    var data = bloc.feedbackData[index];
-                    if(data.status =='complete'){
+                    var data = bloc.feedbackData.where((element) => element.status=="complete").toList()[index];
+                    if(data != null){
                       return GestureDetector(
                           onTap: () {
-                            Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const TaskDetails()));
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context)=> TaskDetails(data: data,)));
                           },
                           child:
 
@@ -807,7 +807,6 @@ class _completedState extends State<completedTask> {
                                             Expanded(
                                               child: Text(
                                                 "${data.title}",
-                                                // "The prevalence of trauma related disorders in children and adolescents affected by forest fires.",
                                                 style: TextStyle(
                                                     fontFamily: "Poppins",
                                                     fontSize: 12,
@@ -817,7 +816,6 @@ class _completedState extends State<completedTask> {
                                             ),
                                             Text(
                                               "11:00 Am - 12:00 Pm",
-                                              // "The prevalence of trauma related disorders in children and adolescents affected by forest fires.",
                                               style: TextStyle(
                                                   fontSize: 8,
                                                   fontWeight: FontWeight.w500,
@@ -825,16 +823,10 @@ class _completedState extends State<completedTask> {
                                               ),),
                                             SizedBox(height: 10,),
                                             Container(
-                                              // color: Colors.black,
-                                              // padding: const EdgeInsets.only(
-                                              //     left: 20,
-                                              //     right: 20,
-                                              //     top: 30,
-                                              //     bottom: 10),
                                               child: Html(
                                                 // data:"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
                                                 data:
-                                                "${data.description}",
+                                                "${data.description}"??'',
                                                 style: {
                                                   "body": Style(
                                                       color: Colors.black,
@@ -879,8 +871,7 @@ class _completedState extends State<completedTask> {
                           )
                       );
                     }else{
-                      if(index ==0){
-                        return Container(
+                      return Container(
                           height: MediaQuery.of(context).size.height * 0.7,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -890,7 +881,7 @@ class _completedState extends State<completedTask> {
                             ],
                           ),
                         );
-                      }
+
                     }
                   });},
           ),
