@@ -96,7 +96,7 @@ class taskBloc extends Bloc{
       if(result.status && result.data != null){
         data.value = result.data['totaldata']['task_details']['user'];
        allTaskData.value =( result.data['totaldata']['task_details'][common]as List).reversed.toList();
-        print('task detail data: ${data.value}');
+        print('task detail data: ${allTaskData.value}');
       }
     }catch (e, s) {
       print(e);
@@ -196,4 +196,55 @@ class taskBloc extends Bloc{
       addnotesLoading.value = false;
     }
   }
+  ValueNotifier<List?> employelist = ValueNotifier(null);
+  ValueNotifier<String?> updateemployelist = ValueNotifier(null);
+
+  fetchexpensePaymentType() async{
+    try{
+      // isUserDetailLoad.value = true;
+      var result = await _repo.getemployeedata();
+      if(result.status && result.data != null){
+        employelist.value = result.data["data1"];
+        print("the all projects are : ${employelist.value}");
+      }
+    }catch (e, s) {
+      print(e);
+      print(s);
+    }
+  }
+  TextEditingController HourLogged = TextEditingController();
+  TextEditingController memo = TextEditingController();
+  TimeOfDay startTime = TimeOfDay.now();
+  TimeOfDay endTime = TimeOfDay.now();
+  ValueNotifier<bool> addtimesheetLoading = ValueNotifier(false);
+  StreamController<String?> timesheetStream= StreamController.broadcast();
+
+  Future<void> addTimeSheet(int id,) async {
+    try {
+      SharedPreferences _pref = await SharedPreferences.getInstance();
+      Map<String, dynamic> data = {
+        "user_id": _pref.getString('uid'),
+        "task_id":id,
+        "employee_id":updateemployelist.value,
+        "start_time":'${startTime.hour}:${startTime.minute}:00',
+        "end_time":'${endTime.hour}:${endTime.minute}:00',
+        "hours_logged":HourLogged.text,
+        "memo":memo.text
+      };
+      addtimesheetLoading.value = true;
+      var result = await _repo.Add('tasks/add_timesheet',data,false);
+      if(result.status == true){
+        timesheetStream.sink.add('timesheetStream');
+      }else{
+        showMessage(MessageType.error("Something went wrong"));
+      }
+    } catch (e, s) {
+      debugPrint("$e");
+      debugPrint("$s");
+    } finally {
+      addtimesheetLoading.value = false;
+    }
+  }
+
+
 }

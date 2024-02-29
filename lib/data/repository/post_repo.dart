@@ -13,7 +13,6 @@ class PostRepository {
 
   //add post::
   Future<ApiResponse3> addFeedback(String text, File? image) async {
-
     var response = await _api.postRequest("addpost", {
       "user_id": prefs.getString('uid'),
       "text": text,

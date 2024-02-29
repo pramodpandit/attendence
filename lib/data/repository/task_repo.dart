@@ -42,5 +42,14 @@ class TaskRepositary{
       throw Exception('data is not avaible ${e.toString()}');
     }
   }
+  Future<ApiResponse4> getemployeedata()async{
+    var response=await _api.getRequest("user/get_all_employee_details",data: {
+      "user_id":prefs.getString('uid'),
+    });
 
+    if (response == null) {
+      ApiException.fromString("response null");
+    }
+    return ApiResponse4.fromJson(response,response);
+  }
 }

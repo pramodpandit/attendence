@@ -7,6 +7,7 @@ import '../../../bloc/project_bloc.dart';
 import '../../../bloc/task_bloc.dart';
 import '../../../data/repository/project_repo.dart';
 import '../../../data/repository/task_repo.dart';
+import 'add_pages/task_add_timesheet.dart';
 
 class TaskTimesheet extends StatefulWidget {
   final int id;
@@ -65,7 +66,7 @@ class _TaskTimesheetListState extends State<TaskTimesheet> {
                               subtitle:   Container(
                                 child: Html(
                                   data:
-                                  "${data['comment']??''}",
+                                  "${data['memo']??''}",
                                   style: {
                                     "body": Style(
                                         color: Colors.black,
@@ -87,7 +88,7 @@ class _TaskTimesheetListState extends State<TaskTimesheet> {
                               leading:CircleAvatar(
                                 child: Icon(Icons.person),
                               ),
-                              trailing: Text('${DateFormat('hh:mm a').format(DateTime.parse(data['start_time']))}'),
+                              trailing: Text('${data['start_time']} - ${data['end_time']}'),
                             )
                           );
                         }),
@@ -97,57 +98,57 @@ class _TaskTimesheetListState extends State<TaskTimesheet> {
           ],
         ),
       ),
-      // floatingActionButton: Column(
-      //   mainAxisAlignment: MainAxisAlignment.end,
-      //   children: [
-      //     SizedBox(
-      //       height: 40,
-      //       width: 90,
-      //       child: FloatingActionButton.extended(
-      //           shape: const RoundedRectangleBorder(
-      //               borderRadius: BorderRadius.all(Radius.circular(5.0))
-      //           ),
-      //           onPressed: () async{
-      //             var result =await Navigator.push(
-      //                 context,
-      //                 MaterialPageRoute(
-      //                     builder: (_) => Provider.value(
-      //                         value: bloc,
-      //                         child: Add_Notes( projectid: widget.data['id'],branch_id: widget.data['business_address'],)
-      //                     )));
-      //           },
-      //           backgroundColor: const  Color(0xFF009FE3),
-      //           label: AnimatedSwitcher(
-      //             duration: const Duration(seconds: 1),
-      //             transitionBuilder: (Widget child, Animation<double> animation) =>
-      //                 FadeTransition(
-      //                   opacity: animation,
-      //                   child: SizeTransition(
-      //                     sizeFactor: animation,
-      //                     axis: Axis.horizontal,
-      //                     child: child,
-      //                   ),
-      //                 ),
-      //             child: const Row(
-      //               children: [
-      //                 Padding(
-      //                   padding: EdgeInsets.only(right: 5.0),
-      //                   child: Icon(
-      //                     PhosphorIcons.plus_circle_fill,
-      //                     color: Colors.white,
-      //                   ),
-      //                 ),
-      //                 Text(
-      //                   "Notes",
-      //                   style: TextStyle(color: Colors.white),
-      //                 )
-      //               ],
-      //             ),
-      //           )),
-      //     ),
-      //     SizedBox(height: 30,)
-      //   ],
-      // ),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          SizedBox(
+            height: 40,
+            width: 90,
+            child: FloatingActionButton.extended(
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5.0))
+                ),
+                onPressed: () async{
+                  var result =await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => Provider.value(
+                              value: bloc,
+                              child: TaskAddTimeSheet(taskId: widget.id, bloc: bloc,)
+                          )));
+                },
+                backgroundColor: const  Color(0xFF009FE3),
+                label: AnimatedSwitcher(
+                  duration: const Duration(seconds: 1),
+                  transitionBuilder: (Widget child, Animation<double> animation) =>
+                      FadeTransition(
+                        opacity: animation,
+                        child: SizeTransition(
+                          sizeFactor: animation,
+                          axis: Axis.horizontal,
+                          child: child,
+                        ),
+                      ),
+                  child: const Row(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(right: 5.0),
+                        child: Icon(
+                          PhosphorIcons.plus_circle_fill,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(
+                        "Notes",
+                        style: TextStyle(color: Colors.white),
+                      )
+                    ],
+                  ),
+                )),
+          ),
+          SizedBox(height: 30,)
+        ],
+      ),
     );
   }
 }
