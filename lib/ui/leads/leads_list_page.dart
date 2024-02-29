@@ -93,7 +93,8 @@ class _LeadsListPageState extends State<LeadsListPage> {
                       style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
-                          fontSize: 18),
+                          fontSize: 18,
+                      ),
                     ),
                   ],
                 ),

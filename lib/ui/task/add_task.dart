@@ -30,6 +30,10 @@ class _addTask extends State<addTask> {
   void initState() {
     bloc = taskBloc(context.read<TaskRepositary>());
     super.initState();
+    bloc.getAllTaskCategoryData();
+    bloc.getAllProjectsData();
+    bloc.getAllDepartmentData();
+    bloc.getAllTaskLabelData();
   }
   @override
   Widget build(BuildContext context) {
@@ -92,48 +96,40 @@ class _addTask extends State<addTask> {
                             padding: EdgeInsets.only(left: 10),
                             child: Row(
                               children: [
-                                Text("Category", style: TextStyle(fontSize: 13)),
+                                Text("Task Category", style: TextStyle(fontSize: 13)),
                                 Text("*", style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)
                               ],
                             ),
                           ),
                           const SizedBox(height: 5),
-                          DropdownButtonFormField<String>(
-                            icon: const Icon(
-                              Icons.keyboard_arrow_down_sharp,
-                              color: Colors.grey,
-                            ),
-                            iconSize: 24,
-                            elevation: 16,
-                            style: const TextStyle(color: Colors.black, fontSize: 15),
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors.grey[200],
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(color: Color(0xffF4F5F7)),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(color: Color(0xffF2F2F2)),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 12, horizontal: 10),
-                              hintText: "Select",
-                              hintStyle:
-                              TextStyle(color: Colors.black.withOpacity(0.6), fontSize: 15,fontWeight: FontWeight.w500),
-                            ),
-                            onChanged: (String? data) {
-                              bloc.selectStatus(data!);
-                            },
-                            items: bloc.TaskCategory.map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value,style: const TextStyle(color: Colors.black,fontWeight: FontWeight.w500),),
-                              );
-                            }).toList(),
-                          ),
-
+                          ValueListenableBuilder(
+                            valueListenable: bloc.allTaskCategory,
+                            builder: (context, allTaskCategory, child) {
+                              if(allTaskCategory == null){
+                                return AppDropdown(
+                                  items: const [],
+                                  onChanged: (value) {
+                                    bloc.taskCategory.value = value.toString();
+                                  },
+                                  value: null,
+                                  hintText: "Select",
+                                );
+                              }
+                            return AppDropdown(
+                                items: allTaskCategory.map((e) => DropdownMenuItem(value: e['id'].toString(),child: Text(e['name']),)).toList(),
+                                onChanged: (value) {
+                                  bloc.taskCategory.value = value.toString();
+                                }, 
+                                value: bloc.taskCategory.value, 
+                                hintText: "Select",
+                              validator: (value) {
+                                if(value == null){
+                                  return "Please Select Category Task";
+                                }
+                                return null;
+                              },
+                            );
+                          },),
                           const SizedBox(
                             height: 20,
                           ),
@@ -147,42 +143,81 @@ class _addTask extends State<addTask> {
                             ),
                           ),
                           const SizedBox(height: 5),
-                          DropdownButtonFormField<String>(
-                            icon: const Icon(
-                              Icons.keyboard_arrow_down_sharp,
-                              color: Colors.grey,
-                            ),
-                            iconSize: 24,
-                            elevation: 16,
-                            style: const TextStyle(color: Colors.black, fontSize: 15),
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors.grey[200],
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(color: Color(0xffF4F5F7)),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(color: Color(0xffF2F2F2)),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 12, horizontal: 10),
-                              hintText: "Select",
-                              hintStyle:
-                              TextStyle(color: Colors.black.withOpacity(0.6), fontSize: 15,fontWeight: FontWeight.w500),
-                            ),
-                            onChanged: (String? data) {
-                              bloc.selectProject(data!);
-                            },
-                            items: bloc.Project.map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value,style: const TextStyle(color: Colors.black,fontWeight: FontWeight.w500),),
+                          ValueListenableBuilder(
+                            valueListenable: bloc.allProjectsData,
+                            builder: (context, allProjectsData, child) {
+                              if(allProjectsData == null){
+                                return AppDropdown(
+                                  items: const [],
+                                  onChanged: (value) {
+                                    bloc.project.value = value;
+                                  },
+                                  value: null,
+                                  hintText: "Select",
+                                );
+                              }
+                              return AppDropdown(
+                                items: allProjectsData.map((e) => DropdownMenuItem(value: e['id'].toString(),child: Text(e['name'].toString()),)).toList(),
+                                onChanged: (value) {
+                                  bloc.project.value = value;
+                                  bloc.getEmployeesDataByProjectId(value.toString());
+                                },
+                                value: bloc.project.value,
+                                hintText: "Select",
+                                validator: (value) {
+                                  if(value == null){
+                                    return "Please Select Project";
+                                  }
+                                  return null;
+                                },
                               );
-                            }).toList(),
-                          ),
-
+                            },),
+                          ValueListenableBuilder(
+                            valueListenable: bloc.project,
+                            builder: (context, project, child) {
+                              if(project == null){
+                                return Offstage();
+                              }
+                            return Column(
+                              children: [
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 10),
+                                  child: Row(
+                                    children: [
+                                      Text("Employee", style: TextStyle(fontSize: 13)),
+                                      Text("*", style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                ValueListenableBuilder(
+                                  valueListenable: bloc.allEmployeesData,
+                                  builder: (context, allEmployeesData, child) {
+                                    if(allEmployeesData == null){
+                                      return AppDropdown(
+                                        items: const [],
+                                        onChanged: (value) {
+                                          bloc.employee.value = value.toString();
+                                        },
+                                        value: null,
+                                        hintText: "Select",
+                                      );
+                                    }
+                                    return AppDropdown(
+                                      items: allEmployeesData.map((e) => DropdownMenuItem(value: e['id'].toString(),child: Text(e['user_details']['name'].toString()),)).toList(),
+                                      onChanged: (value) {
+                                        bloc.employee.value = value.toString();
+                                      },
+                                      value: bloc.employee.value,
+                                      hintText: "Select",
+                                    );
+                                  },),
+                              ],
+                            );
+                          },),
                           const SizedBox(
                             height: 20,
                           ),
@@ -190,101 +225,43 @@ class _addTask extends State<addTask> {
                             padding: EdgeInsets.only(left: 10),
                             child: Row(
                               children: [
-                                Text("Deparment", style: TextStyle(fontSize: 13)),
+                                Text("Department", style: TextStyle(fontSize: 13)),
                                 Text("*", style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)
                               ],
                             ),
                           ),
                           const SizedBox(height: 5),
-                          DropdownButtonFormField<String>(
-                            icon: const Icon(
-                              Icons.keyboard_arrow_down_sharp,
-                              color: Colors.grey,
-                            ),
-                            iconSize: 24,
-                            elevation: 16,
-                            style: const TextStyle(color: Colors.black, fontSize: 15),
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors.grey[200],
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(color: Color(0xffF4F5F7)),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(color: Color(0xffF2F2F2)),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 12, horizontal: 10),
-                              hintText: "Select",
-                              hintStyle:
-                              TextStyle(color: Colors.black.withOpacity(0.6), fontSize: 15,fontWeight: FontWeight.w500),
-                            ),
-                            onChanged: (String? data) {
-                              bloc.selectDepartment(data!);
-                            },
-                            items: bloc.Department.map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value,style: const TextStyle(color: Colors.black,fontWeight: FontWeight.w500),),
+                          ValueListenableBuilder(
+                            valueListenable: bloc.allDepartmentData,
+                            builder: (context, allDepartmentData, child) {
+                              if(allDepartmentData == null){
+                                return AppDropdown(
+                                  items: const [],
+                                  onChanged: (value) {
+                                    bloc.department.value = value.toString();
+                                  },
+                                  value: null,
+                                  hintText: "Select",
+                                );
+                              }
+                              return AppDropdown(
+                                items: allDepartmentData.map((e) => DropdownMenuItem(value: e['id'].toString(),child: Text(e['name']),)).toList(),
+                                onChanged: (value) {
+                                  bloc.department.value = value.toString();
+                                },
+                                value: bloc.department.value,
+                                hintText: "Select",
+                                validator: (value) {
+                                  if(value == null){
+                                    return "Please Select Department";
+                                  }
+                                  return null;
+                                },
                               );
-                            }).toList(),
-                          ),
-
+                            },),
                           const SizedBox(
                             height: 20,
                           ),
-                          const Padding(
-                            padding: EdgeInsets.only(left: 10),
-                            child: Row(
-                              children: [
-                                Text("Employee", style: TextStyle(fontSize: 13)),
-                                Text("*", style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          DropdownButtonFormField<String>(
-                            icon: const Icon(
-                              Icons.keyboard_arrow_down_sharp,
-                              color: Colors.grey,
-                            ),
-                            iconSize: 24,
-                            elevation: 16,
-                            style: const TextStyle(color: Colors.black, fontSize: 15),
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors.grey[200],
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(color: Color(0xffF4F5F7)),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(color: Color(0xffF2F2F2)),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 12, horizontal: 10),
-                              hintText: "Select",
-                              hintStyle:
-                              TextStyle(color: Colors.black.withOpacity(0.6), fontSize: 15,fontWeight: FontWeight.w500),
-                            ),
-                            onChanged: (String? data) {
-                              bloc.selectEmployee(data!);
-                            },
-                            items: bloc.Employee.map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value,style: const TextStyle(color: Colors.black,fontWeight: FontWeight.w500),),
-                              );
-                            }).toList(),
-                          ),
-
-                          const SizedBox(
-                            height: 20,
-                          ),
-
                           AppTextField(
                             controller: bloc.title,
                             title: "Title",
@@ -300,12 +277,12 @@ class _addTask extends State<addTask> {
                           const SizedBox(height: 5),
                           ValueListenableBuilder(
                               valueListenable: bloc.startDate,
-                              builder: (context, DateTime? date, _) {
+                              builder: (context, date, _) {
                                 return InkWell(
                                   onTap: () async {
-                                    DateTime? dt = await showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime.now().subtract(Duration(days: 15)), lastDate:  DateTime.now().add(Duration(days: 30)),);
+                                    DateTime? dt = await showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime(2000), lastDate:  DateTime(3000));
                                     if(dt!=null) {
-                                      await bloc.updateDateStart(dt);
+                                      bloc.startDate.value = dt.toString().split(" ").first.split("-").reversed.join("-");
                                     }
                                   },
                                   child: Container(
@@ -319,7 +296,7 @@ class _addTask extends State<addTask> {
                                       children: [
                                         const Icon(PhosphorIcons.clock),
                                         const SizedBox(width: 15),
-                                        Text(date==null ?  DateFormat('MMM dd, yyyy').format(DateTime.now()) : DateFormat('MMM dd, yyyy').format(date), style: const TextStyle(
+                                        Text(date ?? "Select Date", style: const TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.w500,
                                         ),),
@@ -338,36 +315,87 @@ class _addTask extends State<addTask> {
                           ),
                           const SizedBox(height: 5),
                           ValueListenableBuilder(
-                              valueListenable: bloc.endDate,
-                              builder: (context, DateTime? date, _) {
-                                return InkWell(
-                                  onTap: () async {
-                                    DateTime? dt = await showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime.now().subtract(Duration(days: 15)), lastDate:  DateTime.now().add(Duration(days: 30)),);
-                                    if(dt!=null) {
-                                      await bloc.updateEndDate(dt);
-                                    }
-                                  },
-                                  child: Container(
-                                    height: 50,
-                                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[200],
-                                      borderRadius: BorderRadius.circular(5),
+                            valueListenable: bloc.dueDate,
+                            builder: (context, dueDate, child) {
+                            return AppDropdown(
+                                items: const [
+                                  DropdownMenuItem(value: "yes",child: Text("Yes")),
+                                  DropdownMenuItem(value: "no",child: Text("No")),
+                                ],
+                                onChanged: (value) {
+                                  bloc.dueDate.value = value;
+                                },
+                                value: bloc.dueDate.value,
+                                hintText: "Select due date",
+                                validator: (value) {
+                                  if(value == null){
+                                    return "Please select due date";
+                                  }
+                                  return null;
+                                },
+                            );
+                          },),
+                          ValueListenableBuilder(
+                            valueListenable: bloc.dueDate,
+                            builder: (context, dueDate, child) {
+                              if(dueDate == null){
+                                return Offstage();
+                              }
+                              if(dueDate == "yes"){
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    const SizedBox(height: 20),
+                                    const Padding(
+                                      padding: EdgeInsets.only(left: 10),
+                                      child: Text("End Date", style: TextStyle(fontSize: 13)),
                                     ),
-                                    child: Row(
-                                      children: [
-                                        const Icon(PhosphorIcons.clock),
-                                        const SizedBox(width: 15),
-                                        Text(date==null ?  DateFormat('MMM dd, yyyy').format(DateTime.now()) : DateFormat('MMM dd, yyyy').format(date), style: const TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500,
-                                        ),),
-                                      ],
+                                    const SizedBox(height: 5),
+                                    ValueListenableBuilder(
+                                        valueListenable: bloc.endDate,
+                                        builder: (context, date, _) {
+                                          return InkWell(
+                                            onTap: () async {
+                                              DateTime? dt = await showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime(2000), lastDate:  DateTime(3000),);
+                                              if(dt!=null) {
+                                                bloc.endDate.value = dt.toString().split(" ").first.split("-").reversed.join("-");
+                                              }
+                                            },
+                                            child: Container(
+                                              height: 50,
+                                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey[200],
+                                                borderRadius: BorderRadius.circular(5),
+                                              ),
+                                              child: Row(
+                                                children: [
+                                                  const Icon(PhosphorIcons.clock),
+                                                  const SizedBox(width: 15),
+                                                  Text(date ?? "Select Date", style: const TextStyle(
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        }
                                     ),
-                                  ),
+                                  ],
                                 );
                               }
+                              return Offstage();
+                            },),
+                          const SizedBox(height: 20),
+                          AppTextField(
+                            controller: bloc.duration,
+                            title: "Duration (In Minutes)",
+                            hint: "Duration",
+                            validate: true,
+                            keyboardType: TextInputType.number,
                           ),
+                          const SizedBox(height: 20),
                           AppTextField(
                             controller: bloc.description,
                             title: "Description",
@@ -388,42 +416,34 @@ class _addTask extends State<addTask> {
                             ),
                           ),
                           const SizedBox(height: 5),
-                          DropdownButtonFormField<String>(
-                            icon: const Icon(
-                              Icons.keyboard_arrow_down_sharp,
-                              color: Colors.grey,
-                            ),
-                            iconSize: 24,
-                            elevation: 16,
-                            style: const TextStyle(color: Colors.black, fontSize: 15),
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors.grey[200],
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(color: Color(0xffF4F5F7)),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(color: Color(0xffF2F2F2)),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 12, horizontal: 10),
-                              hintText: "Select",
-                              hintStyle:
-                              TextStyle(color: Colors.black.withOpacity(0.6), fontSize: 15,fontWeight: FontWeight.w500),
-                            ),
-                            onChanged: (String? data) {
-                              bloc.selectEmployee(data!);
-                            },
-                            items: bloc.Employee.map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value,style: const TextStyle(color: Colors.black,fontWeight: FontWeight.w500),),
+                          ValueListenableBuilder(
+                            valueListenable: bloc.allTaskLabelData,
+                            builder: (context, allTaskLabelData, child) {
+                              if(allTaskLabelData == null){
+                                return AppDropdown(
+                                  items: const [],
+                                  onChanged: (value) {
+                                    bloc.taskLabel.value = value.toString();
+                                  },
+                                  value: null,
+                                  hintText: "Select",
+                                );
+                              }
+                              return AppDropdown(
+                                items: allTaskLabelData.map((e) => DropdownMenuItem(value: e['id'].toString(),child: Text(e['name']),)).toList(),
+                                onChanged: (value) {
+                                  bloc.taskLabel.value = value.toString();
+                                },
+                                value: bloc.taskLabel.value,
+                                hintText: "Select",
+                                validator: (value) {
+                                  if(value == null){
+                                    return "Please select task label";
+                                  }
+                                  return null;
+                                },
                               );
-                            }).toList(),
-                          ),
-
+                            },),
                           const SizedBox(
                             height: 20,
                           ),
@@ -437,41 +457,29 @@ class _addTask extends State<addTask> {
                             ),
                           ),
                           const SizedBox(height: 5),
-                          DropdownButtonFormField<String>(
-                            icon: const Icon(
-                              Icons.keyboard_arrow_down_sharp,
-                              color: Colors.grey,
-                            ),
-                            iconSize: 24,
-                            elevation: 16,
-                            style: const TextStyle(color: Colors.black, fontSize: 15),
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors.grey[200],
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(color: Color(0xffF4F5F7)),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(color: Color(0xffF2F2F2)),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 12, horizontal: 10),
+                          ValueListenableBuilder(
+                            valueListenable: bloc.priority,
+                            builder: (context, priority, child) {
+                            return AppDropdown(
+                              items: const [
+                                DropdownMenuItem(value: "medium",child: Text("Medium")),
+                                DropdownMenuItem(value: "high",child: Text("High")),
+                                DropdownMenuItem(value: "veryhigh",child: Text("Very High")),
+                                DropdownMenuItem(value: "low",child: Text("Low")),
+                              ],
+                              onChanged: (value) {
+                                bloc.priority.value = value;
+                              },
+                              value: bloc.priority.value,
                               hintText: "Select",
-                              hintStyle:
-                              TextStyle(color: Colors.black.withOpacity(0.6), fontSize: 15,fontWeight: FontWeight.w500),
-                            ),
-                            onChanged: (String? data) {
-                              bloc.selectEmployee(data!);
-                            },
-                            items: bloc.Employee.map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value,style: const TextStyle(color: Colors.black,fontWeight: FontWeight.w500),),
-                              );
-                            }).toList(),
-                          ),
+                              validator: (value) {
+                                if(value == null){
+                                  return "Please Select Priority";
+                                }
+                                return null;
+                              },
+                            );
+                          },),
 
                           const SizedBox(
                             height: 20,
@@ -486,42 +494,28 @@ class _addTask extends State<addTask> {
                             ),
                           ),
                           const SizedBox(height: 5),
-                          DropdownButtonFormField<String>(
-                            icon: const Icon(
-                              Icons.keyboard_arrow_down_sharp,
-                              color: Colors.grey,
-                            ),
-                            iconSize: 24,
-                            elevation: 16,
-                            style: const TextStyle(color: Colors.black, fontSize: 15),
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors.grey[200],
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(color: Color(0xffF4F5F7)),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(color: Color(0xffF2F2F2)),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 12, horizontal: 10),
-                              hintText: "Select",
-                              hintStyle:
-                              TextStyle(color: Colors.black.withOpacity(0.6), fontSize: 15,fontWeight: FontWeight.w500),
-                            ),
-                            onChanged: (String? data) {
-                              bloc.selectEmployee(data!);
-                            },
-                            items: bloc.Employee.map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value,style: const TextStyle(color: Colors.black,fontWeight: FontWeight.w500),),
+                          ValueListenableBuilder(
+                            valueListenable: bloc.status,
+                            builder: (context, status, child) {
+                              return AppDropdown(
+                                items: const [
+                                  DropdownMenuItem(value: "complete",child: Text("Complete")),
+                                  DropdownMenuItem(value: "incomplete",child: Text("Incomplete")),
+                                  DropdownMenuItem(value: "doing",child: Text("Doing")),
+                                ],
+                                onChanged: (value) {
+                                  bloc.status.value = value;
+                                },
+                                value: bloc.status.value,
+                                hintText: "Select",
+                                validator: (value) {
+                                  if(value == null){
+                                    return "Please Select Status";
+                                  }
+                                  return null;
+                                },
                               );
-                            }).toList(),
-                          ),
-
+                            },),
                           const SizedBox(
                             height: 20,
                           ),
@@ -535,42 +529,48 @@ class _addTask extends State<addTask> {
                             ),
                           ),
                           const SizedBox(height: 5),
-                          DropdownButtonFormField<String>(
-                            icon: const Icon(
-                              Icons.keyboard_arrow_down_sharp,
-                              color: Colors.grey,
-                            ),
-                            iconSize: 24,
-                            elevation: 16,
-                            style: const TextStyle(color: Colors.black, fontSize: 15),
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors.grey[200],
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(color: Color(0xffF4F5F7)),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(color: Color(0xffF2F2F2)),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 12, horizontal: 10),
+                          ValueListenableBuilder(
+                            valueListenable: bloc.billing,
+                            builder: (context, billing, child) {
+                            return AppDropdown(
+                              items: const [
+                                DropdownMenuItem(value: "yes",child: Text("Yes")),
+                                DropdownMenuItem(value: "no",child: Text("No")),
+                              ],
+                              onChanged: (value) {
+                                bloc.billing.value = value;
+                              },
+                              value: bloc.billing.value,
                               hintText: "Select",
-                              hintStyle:
-                              TextStyle(color: Colors.black.withOpacity(0.6), fontSize: 15,fontWeight: FontWeight.w500),
-                            ),
-                            onChanged: (String? data) {
-                              bloc.selectEmployee(data!);
-                            },
-                            items: bloc.Employee.map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value,style: const TextStyle(color: Colors.black,fontWeight: FontWeight.w500),),
-                              );
-                            }).toList(),
-                          ),
-
+                              validator: (value) {
+                                if(value == null){
+                                  return "Please Select Billing";
+                                }
+                                return null;
+                              },
+                            );
+                          },),
+                          ValueListenableBuilder(
+                            valueListenable: bloc.billing,
+                            builder: (context, billing, child) {
+                              if(billing == null){
+                                return Offstage();
+                              }
+                              if(billing == "yes"){
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    const SizedBox(height: 20),
+                                    AppTextField(
+                                        controller: bloc.amount,
+                                        title: "Amount",
+                                      validate: true,
+                                    ),
+                                  ],
+                                );
+                              }
+                              return Offstage();
+                            },),
                           const SizedBox(
                             height: 20,
                           ),
@@ -584,42 +584,55 @@ class _addTask extends State<addTask> {
                             ),
                           ),
                           const SizedBox(height: 5),
-                          DropdownButtonFormField<String>(
-                            icon: const Icon(
-                              Icons.keyboard_arrow_down_sharp,
-                              color: Colors.grey,
-                            ),
-                            iconSize: 24,
-                            elevation: 16,
-                            style: const TextStyle(color: Colors.black, fontSize: 15),
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors.grey[200],
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(color: Color(0xffF4F5F7)),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(color: Color(0xffF2F2F2)),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 12, horizontal: 10),
-                              hintText: "Select",
-                              hintStyle:
-                              TextStyle(color: Colors.black.withOpacity(0.6), fontSize: 15,fontWeight: FontWeight.w500),
-                            ),
-                            onChanged: (String? data) {
-                              bloc.selectEmployee(data!);
-                            },
-                            items: bloc.Employee.map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value,style: const TextStyle(color: Colors.black,fontWeight: FontWeight.w500),),
+                          ValueListenableBuilder(
+                            valueListenable: bloc.repeatType,
+                            builder: (context, repeatType, child) {
+                              return AppDropdown(
+                                items: const [
+                                  DropdownMenuItem(value: "year",child: Text("Year")),
+                                  DropdownMenuItem(value: "month",child: Text("Month")),
+                                  DropdownMenuItem(value: "weeks",child: Text("Weeks")),
+                                  DropdownMenuItem(value: "days",child: Text("Days")),
+                                ],
+                                onChanged: (value) {
+                                  bloc.repeatType.value = value;
+                                },
+                                value: bloc.repeatType.value,
+                                hintText: "Select",
+                                validator: (value) {
+                                  if(value == null){
+                                    return "Please Select Repeat Type";
+                                  }
+                                  return null;
+                                },
                               );
-                            }).toList(),
-                          ),
-
+                            },),
+                          ValueListenableBuilder(
+                            valueListenable: bloc.repeatType,
+                            builder: (context, repeatType, child) {
+                              if(repeatType == null){
+                                return Offstage();
+                              }
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  const SizedBox(height: 20),
+                                  AppTextField(
+                                    controller: bloc.timesOfRepeat,
+                                    title: "Times of repeat",
+                                    validate: true,
+                                    keyboardType: TextInputType.number,
+                                  ),
+                                  const SizedBox(height: 20),
+                                  AppTextField(
+                                    controller: bloc.repeatCycle,
+                                    title: "Repeat Cycle",
+                                    validate: true,
+                                    keyboardType: TextInputType.number,
+                                  ),
+                                ],
+                              );
+                            },),
                           const SizedBox(
                             height: 20,
                           ),
@@ -633,42 +646,27 @@ class _addTask extends State<addTask> {
                             ),
                           ),
                           const SizedBox(height: 5),
-                          DropdownButtonFormField<String>(
-                            icon: const Icon(
-                              Icons.keyboard_arrow_down_sharp,
-                              color: Colors.grey,
-                            ),
-                            iconSize: 24,
-                            elevation: 16,
-                            style: const TextStyle(color: Colors.black, fontSize: 15),
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors.grey[200],
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(color: Color(0xffF4F5F7)),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(color: Color(0xffF2F2F2)),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 12, horizontal: 10),
+                          ValueListenableBuilder(
+                            valueListenable: bloc.dependent,
+                            builder: (context, dependent, child) {
+                            return AppDropdown(
+                              items: const [
+                                // DropdownMenuItem(value: "yes",child: Text("Yes")),
+                                DropdownMenuItem(value: "no",child: Text("No")),
+                              ],
+                              onChanged: (value) {
+                                bloc.dependent.value = value;
+                              },
+                              value: bloc.dependent.value,
                               hintText: "Select",
-                              hintStyle:
-                              TextStyle(color: Colors.black.withOpacity(0.6), fontSize: 15,fontWeight: FontWeight.w500),
-                            ),
-                            onChanged: (String? data) {
-                              bloc.selectEmployee(data!);
-                            },
-                            items: bloc.Employee.map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value,style: const TextStyle(color: Colors.black,fontWeight: FontWeight.w500),),
-                              );
-                            }).toList(),
-                          ),
-
+                              validator: (value) {
+                                if(value == null){
+                                  return "Please Select Dependent";
+                                }
+                                return null;
+                              },
+                            );
+                          },),
                           const SizedBox(
                             height: 20,
                           ),
@@ -676,7 +674,7 @@ class _addTask extends State<addTask> {
                             title: "Submit",
                             onTap: () {
                               if (formKey.currentState!.validate()) {
-                                // bloc.addComplaint();
+                                bloc.addTask();
                               }
                             },
                             margin: EdgeInsets.zero,

@@ -33,4 +33,57 @@ class TaskRepositary{
 //   return resp;
 // }
 
+  Future<ApiResponse2> fetchAllTaskCategoryData()async{
+    try{
+      var response = await _api.getRequest("task_category");
+      return ApiResponse2.fromJson(response,response['data']);
+    }catch(e){
+      throw Exception('data is not avaible ${e.toString()}');
+    }
+  }
+  Future<ApiResponse2> fetchAllProjectsData()async{
+    try{
+      var response = await _api.getRequest("lead/projects");
+      return ApiResponse2.fromJson(response,response['data']);
+    }catch(e){
+      throw Exception('data is not avaible ${e.toString()}');
+    }
+  }
+  Future<ApiResponse2> fetchEmployeesDataByProjectId(String projectId)async{
+    try{
+      var response = await _api.getRequest("project/projectmember-list",data: {
+        "project_id" : projectId
+      });
+      return ApiResponse2.fromJson(response,response['data']);
+    }catch(e){
+      throw Exception('data is not avaible ${e.toString()}');
+    }
+  }
+  Future<ApiResponse2> fetchAllDepartmentData()async{
+    try{
+      var response = await _api.getRequest("fetch_data");
+      return ApiResponse2.fromJson(response,response['data']);
+    }catch(e){
+      throw Exception('data is not avaible ${e.toString()}');
+    }
+  }
+  Future<ApiResponse2> fetchAllTaskLabelData()async{
+    try{
+      var response = await _api.getRequest("task_label");
+      return ApiResponse2.fromJson(response,response['data']);
+    }catch(e){
+      throw Exception('data is not avaible ${e.toString()}');
+    }
+  }
+
+  Future<ApiResponse2> addTaskFunction(Map<String,dynamic> data)async{
+    try{
+      var response = await _api.postRequest("add_task", data);
+      return ApiResponse2.fromJson(response,response['data']);
+    }catch(e){
+      throw Exception('data is not avaible ${e.toString()}');
+    }
+
+  }
+
 }

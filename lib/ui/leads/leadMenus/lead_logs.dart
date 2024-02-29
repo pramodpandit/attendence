@@ -86,7 +86,7 @@ class _LeadLogsState extends State<LeadLogs> {
                           Row(
                             children: [
                               Text(
-                                "${data['name']}",
+                                "${data['status']}",
                                 // "${document[index].name}",
                                 style: const TextStyle(
                                     color: Colors.black,
@@ -122,13 +122,13 @@ class _LeadLogsState extends State<LeadLogs> {
                           SizedBox(
                             height: 10,
                           ),
-                          Row(
-                            children: [
-                              Text("Next follow up"),
-                              const SizedBox(width: 10),
-                              Text("${data['next_followup']}")
-                            ],
-                          ),
+                          // Row(
+                          //   children: [
+                          //     Text("Next follow up"),
+                          //     const SizedBox(width: 10),
+                          //     Text("${data['next_followup']}")
+                          //   ],
+                          // ),
                         ],
                       ),
                     );

@@ -30,7 +30,7 @@ class _LeadListState extends State<LeadList> {
     // bloc.department();
     // bloc.technology();
     // bloc.leadFor();
-    bloc.getLeadData("total");
+    bloc.getLeadData("open");
   }
   @override
   Widget build(BuildContext context) {
@@ -163,7 +163,6 @@ class _LeadListState extends State<LeadList> {
                                 const SizedBox(height: 10,),
                                  DetailsContainer(
                                   title:"${data['createdby_fname'] ?? ''} ${data['createdby_lname'] ?? ''}",
-                                  //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
                                   heading: 'Created By', isHtml: false,
                                 ),
                                 Dash(
@@ -172,10 +171,32 @@ class _LeadListState extends State<LeadList> {
                                   length: 270.w,
                                 ),
                                 const SizedBox(height: 10,),
-                                 DetailsContainer(
+                                DetailsContainer(
                                   title:"${DateFormat.yMMMd().format(DateTime.parse(data['created_date']))}",
                                   //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
                                   heading: 'Created At', isHtml: false,
+                                ),
+                                Dash(
+                                  dashColor: Colors.grey.withOpacity(0.3),
+                                  dashGap: 3,
+                                  length: 270.w,
+                                ),
+                                const SizedBox(height: 10,),
+                                 DetailsContainer(
+                                  title:"${data['next_followup'].toString().split(" ").first}",
+                                  //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
+                                  heading: 'Next Follow Up', isHtml: false,
+                                ),
+                                Dash(
+                                  dashColor: Colors.grey.withOpacity(0.3),
+                                  dashGap: 3,
+                                  length: 270.w,
+                                ),
+                                const SizedBox(height: 10,),
+                                DetailsContainer(
+                                  title:"${data['last_follow_up'].toString().split(" ").first}",
+                                  //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
+                                  heading: 'Last Follow Up', isHtml: false,
                                 ),
                                 Dash(
                                   dashColor: Colors.grey.withOpacity(0.3),
@@ -228,7 +249,7 @@ class _LeadListState extends State<LeadList> {
                     backgroundColor: Colors.white,
                     builder: (context) {
                       List leadTypeData = [
-                        {"title": "Total", "value": "total"},
+                        {"title": "All", "value": "total"},
                         {"title": "Open", "value": "open"},
                         {"title": "Dead", "value": "dead"},
                         {"title": "Converted", "value": "converted"},
@@ -253,13 +274,19 @@ class _LeadListState extends State<LeadList> {
                               return Container(
                                 margin: EdgeInsets.all(5),
                                 padding : EdgeInsets.symmetric(horizontal: 10,vertical: 3),
-                                child: Text(
-                                    leadTypeData[index]["title"],
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                        color: type == leadTypeData[index]["value"]?Colors.white:Colors.black,
-                                    )),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                        leadTypeData[index]["title"],
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500,
+                                            color: type == leadTypeData[index]["value"]?Colors.white:Colors.black,
+                                        )),
+                                    type == leadTypeData[index]["value"]?Icon(PhosphorIcons.check_circle_fill,color: Colors.white):Offstage(),
+                                  ],
+                                ),
                                 decoration: BoxDecoration(
                                     color: type == leadTypeData[index]["value"]? Colors.green: Colors.white,
                                     borderRadius: BorderRadius.circular(5)

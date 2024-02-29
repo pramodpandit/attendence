@@ -27,7 +27,7 @@ class LeadsBloc extends Bloc {
   final LeadsRepository _repo;
   LeadsBloc(this._repo);
 
-  ValueNotifier<String> leadType = ValueNotifier("total");
+  ValueNotifier<String> leadType = ValueNotifier("open");
   ValueNotifier<List?> leadData = ValueNotifier(null);
   ValueNotifier<List?> specificLeadData = ValueNotifier(null);
   ValueNotifier<int> downloadLoading = ValueNotifier(-1);
@@ -575,6 +575,7 @@ TextEditingController cp_location = TextEditingController();
   // lead logs all data notifiers
   ValueNotifier<List?> allBranchData = ValueNotifier(null);
   ValueNotifier<List?> allEmployeeData = ValueNotifier(null);
+  ValueNotifier<List?> specificEmployeeData = ValueNotifier(null);
   ValueNotifier<List?> allProjectTypes = ValueNotifier(null);
   ValueNotifier<List?> allCurrencyData = ValueNotifier(null);
   // lead logs all data notifiers end
@@ -637,6 +638,17 @@ TextEditingController cp_location = TextEditingController();
       print(s);
     }
   }
+  getProjectCodeByProjectType(String projectTypeId) async{
+    try{
+      var result = await _repo.fetchProjectCodeByType(projectTypeId);
+      if(result.status && result.data != null){
+        projectCode.text = result.data[0].toString();
+      }
+    }catch (e, s) {
+      print(e);
+      print(s);
+    }
+  }
   getAllCurrencyData() async{
     try{
       // isUserDetailLoad.value = true;
@@ -663,7 +675,7 @@ TextEditingController cp_location = TextEditingController();
     }
   }
 
-  addLeadLogs(String leadId) async {
+  Future<void> addLeadLogs(String leadId) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     Map<String,dynamic> data = {
       "user_id" : pref.getString("uid"),
@@ -671,21 +683,56 @@ TextEditingController cp_location = TextEditingController();
       "status" : logStatus.value,
       "message" : message.text,
     };
-    if(leadStatus.value == "open"){
+    if(logStatus.value == "open"){
       data.addAll({
         "next_followup" : nextFollowUpDate.text,
         "next_followup_time" : nextFollowUpTime.text,
       });
     }
-    if(leadStatus.value == "converted"){
+    if(logStatus.value == "converted"){
       data.addAll({
         "project_convert" : projectConvert.value,
       });
     }
-    if(leadStatus.value == "converted" && projectConvert.value == "yes"){
+    if(logStatus.value == "converted" && projectConvert.value == "yes"){
       data.addAll({
-
+        "branch_type" : branchType.value,
       });
+      if(branchType.value == "Everyone"){
+        data.addAll({
+          "employee_id" : employeeId.value
+        });
+      }else if(branchType.value == "Specific"){
+        data.addAll({
+          "branch_id" : branchId.value,
+          "employee_id" : employeeId.value,
+        });
+      }
+      data.addAll({
+        "project_type" : projectType.value,
+        "short_code" : shortCode.text,
+        "project_code" : projectCode.text,
+        "start_date" : startDate.text,
+        "deadline" : deadline.value,
+      });
+      if(deadline.value == "yes"){
+        data.addAll({
+          "deadline_date" : deadlineDate.text,
+        });
+      }
+      data.addAll({
+        "currency" : currency.value,
+        "project_cost_type" : projectCostType.value,
+        "amount" : amount.text,
+        "project_summary" : projectSummary.text,
+        "notes" : notes.text,
+        "tax" : withTax.value
+      });
+      if(withTax.value == "yes"){
+        data.addAll({
+          "tax_percentage" : taxPercentage.text,
+        });
+      }
     }
 
     try {
