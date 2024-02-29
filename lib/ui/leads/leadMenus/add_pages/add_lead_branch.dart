@@ -564,12 +564,7 @@ class _AddLeadBranchState extends State<AddLeadBranch> {
                               onFieldSubmitted: (value) {
                                 widget.bloc.other.text = value;
                               },
-                              // validator: (value) {
-                              //   if (value.toString().isEmpty) {
-                              //     return "Please enter your other information.";
-                              //   }
-                              //   return null;
-                              // },
+
                             ),
                           ),
 

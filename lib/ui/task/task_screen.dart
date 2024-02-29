@@ -881,7 +881,6 @@ class _completedState extends State<completedTask> {
                             ],
                           ),
                         );
-
                     }
                   });},
           ),
