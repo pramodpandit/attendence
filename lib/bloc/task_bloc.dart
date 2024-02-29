@@ -1,12 +1,16 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:nb_utils/nb_utils.dart';
 import 'package:office/bloc/bloc.dart';
 import 'package:office/data/model/api_response.dart';
+import 'package:office/data/repository/task_repo.dart';
 import 'package:office/ui/task/task_screen.dart';
 import 'package:office/utils/message_handler.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import '../data/model/Task_list.dart';
-import '../data/repository/task_repo.dart';
+import '../utils/message_handler.dart';
 
 class taskBloc extends Bloc{
 
@@ -76,7 +80,6 @@ class taskBloc extends Bloc{
   selectEmployee(data) {
     Project = data;
   }
-
 // add task
 //   all data
   ValueNotifier<List?> allTaskCategory = ValueNotifier(null);
@@ -197,6 +200,167 @@ class taskBloc extends Bloc{
       }
     }catch(e){
       print(e);
+    }
+  }
+
+  ValueNotifier<List?> allTaskData = ValueNotifier(null);
+  ValueNotifier data = ValueNotifier(null);
+  ValueNotifier<int> isLoadingDownload = ValueNotifier(-1);
+
+  fetchTaskDetails(int id,String common) async{
+    try{
+      // isUserDetailLoad.value = true;
+      var result = await _repo.fetchAllTaskDetail(id);
+      if(result.status && result.data != null){
+        data.value = result.data['totaldata']['task_details']['user'];
+       allTaskData.value =( result.data['totaldata']['task_details'][common]as List).reversed.toList();
+        print('task detail data: ${allTaskData.value}');
+      }
+    }catch (e, s) {
+      print(e);
+      print(s);
+    }
+  }
+  TextEditingController fileName = TextEditingController();
+  TextEditingController filepath = TextEditingController();
+  File? image;
+  ValueNotifier<bool> addfileLoading = ValueNotifier(false);
+  StreamController<String?> fileStream = StreamController.broadcast();
+
+  Future<void> addFiles(int id,String private,) async {
+    try {
+
+      SharedPreferences _pref = await SharedPreferences.getInstance();
+
+      Map<String, dynamic> data = {
+        "user_id": _pref.getString('uid'),
+        "task_id":id,
+        "file_name":fileName.text,
+        "privates":private,
+        "files": await MultipartFile.fromFile(image!.path,
+             filename: image!.path.split('/').last)
+      };
+      addfileLoading.value = true;
+      var result = await _repo.Add('tasks/add_files',data,true);
+      if(result.status == true){
+        fileStream.sink.add('streamFiles');
+      }else{
+        showMessage(MessageType.error("Something went wrong"));
+      }
+
+    } catch (e, s) {
+      debugPrint("$e");
+      debugPrint("$s");
+    } finally {
+      addfileLoading.value = false;
+    }
+  }
+
+  TextEditingController comment = TextEditingController();
+  ValueNotifier<bool> addcommentLoading = ValueNotifier(false);
+  StreamController<String?> commentStream= StreamController.broadcast();
+
+  Future<void> addComment(int id,String private,) async {
+    try {
+
+      SharedPreferences _pref = await SharedPreferences.getInstance();
+
+      Map<String, dynamic> data = {
+        "user_id": _pref.getString('uid'),
+        "task_id":id,
+        "comment":comment.text,
+        "privates":private,
+      };
+      addcommentLoading.value = true;
+      var result = await _repo.Add('tasks/post-add-comment',data,false);
+      if(result.status == true){
+        commentStream.sink.add('commentStream');
+      }else{
+        showMessage(MessageType.error("Something went wrong"));
+      }
+
+    } catch (e, s) {
+      debugPrint("$e");
+      debugPrint("$s");
+    } finally {
+      addcommentLoading.value = false;
+    }
+  }
+
+  TextEditingController notes = TextEditingController();
+  ValueNotifier<bool> addnotesLoading = ValueNotifier(false);
+  StreamController<String?> notesStream= StreamController.broadcast();
+
+  Future<void> addNotes(int id,String private,) async {
+    try {
+      SharedPreferences _pref = await SharedPreferences.getInstance();
+      Map<String, dynamic> data = {
+        "user_id": _pref.getString('uid'),
+        "task_id":id,
+        "title":notes.text,
+        "private":private,
+      };
+      addnotesLoading.value = true;
+      var result = await _repo.Add('tasks/add_notes',data,false);
+      if(result.status == true){
+        notesStream.sink.add('notesStream');
+      }else{
+        showMessage(MessageType.error("Something went wrong"));
+      }
+    } catch (e, s) {
+      debugPrint("$e");
+      debugPrint("$s");
+    } finally {
+      addnotesLoading.value = false;
+    }
+  }
+  ValueNotifier<List?> employelist = ValueNotifier(null);
+  ValueNotifier<String?> updateemployelist = ValueNotifier(null);
+
+  fetchexpensePaymentType() async{
+    try{
+      // isUserDetailLoad.value = true;
+      var result = await _repo.getemployeedata();
+      if(result.status && result.data != null){
+        employelist.value = result.data["data1"];
+        print("the all projects are : ${employelist.value}");
+      }
+    }catch (e, s) {
+      print(e);
+      print(s);
+    }
+  }
+  TextEditingController HourLogged = TextEditingController();
+  TextEditingController memo = TextEditingController();
+  TimeOfDay startTime = TimeOfDay.now();
+  TimeOfDay endTime = TimeOfDay.now();
+  ValueNotifier<bool> addtimesheetLoading = ValueNotifier(false);
+  StreamController<String?> timesheetStream= StreamController.broadcast();
+
+  Future<void> addTimeSheet(int id,) async {
+    try {
+      SharedPreferences _pref = await SharedPreferences.getInstance();
+      Map<String, dynamic> data = {
+        "user_id": _pref.getString('uid'),
+        "task_id":id,
+        "employee_id":updateemployelist.value,
+        "start_time":'${startTime.hour}:${startTime.minute}:00',
+        "end_time":'${endTime.hour}:${endTime.minute}:00',
+        "hours_logged":HourLogged.text,
+        "memo":memo.text
+      };
+      addtimesheetLoading.value = true;
+      var result = await _repo.Add('tasks/add_timesheet',data,false);
+      if(result.status == true){
+        timesheetStream.sink.add('timesheetStream');
+      }else{
+        showMessage(MessageType.error("Something went wrong"));
+      }
+    } catch (e, s) {
+      debugPrint("$e");
+      debugPrint("$s");
+    } finally {
+      addtimesheetLoading.value = false;
     }
   }
 

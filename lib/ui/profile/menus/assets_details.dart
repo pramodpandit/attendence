@@ -71,8 +71,8 @@ class _assetsDetailState extends State<assetsDetail> {
                 ),
                10.height,
                 Table(
-                //  border: TableBorder.all(),
-                  defaultColumnWidth: FixedColumnWidth(80),
+                  border: TableBorder.all(),
+                  //defaultColumnWidth: FixedColumnWidth(80),
                   children: [
                     TableRow(
                         decoration: BoxDecoration(
@@ -127,8 +127,8 @@ class _assetsDetailState extends State<assetsDetail> {
                                 itemBuilder: (context,index){
                                   UserAssetDetail data = asset[index];
                                   return Table(
-                                    //border: TableBorder.all(),
-                                    defaultColumnWidth: FixedColumnWidth(70),
+                                    border: TableBorder.all(),
+                                    //defaultColumnWidth: FixedColumnWidth(70),
                                     children: [
                                       TableRow(
                                           decoration: BoxDecoration(
@@ -149,15 +149,12 @@ class _assetsDetailState extends State<assetsDetail> {
                                             ),
                                             Padding(
                                               padding: EdgeInsets.all(5.0),
-                                              child: Text("${data.amount}",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.w600,fontSize: 11),),
+                                              child: Text("${data.returnable}",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.w600,fontSize: 11),),
                                             ),
                                           ]
                                       ),
                                     ],
                                   );
-
-
-
                                   //   Container(
                                   //   padding: const EdgeInsets.symmetric(horizontal: 10),
                                   //   margin: const EdgeInsets.only(bottom: 20),

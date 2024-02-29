@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:office/ui/project/menus/logs.dart';
-import 'package:office/ui/project/menus/project_files.dart';
-import 'package:office/ui/project/menus/project_overview.dart';
-
+import 'package:provider/provider.dart';
+import '../../bloc/task_bloc.dart';
 import '../../data/model/Task_list.dart';
-import '../project/menus/project_comment.dart';
-import '../project/menus/project_credentials.dart';
-import '../project/menus/project_links.dart';
-import '../project/menus/project_members.dart';
-import '../project/menus/project_notes_list.dart';
+import '../../data/repository/task_repo.dart';
+import 'memus/task_Files.dart';
+import 'memus/task_Overview.dart';
+import 'memus/task_TimeSheet.dart';
+import 'memus/task_comment.dart';
+import 'memus/task_notes.dart';
+
 
 class TaskDetails extends StatefulWidget {
   final TaskData data;
@@ -24,27 +24,31 @@ class _TaskDetailsState extends State<TaskDetails> {
   List<String> projectMenus = [
     "Overview",
     "Files",
-    "Links",
     "Comment",
-    "Notes",
-    "Credentials",
-    "Members",
-    "Logs/Follow"
+    "Timesheet",
+    "Notes"
+
   ];
   List<Widget> projectMenusWidgets = [
-    // ProjectOverview(),
-    // const ProjectFiles(),
-    // const ProjectLinks(),
-    // const ProjectComments(),
-    // const ProjectNotesList(),
-    // const ProjectCredentialList(),
-    // const ProjectMembers(),
-    // const Logs(),
+
   ];
 
   selectMenu(int index){
     selectedMenuIndex.value =index;
   }
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    projectMenusWidgets = [
+      TaskOverView(id: widget.data.id!,),
+      TaskFile(id: widget.data.id!),
+      TaskComment(id: widget.data.id!),
+      TaskTimesheet(id: widget.data.id!),
+      TaskNotes(id: widget.data.id!),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
