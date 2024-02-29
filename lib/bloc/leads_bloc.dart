@@ -573,6 +573,8 @@ TextEditingController cp_location = TextEditingController();
 
 
   // lead logs all data notifiers
+  ValueNotifier<List?> allBranchData = ValueNotifier(null);
+  ValueNotifier<List?> allEmployeeData = ValueNotifier(null);
   ValueNotifier<List?> allProjectTypes = ValueNotifier(null);
   ValueNotifier<List?> allCurrencyData = ValueNotifier(null);
   // lead logs all data notifiers end
@@ -587,7 +589,12 @@ TextEditingController cp_location = TextEditingController();
   // if(log status converted)
   ValueNotifier<String?> projectConvert = ValueNotifier(null);
   // if(log projectConvert yes )
-  ValueNotifier<String?> branch = ValueNotifier(null);
+  ValueNotifier<String?> branchType = ValueNotifier(null);
+  // if branchType everyone / specific
+  ValueNotifier<String?> employeeId = ValueNotifier(null);
+      // if branchType everyone end
+  ValueNotifier<String?> branchId = ValueNotifier(null);
+  // if branchType specific end
   ValueNotifier<String?> projectType = ValueNotifier(null);
   TextEditingController shortCode = TextEditingController();
   TextEditingController projectCode = TextEditingController();
@@ -606,6 +613,30 @@ TextEditingController cp_location = TextEditingController();
   TextEditingController taxPercentage = TextEditingController();
   // if withTax yes end
 
+  ValueNotifier<bool> addLogsLoading = ValueNotifier(false);
+
+  getAllBranchDetails() async{
+    try{
+      var result = await _repo.fetchAllBranchList();
+      if(result.status && result.data != null){
+        allBranchData.value = result.data;
+      }
+    }catch (e, s) {
+      print(e);
+      print(s);
+    }
+  }
+  getAllEmployeeDetails() async{
+    try{
+      var result = await _repo.fetchAllEmployeeList();
+      if(result.status && result.data != null){
+        allEmployeeData.value = result.data;
+      }
+    }catch (e, s) {
+      print(e);
+      print(s);
+    }
+  }
   getAllCurrencyData() async{
     try{
       // isUserDetailLoad.value = true;
@@ -629,6 +660,48 @@ TextEditingController cp_location = TextEditingController();
     }catch (e, s) {
       print(e);
       print(s);
+    }
+  }
+
+  addLeadLogs(String leadId) async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    Map<String,dynamic> data = {
+      "user_id" : pref.getString("uid"),
+      "lead_id" : leadId,
+      "status" : logStatus.value,
+      "message" : message.text,
+    };
+    if(leadStatus.value == "open"){
+      data.addAll({
+        "next_followup" : nextFollowUpDate.text,
+        "next_followup_time" : nextFollowUpTime.text,
+      });
+    }
+    if(leadStatus.value == "converted"){
+      data.addAll({
+        "project_convert" : projectConvert.value,
+      });
+    }
+    if(leadStatus.value == "converted" && projectConvert.value == "yes"){
+      data.addAll({
+
+      });
+    }
+
+    try {
+      addLogsLoading.value = true;
+      var result = await _repo.AddLogs(data);
+      if(result.status == true){
+        showMessage(MessageType.success(result.message.toString()));
+        linkSteam.sink.add('notes');
+      }else{
+        showMessage(MessageType.error("Something went wrong"));
+      }
+    } catch (e, s) {
+      debugPrint("$e");
+      debugPrint("$s");
+    } finally {
+      addLogsLoading.value = false;
     }
   }
 

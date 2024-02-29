@@ -428,7 +428,7 @@ class LeadsRepository {
   }
 
   Future<ApiResponse> createNewLeadFile(Map<String,dynamic> data) async{
-    var response= await _api.postRequest("lead/add_files",data);
+    var response= await _api.postRequest("lead/add_files",data,withFile: true);
     if(response==null){
       throw ApiException.fromString("response null");
     }
@@ -460,6 +460,24 @@ class LeadsRepository {
 
   // lead logs
 
+  Future<ApiResponse2> fetchAllBranchList() async{
+    var response= await _api.getRequest("get-branch",data: {
+      "user_id" : prefs.getString("uid"),
+    });
+    if(response==null){
+      throw ApiException.fromString("response null");
+    }
+    return ApiResponse2.fromJson(response,response['data']);
+  }
+  Future<ApiResponse2> fetchAllEmployeeList() async{
+    var response= await _api.getRequest("get_all_employee_details",data: {
+      "user_id" : prefs.getString("uid"),
+    });
+    if(response==null){
+      throw ApiException.fromString("response null");
+    }
+    return ApiResponse2.fromJson(response,response['data1']);
+  }
   Future<ApiResponse2> fetchAllProjectTypeList() async{
     var response= await _api.getRequest("project/projectetype-list");
     if(response==null){
@@ -473,6 +491,15 @@ class LeadsRepository {
       throw ApiException.fromString("response null");
     }
     return ApiResponse2.fromJson(response,response['data']);
+  }
+
+  Future<ApiResponse2> AddLogs(Map<String,dynamic> data) async {
+    var response = await _api.postRequest("lead/add_logs", data);
+
+    if (response == null) {
+      ApiException.fromString("response null");
+    }
+    return ApiResponse2.fromJson(response,response);
   }
 
   // lead logs end
