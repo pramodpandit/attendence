@@ -132,6 +132,127 @@ class WorkFromHomeBloc extends Bloc {
 // //#region -Response Leave
   ValueNotifier<bool> isResponseApproveLoad = ValueNotifier(false);
   ValueNotifier<bool> isResponseRejectLoad = ValueNotifier(false);
+  ValueNotifier<bool> isCancelLoading = ValueNotifier(false);
+  StreamController<String> CancelStream = StreamController.broadcast();
+  updateEndEditDate(DateTime value) => endDateEdit.value = value;
+  updateStartEditDate(DateTime value) => startDateEdit.value = value;
+
+  CanelLeave(int id) async {
+    try {
+      isCancelLoading.value = true;
+      var result = await _repo.CancelWorkFormhome(id.toString());
+      if (result.status ==true) {
+        CancelStream.sink.add('Post');
+        showMessage(MessageType.success("Cancel leave successful"));
+      } else {
+        showMessage(MessageType.error("Something went wrong"));
+      }
+    } catch (e, s) {
+      debugPrint("$e");
+      debugPrint("$s");
+    } finally {
+      isCancelLoading.value = false;
+    }
+  }
+  ValueNotifier<DateTime?> endDateEdit = ValueNotifier(null);
+  ValueNotifier<String?>selectedLeaveCategory = ValueNotifier(null);
+  StreamController<String?> leaveEditController = StreamController.broadcast();
+  ValueNotifier<int?> leaveId = ValueNotifier(null);
+  TextEditingController reasonTitleEdit = TextEditingController();
+  ValueNotifier<DateTime?> startDateEdit = ValueNotifier(null);
+  TextEditingController reasonEdit= TextEditingController();
+
+
+
+
+  EditForLeave() async {
+    try {
+      if(requesting.value) {
+        return;
+      }
+      if(!formKey.currentState!.validate()) {
+        return;
+      }
+      if(startDateEdit.value==null) {
+        showMessage(const MessageType.success("Please enter date!"));
+        return;
+      }
+      if(selectedDurationType.value==null) {
+        showMessage(const MessageType.success("Please select duration type!"));
+        return;
+      }
+      if(selectedLeaveCategory==null) {
+        showMessage(const MessageType.success("Please select leave category!"));
+        return;
+      }
+      if(selectedDurationType.value=="multiple" && endDateEdit.value==null) {
+        showMessage(const MessageType.success("Please enter date!"));
+        return;
+      }
+      requesting.value = true;
+      ApiResponse res = await _repo.EditForwfh(leaveId.value!,reasonTitleEdit.text, reasonEdit.text, startDateEdit.value!, selectedDurationType.value!, endDate: endDateEdit.value,);
+      if(res.status) {
+        leaveEditController.sink.add("LEAVE_Edit");
+        startDate.value=null;
+        endDate.value=null;
+        selectedDurationType.value = null;
+        selectedLeaveCategory.value = null;
+        reasonTitle.clear();
+        reason.clear();
+
+        showMessage(const MessageType.success("Leave edit successfully!"));
+      } else {
+        showMessage(MessageType.error(res.message.toString()));
+      }
+    } catch(e,s) {
+      debugPrint("$e");
+      debugPrintStack(stackTrace: s);
+      showMessage(MessageType.success('$e'));
+    } finally {
+      requesting.value = false;
+    }
+  }
+  TextEditingController remark = TextEditingController();
+  ValueNotifier<bool> isApprovedLoading = ValueNotifier(false);
+
+  Approvedwfh(int id) async {
+    try {
+      isApprovedLoading.value = true;
+      var result = await _repo.ApprovedLeave(id);
+      if (result.status ==true) {
+        CancelStream.sink.add('Post');
+        showMessage(MessageType.success("success"));
+      } else {
+        showMessage(MessageType.error("Something went wrong"));
+      }
+    } catch (e, s) {
+      debugPrint("$e");
+      debugPrint("$s");
+    } finally {
+      isApprovedLoading.value = false;
+    }
+  }
+  Future AddRemarkLeave(int id) async {
+    try {
+      isResponseApproveLoad.value = true;
+      var result = await _repo.AddRemark(id,remark.text);
+      if (result.status ==true) {
+
+        showMessage(MessageType.success("success"));
+        remark.clear();
+        return result.status;
+      } else {
+        return result.status;
+
+        showMessage(MessageType.error("Something went wrong"));
+      }
+    } catch (e, s) {
+      debugPrint("$e");
+      debugPrint("$s");
+    } finally {
+      isResponseApproveLoad.value = false;
+    }
+  }
 //   respondLeaveRequest(String leaveId,String status) async {
 //     try{
 //       if(status=="approve"){

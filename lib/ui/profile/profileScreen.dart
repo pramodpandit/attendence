@@ -29,10 +29,12 @@ import 'package:office/ui/water/add_water.dart';
 import 'package:office/ui/work_from_home/workFromHomePage.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../Settings/setting.dart';
 import '../bill/add_bill.dart';
 import '../leave/employee_leave.dart';
 import '../leave/leave_request/leave_page_hr.dart';
 import '../payroll/sallary.dart';
+import '../work_form_home_request/work_from_home_request.dart';
 import '../work_from_home/work_from_home_more_details.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -235,13 +237,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   builder: (context) => const WorkFromHomeMoreDetailPage()));
                             },
                           ),
+                          if (bloc.hasAccess(department, 3,'1'))BoxContainer(
+                            heading: "Work from home Request",
+                            image: "images/calendar1.png",
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => const WorkFromHomeRequest()));
+                            },
+                          ),
                           if (bloc.hasAccess(department, 29,'1'))BoxContainer(
                             heading: "Employee Leaves",
                             image: "images/calendar1.png",
                             onTap: () {
                               Navigator.of(context).push(MaterialPageRoute(
                                   builder: (context) => const EmployeeLeave()));
-                            },
+                            }
                           ),
                           if (bloc.hasAccess(department, 4,'1'))BoxContainer(
                             heading: "Projects",
@@ -285,14 +295,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   builder: (context) => const NoticeBoardScreen()));
                             },
                           ),
-                          // if (bloc.hasAccess(department, 7,'1'))BoxContainer(
-                          //   heading: "Payroll Salary",
-                          //   image: "images/board.png",
-                          //   onTap: () {
-                          //     Navigator.of(context).push(MaterialPageRoute(
-                          //         builder: (context) => const sallary()));
-                          //   },
-                          // ),
+                          if (bloc.hasAccess(department, 7,'1'))BoxContainer(
+                            heading: "Payroll Salary",
+                            image: "images/board.png",
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => const sallary()));
+                            },
+                          ),
                           if (bloc.hasAccess(department, 8,'1'))BoxContainer(
                             heading: "Holidays",
                             image: "images/holiday.png",
@@ -350,9 +360,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   builder: (context) => const EmployeeFeedback()));
                             },
                           ),
-                          if (bloc.hasAccess(department, 14,'1'))const BoxContainer(
+                          if (bloc.hasAccess(department, 14,'1')) BoxContainer(
                             heading: "Setting",
                             image: "images/setting.png",
+                            onTap: (){
+                              Navigator.of(context).push(MaterialPageRoute(builder: (context)=>Setting()));
+                            },
                           ),
                           if (bloc.hasAccess(department, 15,'1'))BoxContainer(
                             heading: "Credentials",

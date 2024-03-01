@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:office/bloc/profile_bloc.dart';
@@ -28,265 +29,134 @@ class _assetsDetailState extends State<assetsDetail> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Assets Details",style: TextStyle(
-          color:Color(0xFF253772),
-          fontFamily: "Poppins", ),),
-        centerTitle: true,
-        leading: GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: const Icon(PhosphorIcons.caret_left_bold,color:Color(0xFF253772) ,)),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.only(left: 15,right: 15),
-          child: Container(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
+      body: Column(
+        children: [
+          Stack(
+             children: [
+               Container(
+                 height: 100,
+                 width: 1.sw,
+                 decoration: const BoxDecoration(
+                     color: Color(0xFF009FE3),
+                     borderRadius: BorderRadius.only(
+                         bottomLeft: Radius.circular(20),
+                         bottomRight: Radius.circular(20))
+                 ),
+                 child: const Column(
+                   crossAxisAlignment: CrossAxisAlignment.center,
+                   children: [
+                     SizedBox(height: 56,),
+                     Text(
+                       "Assets Details",
+                       textAlign: TextAlign.center,
+                       style: TextStyle(
+                           color: Colors.white,
+                           fontWeight: FontWeight.bold,
+                           fontSize: 18
+                       ),
+                     ),
+                   ],
+                 ),
+               ),
+               Positioned(
+                 top: 56,
+                 left: 10,
+                 child: GestureDetector(
+                   onTap: () {
+                     Navigator.pop(context);
+                   },
+                   child: const CircleAvatar(
+                     backgroundColor: Colors.white,
+                     radius: 15,
+                     child: Icon(Icons.arrow_back, size: 18,),
+                   ),
+                 ),
+               ),
+             ],
+          ),
+          SizedBox(height: 10,),
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 15,right: 15),
+              child: Container(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Text(
-                        "${widget.data.itemName}",
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            "${widget.data.itemName}",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ),
+                      ],
+                    ),
+                    Text(
+                      widget.data.itemGroupName.toString(),
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        color:Colors.black,
                       ),
                     ),
-                  ],
-                ),
-                Text(
-                  widget.data.itemGroupName.toString(),
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    color:Colors.black,
-                  ),
-                ),
-               10.height,
-                Table(
-                  border: TableBorder.all(),
-                  //defaultColumnWidth: FixedColumnWidth(80),
-                  children: [
-                    TableRow(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black),
-                        ),
-                        children:const [
-                          Padding(
-                            padding: EdgeInsets.all(5.0),
-                            child: Text("Date",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.w600,fontSize: 11),),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.all(5.0),
-                            child: Text("Description",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.w600,fontSize: 11),),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.all(5.0),
-                            child: Text("Status",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.w600,fontSize: 11),),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.all(5.0),
-                            child: Text("Value",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.w600,fontSize: 11),),
-                          ),
-                        ]
-                    ),
-                  ],
-                ),
-                ValueListenableBuilder(
-                    valueListenable: bloc.isAssetsLoadDetail,
-                    builder: (context, bool loading, __) {
-                      if (loading == true) {
-                        return Column(
-                          children: [
-                            SizedBox(
-                              height: MediaQuery.of(context).size.width * 0.5,
-                            ),
-                            const Center(child: CircularProgressIndicator()),
-                          ],
-                        );
-                      }
-                      return ValueListenableBuilder(
-                          valueListenable: bloc.assetsUserDetail,
-                          builder: (context, List<UserAssetDetail>? asset, __) {
-                            if (asset == null) {
-                              return const Center(
-                                child: Text("User Details Not Found!"),
-                              );
-                            }
-                            return ListView.builder(
-                                itemCount: asset.length,
-                                shrinkWrap: true,
-                                physics: const ScrollPhysics(),
-                                itemBuilder: (context,index){
-                                  UserAssetDetail data = asset[index];
-                                  return Table(
-                                    border: TableBorder.all(),
-                                    //defaultColumnWidth: FixedColumnWidth(70),
-                                    children: [
-                                      TableRow(
-                                          decoration: BoxDecoration(
-                                            border: Border.all(color: Colors.black),
-                                          ),
-                                          children: [
-                                            Padding(
-                                              padding: EdgeInsets.all(5.0),
-                                              child: Text("${DateFormat.yMd().format(DateTime.parse(data.createdAt.toString()))}",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.w600,fontSize: 11),),
-                                            ),
-                                            Padding(
-                                              padding: EdgeInsets.all(5.0),
-                                              child: Text("${data.remarks}",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.w600,fontSize: 11),),
-                                            ),
-                                            Padding(
-                                              padding: EdgeInsets.all(5.0),
-                                              child: Text("${data.status}",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.w600,fontSize: 11),),
-                                            ),
-                                            Padding(
-                                              padding: EdgeInsets.all(5.0),
-                                              child: Text("${data.returnable}",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.w600,fontSize: 11),),
-                                            ),
-                                          ]
-                                      ),
-                                    ],
-                                  );
-                                  //   Container(
-                                  //   padding: const EdgeInsets.symmetric(horizontal: 10),
-                                  //   margin: const EdgeInsets.only(bottom: 20),
-                                  //   decoration: BoxDecoration(
-                                  //     boxShadow: [
-                                  //       BoxShadow(
-                                  //           color: Colors.grey.withOpacity(0.3),
-                                  //           blurRadius: 3,
-                                  //           spreadRadius: 1)
-                                  //     ],
-                                  //     color: Colors.white,
-                                  //     borderRadius: const BorderRadius.all(Radius.circular(10)),
-                                  //   ),
-                                  //   child:  Column(
-                                  //     crossAxisAlignment: CrossAxisAlignment.start,
-                                  //     mainAxisAlignment: MainAxisAlignment.start,
-                                  //     children: [
-                                  //       const SizedBox(height: 10,),
-                                  //       Row(
-                                  //         mainAxisAlignment: MainAxisAlignment.start,
-                                  //         crossAxisAlignment: CrossAxisAlignment.start,
-                                  //         children: [
-                                  //            Expanded(
-                                  //             child: Text(
-                                  //               "${data.itemName}",
-                                  //               textAlign: TextAlign.left,
-                                  //               style: TextStyle(
-                                  //                 fontWeight: FontWeight.w700,
-                                  //               ),
-                                  //             ),
-                                  //           ),
-                                  //
-                                  //           Text(
-                                  //             data.status=='allotment'?'Allotment':'Receiving',
-                                  //             textAlign: TextAlign.left,
-                                  //             style: TextStyle(
-                                  //               fontWeight: FontWeight.w700,
-                                  //               color:index==1 || index==3?const Color(0xFFD41817):const Color(0xFF3CEB43),
-                                  //             ),
-                                  //           ),
-                                  //         ],
-                                  //       ),
-                                  //       Text(
-                                  //         data.itemGroupName.toString(),
-                                  //         textAlign: TextAlign.left,
-                                  //         style: TextStyle(
-                                  //           fontWeight: FontWeight.w700,
-                                  //           color:Colors.black
-                                  //         ),
-                                  //       ),
-                                  //       // Text(
-                                  //       //   DateFormat.yMMMMd().format(DateTime.parse(data.allotedDate.toString())),
-                                  //       //   textAlign: TextAlign.start,
-                                  //       //   style:  TextStyle(
-                                  //       //       color: Colors.black.withOpacity(0.7), fontSize: 8),
-                                  //       // ),
-                                  //       10.height,
-                                  //
-                                  //
-                                  //       const SizedBox(height: 10,),
-                                  //       // Text(
-                                  //       //   "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi.Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi. Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi.Neque porro quisquam.",
-                                  //       //   textAlign: TextAlign.left,
-                                  //       //   style: TextStyle(
-                                  //       //       color: Colors.black.withOpacity(0.7),
-                                  //       //       fontWeight:
-                                  //       //       FontWeight.w400,
-                                  //       //       fontFamily: "Poppins",
-                                  //       //       fontSize: 11
-                                  //       //   ),
-                                  //       // ),
-                                  //       const SizedBox(height: 20,),
-                                  //     ],
-                                  //   ),
-                                  // );
-                                }
+                   10.height,
+                    ValueListenableBuilder(
+                        valueListenable: bloc.isAssetsLoadDetail,
+                        builder: (context, bool loading, __) {
+                          if (loading == true) {
+                            return Column(
+                              children: [
+                                SizedBox(
+                                  height: MediaQuery.of(context).size.width * 0.5,
+                                ),
+                                const Center(child: CircularProgressIndicator()),
+                              ],
                             );
-                          });
-                    }),
-                // Text(
-                //   // "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-                //   widget.data.itemName ?? "",
-                //   style: const TextStyle(
-                //       color: Colors.black,
-                //       fontSize:17,
-                //       fontWeight: FontWeight.bold
-                //   ),
-                // ),
-                // Text(
-                //   DateFormat.yMMMMd().format(DateTime.parse(widget.data.updateAt.toString())),
-                //   style: TextStyle(
-                //       color: Colors.grey.withOpacity(0.6),
-                //       fontSize:12,
-                //       fontWeight: FontWeight.bold
-                //   ),),
-                // const SizedBox(height: 20,),
-                // Row(
-                //   children: [
-                //     Icon(PhosphorIcons.user_fill,color: Colors.black.withOpacity(0.7),size: 20,),
-                //     SizedBox(width: 10,),
-                //    // Text("${widget.data.firstName ?? ""} ${widget.data.middleName ?? ""} ${widget.data.lastName ?? ""}",style: TextStyle(color: Colors.black.withOpacity(0.7),fontSize: 16,fontWeight: FontWeight.w600),)
-                //   ],
-                // ),
-                // // Html(
-                // //   // data:"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-                // //   data:widget.data.description ?? "",
-                // //   style: {
-                // //     "body": Style(
-                // //         color: Colors.black45,
-                // //         fontWeight:
-                // //         FontWeight.w600,
-                // //         fontFamily: "Poppins",
-                // //         display: Display.inline,
-                // //         fontSize: FontSize(14),
-                // //         textAlign: TextAlign.start
-                // //     ),
-                // //     "p": Style(
-                // //         color: Colors.black45,
-                // //         fontWeight:
-                // //         FontWeight.w600,
-                // //         // padding: EdgeInsets.zero,
-                // //         fontFamily: "Poppins",
-                // //         display: Display.inline,
-                // //         fontSize: FontSize(14),
-                // //         textAlign: TextAlign.start
-                // //     ),
-                // //   },
-                // // ),
-              ],
+                          }
+                          return ValueListenableBuilder(
+                              valueListenable: bloc.assetsUserDetail,
+                              builder: (context, List<UserAssetDetail>? asset, __) {
+                                if (asset == null) {
+                                  return const Center(
+                                    child: Text("User Details Not Found!"),
+                                  );
+                                }
+                                return
+                                  SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: DataTable(
+                                      columnSpacing: 10.0,
+                                      columns: [
+                                        DataColumn(label: Text('Date',style: TextStyle(fontWeight: FontWeight.w700),)),
+                                        DataColumn(label: Text('Description',style: TextStyle(fontWeight: FontWeight.w700))),
+                                        DataColumn(label: Text('Status',style: TextStyle(fontWeight: FontWeight.w700))),
+                                        DataColumn(label: Text('Value',style: TextStyle(fontWeight: FontWeight.w700))),
+                                      ],
+                                      rows: List.generate(asset.length, (index) {
+                                        return DataRow(
+                                            cells: [
+                                          DataCell(Center(child: Container(width: 75, child: Text("${DateFormat.yMd().format(DateTime.parse(asset[index].createdAt.toString()))}",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w600,fontSize: 11),),))),
+                                          DataCell(Center(child: Container(  child: Text("${asset[index].remarks}",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w600,fontSize: 11),),)),),
+                                          DataCell(Center(child: Container(  child: Text("${asset[index].status}",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w600,fontSize: 11),),))),
+                                          DataCell(Center(child: Container( child: Text("${asset[index].returnable}",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w600,fontSize: 11),),)))
+                                        ]);
+                                      }),
+                                    ),
+                                  );
+                              });
+                        }),
+                  ],
+                ),
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

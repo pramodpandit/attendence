@@ -5,20 +5,21 @@ import 'package:office/bloc/work_from_home_bloc.dart';
 import 'package:office/data/repository/work_from_home_repository.dart';
 import 'package:office/ui/leave/leaves_detail.dart';
 import 'package:office/ui/widget/loading_widget.dart';
+import 'package:office/ui/work_form_home_request/work_form_home_detailPage.dart';
 import 'package:office/ui/work_from_home/apply_work_from_home.dart';
 import 'package:office/ui/work_from_home/work_from_home_detail.dart';
 import 'package:office/utils/constants.dart';
 import 'package:office/utils/enums.dart';
 import 'package:provider/provider.dart';
 
-class WorkFromHomeMoreDetailPage extends StatefulWidget {
-  const WorkFromHomeMoreDetailPage({Key? key}) : super(key: key);
+class WorkFromHomeRequest extends StatefulWidget {
+  const WorkFromHomeRequest({Key? key}) : super(key: key);
 
   @override
-  State<WorkFromHomeMoreDetailPage> createState() => _WorkFromHomeMoreDetailPageState();
+  State<WorkFromHomeRequest> createState() => _WorkFromHomeRequestState();
 }
 
-class _WorkFromHomeMoreDetailPageState extends State<WorkFromHomeMoreDetailPage> {
+class _WorkFromHomeRequestState extends State<WorkFromHomeRequest> {
 
   late WorkFromHomeBloc bloc;
   @override
@@ -34,49 +35,48 @@ class _WorkFromHomeMoreDetailPageState extends State<WorkFromHomeMoreDetailPage>
     // bloc.getLeaveCategory();
     bloc.getWorkFromHomeRecords();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        floatingActionButton: FloatingActionButton.extended(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => Provider.value(
-                      value: bloc,
-                      child: const ApplyWorkFromHome(),
-                    )),
-              );
-            },
-            backgroundColor: const Color(0xFF253772),
-            label: AnimatedSwitcher(
-              duration: const Duration(seconds: 1),
-              transitionBuilder: (Widget child, Animation<double> animation) =>
-                  FadeTransition(
-                    opacity: animation,
-                    child: SizeTransition(
-                      sizeFactor: animation,
-                      axis: Axis.horizontal,
-                      child: child,
-                    ),
-                  ),
-              child: const Row(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(right: 10.0),
-                    child: Icon(
-                      Icons.add,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Text(
-                    "Work from home",
-                    style: TextStyle(color: Colors.white),
-                  )
-                ],
-              ),
-            )),
+        // floatingActionButton: FloatingActionButton.extended(
+        //     onPressed: () {
+        //       Navigator.push(
+        //         context,
+        //         MaterialPageRoute(
+        //             builder: (_) => Provider.value(
+        //               value: bloc,
+        //               child: const ApplyWorkFromHome(),
+        //             )),
+        //       );
+        //     },
+        //     backgroundColor: const Color(0xFF253772),
+        //     label: AnimatedSwitcher(
+        //       duration: const Duration(seconds: 1),
+        //       transitionBuilder: (Widget child, Animation<double> animation) =>
+        //           FadeTransition(
+        //             opacity: animation,
+        //             child: SizeTransition(
+        //               sizeFactor: animation,
+        //               axis: Axis.horizontal,
+        //               child: child,
+        //             ),
+        //           ),
+        //       child: const Row(
+        //         children: [
+        //           Padding(
+        //             padding: EdgeInsets.only(right: 10.0),
+        //             child: Icon(
+        //               Icons.add,
+        //               color: Colors.white,
+        //             ),
+        //           ),
+        //           Text(
+        //             "Work from home",
+        //             style: TextStyle(color: Colors.white),
+        //           )
+        //         ],
+        //       ),
+        //     )),
         body: Stack(
           children: [
             Container(
@@ -234,7 +234,7 @@ class _WorkFromHomeMoreDetailPageState extends State<WorkFromHomeMoreDetailPage>
                                               Navigator.of(context).push(MaterialPageRoute(
                                                 builder: (context) => Provider.value(
                                                   value: bloc,
-                                                  child: WorkFromHomeDetail(data: workFromHomeData[i],responseButton: false,),
+                                                  child: Workfmhr(data: workFromHomeData[i],responseButton: false,),
                                                 ),
                                               ));
                                             },
