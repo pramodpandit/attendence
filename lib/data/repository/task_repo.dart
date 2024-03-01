@@ -9,8 +9,8 @@ import '../network/api_service.dart';
 class TaskRepositary{
   final SharedPreferences prefs;
   final ApiService _api;
-
   TaskRepositary(this.prefs, this._api);
+
   Future<ApiResponse4<List<TaskData>>> getTaskData()async{
     var response=await _api.postRequest("fetch_tasks", {
       "user_id":prefs.getString('uid'),
@@ -19,7 +19,6 @@ class TaskRepositary{
   }
 
   Future<ApiResponse2> fetchAllTaskDetail(int id) async {
-
     var response = await _api.postRequest("tasks_details", {
       "user_id":prefs.getString('uid'),
       "task_id": id,
@@ -29,6 +28,7 @@ class TaskRepositary{
     }
     return ApiResponse2.fromJson(response,response);
   }
+
   Future<ApiResponse2> Add(String url,Map<String,dynamic> data,bool withfile) async {
     try{
 
