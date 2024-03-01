@@ -50,6 +50,75 @@ class WorkFromHomeRepository {
     }
     return ApiResponse.fromJson(response);
   }
+  Future<ApiResponse2> CancelWorkFormhome(String id) async {
+    SharedPreferences _pref = await SharedPreferences.getInstance();
+
+    var response = await _api.postRequest("wfh/leave_cancle", {
+      "user_id": _pref.getString('uid'),
+      "id": int.parse(id),
+    },);
+    if (response == null) {
+      ApiException.fromString("response null");
+    }
+    return ApiResponse2.fromJson(response);
+  }
+  Future<ApiResponse> EditForwfh(int id,String title, String description, DateTime startDate,  String durationType, {DateTime? endDate}) async{
+    SharedPreferences _pref = await SharedPreferences.getInstance();
+    Map<String, dynamic> data = {
+      "id":id,
+      "user_id": _pref.getString('uid'),
+      "title": title,
+      "reason": description,
+      "start_date": DateFormat("yyyy-MM-dd").format(startDate),
+      "duration_type": durationType,
+    };
+    if(endDate!=null) {
+      data['end_date'] = DateFormat("yyyy-MM-dd").format(endDate);
+    }
+    var response= await _api.postRequest("wfh/edit", data,);
+    if(response==null) {
+      throw ApiException.fromString("response null");
+    }
+    return ApiResponse.fromJson(response);
+  }
+
+  Future<ApiResponse2> CancelLeave(int id) async {
+    SharedPreferences _pref = await SharedPreferences.getInstance();
+
+    var response = await _api.postRequest("wfh/leave_cancle", {
+      "user_id": _pref.getString('uid'),
+      "id": id,
+    },);
+    if (response == null) {
+      ApiException.fromString("response null");
+    }
+    return ApiResponse2.fromJson(response);
+  }
+  Future<ApiResponse2> ApprovedLeave(int id) async {
+    SharedPreferences _pref = await SharedPreferences.getInstance();
+
+    var response = await _api.postRequest("wfh/leave_approved", {
+      "user_id": _pref.getString('uid'),
+      "id": id,
+    },);
+    if (response == null) {
+      ApiException.fromString("response null");
+    }
+    return ApiResponse2.fromJson(response);
+  }
+  Future<ApiResponse2> AddRemark(int id,String remark) async {
+    SharedPreferences _pref = await SharedPreferences.getInstance();
+
+    var response = await _api.postRequest("wfh/remark", {
+      "user_id": _pref.getString('uid'),
+      "id": id,
+      "remark":remark
+    },);
+    if (response == null) {
+      ApiException.fromString("response null");
+    }
+    return ApiResponse2.fromJson(response);
+  }
 
   // Future<ApiResponse2> respondLeaveRequest(String leaveId,String status) async{
   //   var response= await _api.postRequest("leave/respond_request", {

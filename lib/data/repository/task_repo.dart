@@ -9,8 +9,8 @@ import '../network/api_service.dart';
 class TaskRepositary{
   final SharedPreferences prefs;
   final ApiService _api;
-
   TaskRepositary(this.prefs, this._api);
+
   Future<ApiResponse2> getTaskData(String type)async{
     var response=await _api.postRequest("employee/detailst", {
       "user_id":prefs.getString('uid'),

@@ -1,30 +1,54 @@
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:office/bloc/leave_bloc.dart';
-import 'package:office/bloc/work_from_home_bloc.dart';
 import 'package:office/ui/widget/app_button.dart';
 import 'package:office/ui/widget/app_dropdown.dart';
 import 'package:office/ui/widget/app_text_field.dart';
 import 'package:provider/provider.dart';
 
-class ApplyWorkFromHome extends StatefulWidget {
-  const ApplyWorkFromHome({Key? key}) : super(key: key);
+import '../../bloc/work_from_home_bloc.dart';
+import '../../data/model/LeaveRecord.dart';
+import '../../data/repository/work_from_home_repository.dart';
+
+class EditworkPage extends StatefulWidget {
+  final Map data;
+  const EditworkPage({Key? key, required this.data}) : super(key: key);
 
   @override
-  State<ApplyWorkFromHome> createState() => _ApplyWorkFromHomeState();
+  State<EditworkPage> createState() => _EditLeavePageState();
 }
 
-class _ApplyWorkFromHomeState extends State<ApplyWorkFromHome> {
-
+class _EditLeavePageState extends State<EditworkPage> {
   late WorkFromHomeBloc bloc;
+  File? galleryFile;
+  FilePickerResult? filePickerResult;
 
   @override
   void initState() {
-    bloc = context.read<WorkFromHomeBloc>();
+    bloc = WorkFromHomeBloc(context.read<WorkFromHomeRepository>());
     super.initState();
+    bloc.leaveEditController.stream.listen((event) {
+      if (event == 'LEAVE_Edit') {
+        bloc.getWorkFromHomeRecords();
+        Navigator.pop(context);
+        Navigator.pop(context);
+      }
+    });
+    bloc.startDateEdit.value = DateTime.parse(widget.data['start_date'].toString());
+    bloc.endDateEdit.value = DateTime.parse(widget.data['end_date'] ==null?DateTime.now().toString():widget.data['end_date'].toString());
+    bloc.reasonTitleEdit.text = widget.data['reason_title'].toString();
+    bloc.reasonEdit.text = widget.data['reason'].toString();
+    bloc.selectedDurationType.value = widget.data['duration_type'];
+   // bloc.selectedLeaveCategory = widget.data['leaveType'];
+    bloc.leaveId.value = widget.data['id'];
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +69,7 @@ class _ApplyWorkFromHomeState extends State<ApplyWorkFromHome> {
               children: [
                 SizedBox(height: 56,),
                 Text(
-                  "Request Work Form Home",
+                  "Edit Leave",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: Colors.white,
@@ -90,15 +114,14 @@ class _ApplyWorkFromHomeState extends State<ApplyWorkFromHome> {
                           ),
                           const SizedBox(height: 10),
 
-                          const SizedBox(height: 10),
                           AppTextField(
-                            controller: bloc.reasonTitle,
+                            controller: bloc.reasonTitleEdit,
                             title: "Reason Title",
                             validate: true,
                           ),
                           const SizedBox(height: 10),
                           AppTextField(
-                            controller: bloc.reason,
+                            controller: bloc.reasonEdit,
                             title: "Reason Description",
                             validate: true,
                             maxLines: 5,
@@ -106,13 +129,13 @@ class _ApplyWorkFromHomeState extends State<ApplyWorkFromHome> {
                           ),
                           const SizedBox(height: 10),
                           ValueListenableBuilder(
-                              valueListenable: bloc.startDate,
+                              valueListenable: bloc.startDateEdit,
                               builder: (context, DateTime? date, _) {
                                 return InkWell(
                                   onTap: () async {
                                     DateTime? dt = await showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate:  DateTime.now().add(Duration(days: 30)),);
                                     if(dt!=null) {
-                                      bloc.updateStartDate(dt);
+                                      bloc.updateStartEditDate(dt);
                                     }
                                   },
                                   child: Container(
@@ -139,9 +162,9 @@ class _ApplyWorkFromHomeState extends State<ApplyWorkFromHome> {
                           ValueListenableBuilder(
                             valueListenable: bloc.selectedDurationType,
                             builder: (context, String? durationType, _) {
-                              if(durationType=='multiple') {
+                              if(durationType=='multiple' || widget.data['durationType'] =='multiple' ) {
                                 return ValueListenableBuilder(
-                                  valueListenable: bloc.endDate,
+                                  valueListenable: bloc.endDateEdit,
                                   builder: (context, DateTime? date, _) {
                                     return Column(
                                       children: [
@@ -150,7 +173,7 @@ class _ApplyWorkFromHomeState extends State<ApplyWorkFromHome> {
                                           onTap: () async {
                                             DateTime? dt = await showDatePicker(context: context, initialDate: DateTime.now().add(Duration(days: 2)), firstDate: DateTime.now().add(Duration(days: 2)), lastDate:  DateTime.now().add(Duration(days: 30)),);
                                             if(dt!=null) {
-                                              bloc.updateEndDate(dt);
+                                              bloc.updateEndEditDate(dt);
                                             }
                                           },
                                           child: Container(
@@ -181,12 +204,25 @@ class _ApplyWorkFromHomeState extends State<ApplyWorkFromHome> {
                             },
                           ),
                           const SizedBox(height: 10),
+                          // InkWell(
+                          //   onTap: (){
+                          //     openFilePicker();
+                          //     // _openImagePicker(ImageSource.gallery);
+                          //   },
+                          //   child:AppTextField(
+                          //     enabled: false,
+                          //     controller: bloc.filepath,
+                          //     title: "Attach File",
+                          //     validate: false,
+                          //   ),
+                          // ),
+                          const SizedBox(height: 10),
                           ValueListenableBuilder(
                               valueListenable: bloc.requesting,
                               builder: (context, bool loading, _) {
                                 return AppButton(
-                                  title: "Request",
-                                  onTap: ()=> bloc.applyForWFH(),
+                                  title: "Update",
+                                  onTap: bloc.EditForLeave,
                                   margin: EdgeInsets.zero,
                                   loading: loading,
                                 );
@@ -204,4 +240,11 @@ class _ApplyWorkFromHomeState extends State<ApplyWorkFromHome> {
       ),
     );
   }
+  // Future<void> openFilePicker() async{
+  //   filePickerResult = await FilePicker.platform.pickFiles(
+  //   );
+  //   galleryFile = File(filePickerResult!.files.single.path!);
+  //   bloc.image = galleryFile;
+  //   bloc.filepath.text = galleryFile!.path.split('/').last;
+  // }
 }

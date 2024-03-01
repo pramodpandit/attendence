@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:office/bloc/work_from_home_bloc.dart';
-import 'package:office/data/model/LeaveRecord.dart';
-import 'package:office/ui/widget/app_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../bloc/leave_bloc.dart';
+import '../../data/repository/work_from_home_repository.dart';
 import '../../utils/message_handler.dart';
 import '../widget/app_button.dart';
+import 'work_form_home_editwork.dart';
 
 class WorkFromHomeDetail extends StatefulWidget {
   const WorkFromHomeDetail({Key? key, required this.data,required this.responseButton}) : super(key: key);
@@ -25,14 +22,19 @@ class _WorkFromHomeDetailState extends State<WorkFromHomeDetail> {
   late WorkFromHomeBloc bloc;
   String uid="";
 
-
   @override
   void initState() {
-    bloc = context.read<WorkFromHomeBloc>();
+    bloc = WorkFromHomeBloc(context.read<WorkFromHomeRepository>());
     super.initState();
     init();
     bloc.msgController!.stream.listen((event) {
       AppMessageHandler().showSnackBar(context, event);
+    });
+    bloc.CancelStream.stream.listen((event) {
+      if (event == 'Post') {
+        bloc.getWorkFromHomeRecords();
+        Navigator.pop(context);
+      }
     });
   }
   init()async{
@@ -41,6 +43,39 @@ class _WorkFromHomeDetailState extends State<WorkFromHomeDetail> {
     setState(() {});
   }
 
+  void showDialogBoxcancel(){
+    showDialog(context: context, builder: (context){
+      return AlertDialog(
+        title: Text('Confirm',style: TextStyle(color: Colors.black),),
+        content: Text('Are You Sure?',style: TextStyle(color: Colors.black),),
+        actions: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              TextButton(onPressed: (){Navigator.pop(context);}, child: Text('No',style: TextStyle(color: Colors.black),)),
+              ValueListenableBuilder(
+                valueListenable: bloc.isCancelLoading,
+                builder: (context, value, child) {
+                  return ElevatedButton(
+                      style:ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blueAccent,
+                          shape: BeveledRectangleBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(5))
+                          )
+                      ),
+                      onPressed: (){
+                        bloc.CanelLeave(widget.data['id']);
+                        Navigator.pop(context);
+                      }, child: Text('Yes',style: TextStyle(color: Colors.white),));
+                },
+
+              )
+            ],
+          )
+        ],
+      );
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -151,17 +186,11 @@ class _WorkFromHomeDetailState extends State<WorkFromHomeDetail> {
                                 ),
                               ],
                             ),
-                            // if (widget.data.leaveCategory != null)
-                            //   IconTittle(
-                            //     icon: Icons.category,
-                            //     tittle: widget.data.leaveCategory ?? "",
-                            //   ),
+
                             IconTittle(
                                 icon: Icons.calendar_month,
-                                tittle: widget.data['end_date'] != null
-                                    ? "${widget.data['start_date']==null?widget.data['start_date']:DateFormat.yMMMMd().format(DateTime.parse(widget.data['start_date'] ?? ""))} To ${DateFormat.yMMMMd().format(DateTime.parse(widget.data['end_date'] ?? ""))}"
-                                    :widget.data['end_date']==null?widget.data['end_date'].toString(): DateFormat.yMMMMd().format(DateTime.parse(
-                                    widget.data['end_date'] ?? ""))),
+                                tittle: widget.data['end_date']==null?DateFormat.yMMMMd().format(DateTime.parse(widget.data['start_date'] ?? "")):
+                                '${DateFormat.yMMMMd().format(DateTime.parse(widget.data['start_date'] ?? ""))} to ${DateFormat.yMMMMd().format(DateTime.parse(widget.data['end_date'] ?? ""))}'),
                             if (widget.data['duration_type'] != null)
                               IconTittle(
                                 icon: Icons.merge_type,
@@ -182,9 +211,58 @@ class _WorkFromHomeDetailState extends State<WorkFromHomeDetail> {
                                   fontSize: 12,
                                   fontWeight: FontWeight.w400),
                             ),
-                          ],
+                            SizedBox(height: 10,),
+                          widget.data['status'] == "pending"?
+                          Row(
+                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                             children: [
+                             ValueListenableBuilder(
+                              valueListenable: bloc.isCancelLoading,
+                              builder: (context, value, child) {
+                               return SizedBox(
+                                width: 100,
+                                 child: OutlinedButton(
+                                  style: ElevatedButton.styleFrom(side: BorderSide(color: Colors.red,width: 0),shape: BeveledRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(3)))),
+                                   onPressed: (){
+                                    showDialogBoxcancel();
+                                 }, child: Text('Cancel',style: TextStyle(color: Colors.red),)),
+                              );
+                             },
+                             ),
+                            SizedBox(
+                               width: 100,
+                                 child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                  side: BorderSide(color: Colors.green,width: 0),shape: BeveledRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(3)))),
+                                   onPressed: (){
+                                    Navigator.push(
+                                   context,
+                                    MaterialPageRoute(
+                                     builder: (_) => Provider.value(
+                                      value: bloc,
+                                     child: EditworkPage(data: widget.data,),
+                                     )),
+                                    );
+                                   }, child: Text('Edit',style: TextStyle(color: Colors.white),)),
+                                 ),
+                               ],
+                               ):Container(
+                                  child:Row(
+                                    children: [
+                                     SizedBox(
+                                         height:25,
+                                        width: 25,
+                                        child: Image.asset('images/img_2.png',color: Colors.grey,)),
+                                       SizedBox(width: 10,),
+                                       widget.data['remark'] == null ?Offstage(): Text(widget.data['remark'].toString())
+                                   ],
+                                 ),
+                               )
+                              ],
+                          )
                         ),
-                      ),
+
                     ],
                   ),
                 ),
@@ -283,4 +361,5 @@ class IconTittle extends StatelessWidget {
       ),
     );
   }
+
 }
