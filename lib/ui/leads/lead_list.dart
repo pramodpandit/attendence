@@ -182,17 +182,6 @@ class _LeadListState extends State<LeadList> {
                                   length: 270.w,
                                 ),
                                 const SizedBox(height: 10,),
-                                 DetailsContainer(
-                                  title:"${data['next_followup'].toString().split(" ").first}",
-                                  //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
-                                  heading: 'Next Follow Up', isHtml: false,
-                                ),
-                                Dash(
-                                  dashColor: Colors.grey.withOpacity(0.3),
-                                  dashGap: 3,
-                                  length: 270.w,
-                                ),
-                                const SizedBox(height: 10,),
                                 DetailsContainer(
                                   title:"${data['last_follow_up'].toString().split(" ").first}",
                                   //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
@@ -203,6 +192,22 @@ class _LeadListState extends State<LeadList> {
                                   dashGap: 3,
                                   length: 270.w,
                                 ),
+                                data['status'] == "open"?
+                                    Column(
+                                      children: [
+                                        const SizedBox(height: 10,),
+                                        DetailsContainer(
+                                          title: data['next_followup'].toString().split(" ").first,
+                                          //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
+                                          heading: 'Next Follow Up', isHtml: false,
+                                        ),
+                                        Dash(
+                                          dashColor: Colors.grey.withOpacity(0.3),
+                                          dashGap: 3,
+                                          length: 270.w,
+                                        ),
+                                      ],
+                                    ):Offstage(),
                                 const SizedBox(height: 10,),
                                  DetailsContainer(
                                   title:"${data['clientsurname'] ?? ''} ${data['clientfirstname'] ?? ''} ${data['clientlastname'] ?? ''}",

@@ -266,15 +266,16 @@ class _AttendancePunchingState extends State<AttendancePunching> {
             TextButton(
               child: Text("Confirm"),
               onPressed: () {
-                // Toggle the state when confirmed
                 setState(() {
                   if (bloc.todayWorkingDetail.value["checkin"] == "") {
-                    bloc.markCheckInAttendance(punchWorkController.text);
+                    bloc.markCheckInAttendance(punchWorkController.text,bloc.todayWorkingDetail.value['type'].toString(),bloc.todayWorkingDetail.value['daycont']);
+                    bloc.todayWorkingDetail.value = null;
                     punchInTime = DateTime.now();
                     punchOutTime=null;
                     _saveDateTime('punchInTime', punchInTime);
                   } else {
-                    bloc.markCheckOutAttendance(punchWorkController.text);
+                    bloc.markCheckOutAttendance(punchWorkController.text,bloc.todayWorkingDetail.value['daycont']);
+                    bloc.todayWorkingDetail.value = null;
                     punchOutTime = DateTime.now();
                     _saveDateTime('punchOutTime', punchOutTime);
                   }

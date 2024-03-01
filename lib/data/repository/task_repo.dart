@@ -11,11 +11,11 @@ class TaskRepositary{
   final ApiService _api;
 
   TaskRepositary(this.prefs, this._api);
-  Future<ApiResponse4<List<TaskData>>> getTaskData()async{
-    var response=await _api.postRequest("fetch_tasks", {
+  Future<ApiResponse2> getTaskData(String type)async{
+    var response=await _api.postRequest("employee/detailst", {
       "user_id":prefs.getString('uid'),
     });
-    return ApiResponse4.fromJson(response,List.from((response['data'] ?? []).map((e) => TaskData.fromJson(e))));
+    return ApiResponse2.fromJson(response,response['data']['task'][type]);
   }
 
   Future<ApiResponse2> fetchAllTaskDetail(int id) async {
@@ -39,7 +39,9 @@ class TaskRepositary{
   }
   Future<ApiResponse2> fetchAllProjectsData()async{
     try{
-      var response = await _api.getRequest("lead/projects");
+      var response = await _api.getRequest("lead/projects",data: {
+        "user_id" : prefs.getString("uid"),
+      });
       return ApiResponse2.fromJson(response,response['data']);
     }catch(e){
       throw Exception('data is not avaible ${e.toString()}');

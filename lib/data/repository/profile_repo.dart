@@ -186,7 +186,7 @@ class ProfileRepository {
     return ApiResponse2.fromJson(response,response['data']);
   }
 
-  Future<ApiResponse2> checkInAttendance(String work,File image, String latitude,String longitude) async {
+  Future<ApiResponse2> checkInAttendance(String work,File image, String latitude,String longitude, String attendanceType,String dayCount) async {
     SharedPreferences _pref = await SharedPreferences.getInstance();
 
     var response = await _api.postRequest("mark_attendence", {
@@ -200,6 +200,8 @@ class ProfileRepository {
         filename: image.path.split("/").last
       ),
       "type" : "check_in",
+      "attend_type" : attendanceType,
+      "daycont" : dayCount,
     },withFile: true);
     if (response == null) {
       throw ApiException.fromString("response null");
@@ -207,7 +209,7 @@ class ProfileRepository {
     return ApiResponse2.fromJson(response,response['data']);
   }
 
-  Future<ApiResponse2> checkOutAttendance(String work,File image, String latitude,String longitude) async {
+  Future<ApiResponse2> checkOutAttendance(String work,File image, String latitude,String longitude, String dayCount) async {
     SharedPreferences _pref = await SharedPreferences.getInstance();
 
     var response = await _api.postRequest("mark_attendence", {
@@ -221,11 +223,19 @@ class ProfileRepository {
           filename: image.path.split("/").last
       ),
       "type" : "check_out",
+      "daycont" : dayCount,
     },withFile: true);
     if (response == null) {
       throw ApiException.fromString("response null");
     }
     return ApiResponse2.fromJson(response,response['data']);
+  }
+
+  Future<ApiResponse2> getDoingTaskData(String type)async{
+    var response=await _api.postRequest("employee/detailst", {
+      "user_id":prefs.getString('uid'),
+    });
+    return ApiResponse2.fromJson(response,response['data']['task'][type]);
   }
 
 }

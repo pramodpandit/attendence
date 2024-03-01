@@ -30,17 +30,17 @@ class DashBoard extends StatefulWidget {
 class _DashBoardState extends State<DashBoard> {
   late ProfileBloc bloc;
   late NoticeBloc blocnotice;
-  late taskBloc ongoingbloc;
+  // late taskBloc ongoingbloc;
 
   @override
   void initState() {
     bloc = ProfileBloc(context.read<ProfileRepository>());
     blocnotice = NoticeBloc(context.read<NoticeRepository>());
-    ongoingbloc = taskBloc(context.read<TaskRepositary>(), );
+    // ongoingbloc = taskBloc(context.read<TaskRepositary>(), );
     super.initState();
     bloc.fetchUserDetail();
     blocnotice.fetchNoticeBoards();
-    ongoingbloc.fetchTaskData();
+    bloc.fetchDoingTaskData();
   }
 
   @override
@@ -442,21 +442,25 @@ class _DashBoardState extends State<DashBoard> {
 
                                 Container(
                                   child: ValueListenableBuilder(
-                                    valueListenable: ongoingbloc.isUserDetailLoad,
+                                    valueListenable: bloc.isUserDetailLoad,
                                     builder: (BuildContext context,bool isLoading,Widget? child){
                                       if(isLoading){
                                         return const Center(
                                           child: CircularProgressIndicator(),
                                         );
                                       }
-                                      return  CarouselSlider.builder(
-                                          itemCount: ongoingbloc.feedbackData.length,
-                                          itemBuilder: (context,index, realindex){
-                                            var data = ongoingbloc.feedbackData[index];
-                                            if(data.status =='doing'){
-                                              return GestureDetector(
+                                      return  ValueListenableBuilder(
+                                        valueListenable: bloc.allDoingTaskData,
+                                        builder: (context, allDoingTaskData, child) {
+                                          if(allDoingTaskData == null){
+                                            return CircularProgressIndicator();
+                                          }
+                                        return CarouselSlider.builder(
+                                            itemCount: allDoingTaskData.length,
+                                            itemBuilder: (context,index, realindex){
+                                                return GestureDetector(
                                                   onTap: () {
-                                                    Navigator.of(context).push(MaterialPageRoute(builder: (context)=>TaskDetails(data: data,)));
+                                                    Navigator.of(context).push(MaterialPageRoute(builder: (context)=>TaskDetails(data: allDoingTaskData[index],)));
                                                   },
                                                   child:  SizedBox(
                                                     height: 120,
@@ -487,7 +491,7 @@ class _DashBoardState extends State<DashBoard> {
                                                                   ),
                                                                   Flexible(
                                                                     child: Text(
-                                                                      "${data.title}",
+                                                                      "${allDoingTaskData[index]['title']}",
                                                                       style: TextStyle(
                                                                           fontSize: 14,
                                                                           color: Colors.black,
@@ -521,7 +525,7 @@ class _DashBoardState extends State<DashBoard> {
                                                                 child: Html(
                                                                   // data:"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
                                                                   data:
-                                                                  "${data.description}",
+                                                                  "${allDoingTaskData[index]['description']}",
                                                                   style: {
                                                                     "body": Style(
                                                                         color: Colors.black,
@@ -548,20 +552,19 @@ class _DashBoardState extends State<DashBoard> {
                                                       },
                                                     ),
                                                   ),
-                                              );
-                                            }
-                                            return Offstage();
+                                                );
+                                              return Offstage();
 
-                                          },
-                                          options: CarouselOptions(
-                                            autoPlay: false,
-                                            enlargeCenterPage: false,
-                                            aspectRatio: 2.0,
-                                            viewportFraction: 1.0,
-                                            initialPage: 0,
+                                            },
+                                            options: CarouselOptions(
+                                              autoPlay: false,
+                                              enlargeCenterPage: false,
+                                              aspectRatio: 2.0,
+                                              viewportFraction: 1.0,
+                                              initialPage: 0,
 
-                                          ));
-
+                                            ));
+                                      },);
                                         },
                                   ),
                                 ),

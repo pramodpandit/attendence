@@ -17,30 +17,24 @@ class taskBloc extends Bloc{
   late TaskRepositary _repo;
   taskBloc(this._repo, );
   ValueNotifier<int> selectedMenuIndex = ValueNotifier(0);
-  List<String> taskMenus = [
-    "All",
-    "Pending",
-    "Ongoing",
-    "Completed",
-  ];
-  List<Widget> profileMenusWidgets = [
-    const AllTask(),
-    const pendingTask(),
-    const ongoingTask(),
-    const completedTask(),
-  ];
   ValueNotifier<bool> isUserDetailLoad = ValueNotifier(false);
   List<TaskData> feedbackData = [];
   List<TaskData> ongoing = [];
-  fetchTaskData() async{
+
+
+  ValueNotifier<String> taskStatus = ValueNotifier("doing");
+  ValueNotifier<List?> allFetchedTaskData = ValueNotifier(null);
+  fetchTaskData(String type) async{
     try{
       isUserDetailLoad.value = true;
-      var result = await _repo.getTaskData();
+      var result = await _repo.getTaskData(type);
       if(result.status && result.data != null){
-        feedbackData = result.data!.reversed.toList();
-
+        allFetchedTaskData.value = result.data;
+      }else{
+        allFetchedTaskData.value = [];
       }
     }catch (e, s) {
+      allFetchedTaskData.value = [];
       print(e);
       print(s);
     }finally{
@@ -91,6 +85,7 @@ class taskBloc extends Bloc{
   ValueNotifier<String?> taskCategory = ValueNotifier(null);
   ValueNotifier<String?> project = ValueNotifier(null);
   ValueNotifier<String?> employee = ValueNotifier(null);
+  ValueNotifier<String?> helper = ValueNotifier(null);
   ValueNotifier<String?> department = ValueNotifier(null);
   TextEditingController title = TextEditingController();
   ValueNotifier<String?> startDate = ValueNotifier(null);
@@ -164,6 +159,7 @@ class taskBloc extends Bloc{
       "t_cat_id" : taskCategory.value,
       "project_id" : project.value,
       "employee_id" : employee.value,
+      "helper_id" : helper.value,
       "department_id" : department.value,
       "title" : title.text,
       "start_date" : startDate.value,
