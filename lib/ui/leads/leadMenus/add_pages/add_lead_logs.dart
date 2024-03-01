@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:office/bloc/leads_bloc.dart';
 import 'package:office/bloc/project_bloc.dart';
 import 'package:office/data/repository/project_repo.dart';
@@ -27,6 +28,8 @@ class _AddLeadLogsState extends State<AddLeadLogs> {
     super.initState();
     widget.bloc.getAllProjectTypes();
     widget.bloc.getAllCurrencyData();
+    widget.bloc.getAllBranchDetails();
+    widget.bloc.getAllEmployeeDetails();
   }
 
   @override
@@ -135,7 +138,7 @@ class _AddLeadLogsState extends State<AddLeadLogs> {
                                     onTap: () {
                                       showTimePicker(context: context, initialTime: TimeOfDay.now()).then((value){
                                         if(value != null){
-                                          widget.bloc.nextFollowUpTime.text = DateFormat.jm().format(DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day,value.hour,value.minute));
+                                          widget.bloc.nextFollowUpTime.text = DateFormat("HH:mm:ss").format(DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day,value.hour,value.minute));
                                         }
                                       });
                                     },
@@ -199,8 +202,8 @@ class _AddLeadLogsState extends State<AddLeadLogs> {
                                     const SizedBox(height: 10),
                                     AppDropdown(
                                       items: const [
-                                        DropdownMenuItem(value: "specific", child: Text("Specific")),
-                                        DropdownMenuItem(value: "everyone", child: Text("Everyone")),
+                                        DropdownMenuItem(value: "Specific", child: Text("Specific")),
+                                        DropdownMenuItem(value: "Everyone", child: Text("Everyone")),
                                       ],
                                       onChanged: (value) {
                                         widget.bloc.branchType.value = value;
@@ -214,7 +217,7 @@ class _AddLeadLogsState extends State<AddLeadLogs> {
                                         if(branchType == null){
                                           return Offstage();
                                         }
-                                        if(branchType == "specific"){
+                                        if(branchType == "Specific"){
                                           return Column(
                                             children: [
                                               const SizedBox(height: 10),
@@ -235,60 +238,74 @@ class _AddLeadLogsState extends State<AddLeadLogs> {
                                                   items: allBranchData.map((e) => DropdownMenuItem<String>(value: e['id'].toString(),child: Text(e['title']),)).toList(),
                                                   onChanged: (value) {
                                                     widget.bloc.branchId.value = value;
+                                                    widget.bloc.specificEmployeeData.value = widget.bloc.allEmployeeData.value!.where((element) => element['branch_id'].toString() == value.toString()).toList();
                                                   },
-                                                  value: widget.bloc.projectType.value,
+                                                  value: widget.bloc.branchId.value,
                                                   hintText: "Branch",
                                                 );
                                               },),
                                               const SizedBox(height: 10),
                                               ValueListenableBuilder(
+                                                valueListenable: widget.bloc.specificEmployeeData,
+                                                builder: (context, specificEmployeeData, child) {
+                                                  if(specificEmployeeData == null || specificEmployeeData.isEmpty){
+                                                    return MultiSelectDropDown(
+                                                      fieldBackgroundColor: Colors.grey.shade200,
+                                                      borderColor: Colors.transparent,
+                                                      hintColor: Colors.black,
+                                                      hint: "Select Employee",
+                                                      focusedBorderColor: Colors.transparent,
+                                                        onOptionSelected: (selectedOptions) {},
+                                                        options: const [],
+                                                    );
+                                                  }
+                                                  return MultiSelectDropDown(
+                                                      fieldBackgroundColor: Colors.grey.shade200,
+                                                      borderColor: Colors.transparent,
+                                                      hintColor: Colors.black,
+                                                      hint: "Select Employee",
+                                                      focusedBorderColor: Colors.transparent,
+                                                      onOptionSelected: (selectedOptions) {
+                                                        widget.bloc.employeeId.value = selectedOptions.map((e) => e.value).toList().join(",");
+                                                      },
+                                                      options: specificEmployeeData.map((e) => ValueItem<String>(value: e['id'].toString(),label: "${e['first_name'] ?? ''} ${e['middle_name'] ?? ''} ${e['last_name'] ?? ''}",)).toList()
+                                                  );
+                                                },)
+                                            ],
+                                          );
+                                        }
+                                        if(branchType == "Everyone"){
+                                          return Column(
+                                            children: [
+                                              const SizedBox(height: 10),
+                                              ValueListenableBuilder(
                                                 valueListenable: widget.bloc.allEmployeeData,
                                                 builder: (context, allEmployeeData, child) {
                                                   if(allEmployeeData == null){
-                                                    return AppDropdown(
-                                                      items: [],
-                                                      onChanged: (value) {
-                                                        widget.bloc.employeeId.value = value;
-                                                      },
-                                                      value: null,
-                                                      hintText: "Employee",
+                                                    return MultiSelectDropDown(
+                                                        fieldBackgroundColor: Colors.grey.shade200,
+                                                        borderColor: Colors.transparent,
+                                                        hintColor: Colors.black,
+                                                        hint: "Select Employee",
+                                                        focusedBorderColor: Colors.transparent,
+                                                        onOptionSelected: (selectedOptions) {},
+                                                        options: const []
                                                     );
                                                   }
-                                                return AppDropdown(
-                                                  items: allEmployeeData.map((e) => DropdownMenuItem<String>(value: e['id'].toString(),child: Text("${e['first_name'] ?? ''} ${e['middle_name'] ?? ''} ${e['last_name'] ?? ''}"),)).toList(),
-                                                  onChanged: (value) {
-                                                    widget.bloc.employeeId.value = value;
-                                                  },
-                                                  value: widget.bloc.employeeId.value,
-                                                  hintText: "Employee",
+                                                return MultiSelectDropDown(
+                                                  fieldBackgroundColor: Colors.grey.shade200,
+                                                    borderColor: Colors.transparent,
+                                                    hintColor: Colors.black,
+                                                    hint: "Select Employee",
+                                                    focusedBorderColor: Colors.transparent,
+                                                    onOptionSelected: (selectedOptions) {
+                                                      widget.bloc.employeeId.value = selectedOptions.map((e) => e.value).toList().join(",");
+                                                    },
+                                                    options: allEmployeeData.map((e) => ValueItem<String>(value: e['id'].toString(),label: "${e['first_name'] ?? ''} ${e['middle_name'] ?? ''} ${e['last_name'] ?? ''}",)).toList()
                                                 );
                                               },)
                                             ],
                                           );
-                                        }
-                                        if(branchType == "everyone"){
-                                          ValueListenableBuilder(
-                                            valueListenable: widget.bloc.allEmployeeData,
-                                            builder: (context, allEmployeeData, child) {
-                                              if(allEmployeeData == null){
-                                                return AppDropdown(
-                                                  items: [],
-                                                  onChanged: (value) {
-                                                    widget.bloc.employeeId.value = value;
-                                                  },
-                                                  value: null,
-                                                  hintText: "Employee",
-                                                );
-                                              }
-                                              return AppDropdown(
-                                                items: allEmployeeData.map((e) => DropdownMenuItem<String>(value: e['id'].toString(),child: Text("${e['first_name'] ?? ''} ${e['middle_name'] ?? ''} ${e['last_name'] ?? ''}"),)).toList(),
-                                                onChanged: (value) {
-                                                  widget.bloc.employeeId.value = value;
-                                                },
-                                                value: widget.bloc.employeeId.value,
-                                                hintText: "Employee",
-                                              );
-                                            },);
                                         }
                                         return Offstage();
                                       },),
@@ -311,6 +328,7 @@ class _AddLeadLogsState extends State<AddLeadLogs> {
                                           onChanged: (value) {
                                             widget.bloc.projectType.value = value;
                                             widget.bloc.shortCode.text = allProjectTypes.where((element) => element['id'].toString() == value.toString()).toList()[0]['short_code'];
+                                            widget.bloc.getProjectCodeByProjectType(value.toString());
                                           },
                                           value: widget.bloc.projectType.value,
                                           hintText: "Project Type",
@@ -419,7 +437,7 @@ class _AddLeadLogsState extends State<AddLeadLogs> {
                                           onChanged: (value) {
                                             widget.bloc.currency.value = value;
                                           },
-                                          value: widget.bloc.projectType.value,
+                                          value: widget.bloc.currency.value,
                                           hintText: "Select Currency",
                                         );
                                       },),
@@ -495,7 +513,11 @@ class _AddLeadLogsState extends State<AddLeadLogs> {
                                     : CustomButton2(
                                     onPressed: () {
                                       if (formKey.currentState!.validate()) {
-                                        widget.bloc.addLeadLogs(widget.leadId.toString());
+                                        widget.bloc.addLeadLogs(widget.leadId.toString()).then((value){
+                                          Navigator.pop(context);
+                                          widget.bloc.specificLeadData.value = null;
+                                          widget.bloc.getSpecificLeadData(widget.leadId.toString(),"lead_logs");
+                                        });
                                       }
                                     },
                                     tittle: 'Add Logs'),

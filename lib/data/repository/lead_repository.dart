@@ -470,13 +470,22 @@ class LeadsRepository {
     return ApiResponse2.fromJson(response,response['data']);
   }
   Future<ApiResponse2> fetchAllEmployeeList() async{
-    var response= await _api.getRequest("get_all_employee_details",data: {
+    var response= await _api.getRequest("user/get_all_employee_details",data: {
       "user_id" : prefs.getString("uid"),
     });
     if(response==null){
       throw ApiException.fromString("response null");
     }
     return ApiResponse2.fromJson(response,response['data1']);
+  }
+  Future<ApiResponse2> fetchProjectCodeByType(String projectTypeId) async{
+    var response= await _api.postRequest("project/type-project",{
+      "projectType_id" : projectTypeId,
+    });
+    if(response==null){
+      throw ApiException.fromString("response null");
+    }
+    return ApiResponse2.fromJson(response,[response['project_code']]);
   }
   Future<ApiResponse2> fetchAllProjectTypeList() async{
     var response= await _api.getRequest("project/projectetype-list");
