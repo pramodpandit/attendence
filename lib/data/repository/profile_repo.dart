@@ -48,11 +48,7 @@ class ProfileRepository {
       throw ApiException.fromString("response null");
     }
     List<dynamic> list = response['data1'] ?? [];
-    print('response profile ${list}');
-    List<User> user =
-    list.map<User>((e) => User.fromJson(e)).toList();
-    return ApiResponse2<List<User>>.fromJson(response, user);
-
+    return ApiResponse2.fromJson(response,list);
   }
 
   Future<ApiResponse2<List<Document>>> userDocuments() async {
