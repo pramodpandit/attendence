@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'Add_page/add_expense_type.dart';
+import 'Add_page/add_project_type.dart';
+
 class ProjectSetting extends StatefulWidget {
   const ProjectSetting({super.key});
 
@@ -166,6 +169,7 @@ class _ProjectTypeState extends State<ProjectType> {
                     borderRadius: BorderRadius.all(Radius.circular(5.0))
                 ),
                 onPressed: () async{
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>AddProjectType()));
                 },
                 backgroundColor: const  Color(0xFF009FE3),
                 label: AnimatedSwitcher(
@@ -235,6 +239,7 @@ class _ProjectExpenseTypeState extends State<ProjectExpenseType> {
                     borderRadius: BorderRadius.all(Radius.circular(5.0))
                 ),
                 onPressed: () async{
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>AddProjectExpenseType()));
                 },
                 backgroundColor: const  Color(0xFF009FE3),
                 label: AnimatedSwitcher(
