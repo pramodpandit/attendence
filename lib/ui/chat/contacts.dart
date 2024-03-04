@@ -260,6 +260,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                                               ],
                                             ),
                                             const Divider(),
+
                                           ],
                                         ),
                                       ),
