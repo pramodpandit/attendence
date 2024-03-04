@@ -5,6 +5,8 @@ import 'package:office/ui/Settings/projectsetting.dart';
 import 'package:office/ui/Settings/task_category.dart';
 
 import '../../data/model/TaskCategory.dart';
+import 'currency_setting.dart';
+import 'designation_List.dart';
 
 class Setting extends StatefulWidget {
   const Setting({super.key});
@@ -73,7 +75,9 @@ class _SettingState extends State<Setting> {
                   5.height,
                   ListSetting('Department',callback: (){}),
                   5.height,
-                  ListSetting('Designation',callback: (){}),
+                  ListSetting('Designation',callback: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=>DesignationList()));
+                  }),
                   5.height,
                   ListSetting('Skills/Technology',callback: (){}),
                   5.height,
@@ -85,7 +89,9 @@ class _SettingState extends State<Setting> {
                   5.height,
                   ListSetting('Leave Type',callback: (){}),
                   5.height,
-                  ListSetting('Currency',callback: (){}),
+                  ListSetting('Currency',callback: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=>CurrencySetting()));
+                  }),
                   5.height,
                   ListSetting('Company',callback: (){}),
                   5.height,
