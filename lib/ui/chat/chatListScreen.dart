@@ -23,7 +23,7 @@ class ChatListScreen extends StatefulWidget {
 
 class _ChatListScreenState extends State<ChatListScreen> {
   late ProfileBloc bloc;
-  List<String> tabTittle = ["Chats", "Groups"];
+  // List<String> tabTittle = ["Chats", "Groups"];
   ValueNotifier<int> tabIndex = ValueNotifier(0);
   ValueNotifier<bool> isSearchClicked = ValueNotifier(false);
 
@@ -39,7 +39,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         child: Column(children: [
           const SizedBox(
             height: 60,
@@ -212,21 +212,12 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                       await Future.delayed(
                                           Duration(milliseconds: 1200));
                                     },
-                                    child: InkWell(
-                                      onTap: () {
-                                        Navigator.of(context).push(
-                                          PageRouteBuilder(
-                                            pageBuilder: (context, animation, secondaryAnimation) {
-                                              return ChatScreen(User(firstName: "Aditya"));
-                                            },),);
+                                    child: ListView.builder(
+                                      itemCount: 15,
+                                      shrinkWrap: true,
+                                      itemBuilder: (context, index) {
+                                        return const SingleChat();
                                       },
-                                      child: ListView.builder(
-                                        itemCount: 15,
-                                        shrinkWrap: true,
-                                        itemBuilder: (context, index) {
-                                          return const SingleChat();
-                                        },
-                                      ),
                                     ),
                                   ),
                                   Positioned(
@@ -273,7 +264,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                       await Future.delayed(
                                           const Duration(milliseconds: 1500));
                                     },
-                                    child: Container()),
+                                    child: Container(
+                                      child: Text("its ok"),
+                                    )),
                                 Positioned(
                                   bottom: 110,
                                   right: 10,
@@ -380,60 +373,28 @@ class SingleChat extends StatefulWidget {
 class _SingleChatState extends State<SingleChat> {
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return ListTile(
       onTap: () {
-        // Navigator.of(context)
-        //     .push(MaterialPageRoute(builder: (context) => const ChatScreen()));
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (context) => ChatScreen({"first_name": "Pramod"})));
       },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const CircleAvatar(
-              child: Icon(Icons.person),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Text(
-                        "Jacob",
-                        style: TextStyle(fontWeight: FontWeight.w500),
-                      ),
-                      const Spacer(),
-                      Text(
-                        "1:32 PM",
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: Colors.grey.shade500,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 2,
-                  ),
-                  Text(
-                    "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi",
-                    softWrap: true,
-                    maxLines: 2,
-                    style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        overflow: TextOverflow.ellipsis,
-                        fontSize: 12,
-                        color: Colors.grey.shade400),
-                  ),
-                ],
-              ),
-            ),
-          ],
+      contentPadding: EdgeInsets.symmetric(horizontal: 5),
+      title: Text(
+            "Jacob",
+            style: TextStyle(fontWeight: FontWeight.w500),
+          ),
+      subtitle: Text(
+          "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi",
+          softWrap: true,
+          style: TextStyle(
+              fontWeight: FontWeight.w400,
+              overflow: TextOverflow.ellipsis,
+              fontSize: 12,
+              color: Colors.grey.shade400),
         ),
-      ),
+      leading: CircleAvatar(
+            child: Icon(Icons.person),
+          ),
     );
   }
 }

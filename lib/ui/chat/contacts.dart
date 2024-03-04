@@ -168,13 +168,17 @@ class _ContactsScreenState extends State<ContactsScreen> {
                                           searchedUser =
                                               profileBloc.allUserDetail.value!
                                                   .where((element) =>
-                                                  "${element.firstName
+                                                  "${element['first_name'] == null ? '':
+                                                      element['first_name']
                                                       .toString()
                                                       .toLowerCase()
-                                                  } ${element.middleName
+                                                  } ${element['middle_name'] == null ? '':
+                                                      element['middle_name']
                                                       .toString()
-                                                      .toLowerCase()} ${element
-                                                      .lastName.toString()
+                                                      .toLowerCase()
+                                                  } ${element['last_name'] == null ? '':
+                                                      element['last_name']
+                                                      .toString()
                                                       .toLowerCase()}".contains(
                                                       value!.toLowerCase()))
                                                   .toList();

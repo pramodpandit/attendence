@@ -19,7 +19,7 @@ import '../../bloc/profile_bloc.dart';
 import '../../data/repository/profile_repo.dart';
 
 class ChatScreen extends StatefulWidget {
-  final User user;
+  final Map<String,dynamic> user;
   const ChatScreen(this.user,{Key? key}) : super(key: key);
 
   @override
@@ -27,6 +27,7 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  ScrollController scrollController = ScrollController();
   TextEditingController sendmessage = TextEditingController();
   File? galleryFile;
   PlayerController playerController = PlayerController();
@@ -76,9 +77,13 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     profileBloc=ProfileBloc(context.read<ProfileRepository>());
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      scrollController.jumpTo(scrollController.position.maxScrollExtent);
+    });
   }
 
   Future<void> getLocation() async {
+    Navigator.of(context).pop();
     LocationPermission permission = await Geolocator.checkPermission();
     if(permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
       permission = await Geolocator.requestPermission();
@@ -226,8 +231,8 @@ class _ChatScreenState extends State<ChatScreen> {
                    CircleAvatar(
                      radius: 20,
                      child: ClipOval(
-                      child: widget.user.image != null?Image.network(
-                        "https://freeze.talocare.co.in/public/${widget.user.image}",
+                      child: widget.user['image'] != null?Image.network(
+                        "https://freeze.talocare.co.in/public/${widget.user['image']}",
                         height: 50,
                         width: 50,
                         fit: BoxFit.cover,
@@ -245,7 +250,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                            Text(
-                             "${widget.user.firstName??""} ${widget.user.middleName??""} ${widget.user.lastName??""}",
+                             "${widget.user['first_name']??""} ${widget.user['middle_name']??""} ${widget.user['last_name']??""}",
                             maxLines: 1,
                             style: const TextStyle(fontWeight: FontWeight.w500,overflow: TextOverflow.ellipsis),
                           ),
@@ -318,6 +323,7 @@ class _ChatScreenState extends State<ChatScreen> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: ListView.builder(
+                  controller: scrollController,
                   itemCount: 8,
                   itemBuilder: (context, index) {
                     return Container(
