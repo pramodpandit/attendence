@@ -74,10 +74,10 @@ class TaskRepositary{
     }
   }
 
-  Future<ApiResponse2> addTaskFunction(Map<String,dynamic> data)async{
+  Future addTaskFunction(Map<String,dynamic> data)async{
     try{
       var response = await _api.postRequest("add_task", data);
-      return ApiResponse2.fromJson(response,response['data']);
+      return response;
     }catch(e){
       throw Exception('data is not avaible ${e.toString()}');
     }

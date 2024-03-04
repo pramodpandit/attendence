@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:office/bloc/bloc.dart';
 import 'package:office/data/model/api_response.dart';
 import 'package:office/data/repository/task_repo.dart';
@@ -150,7 +151,7 @@ class taskBloc extends Bloc{
     }
   }
 
-  addTask() async{
+  addTask(BuildContext context) async{
     SharedPreferences pref = await SharedPreferences.getInstance();
     Map<String,dynamic> data = {
       "user_id" : pref.getString("uid"),
@@ -188,9 +189,13 @@ class taskBloc extends Bloc{
       });
     }
     try{
-      ApiResponse2 res = await _repo.addTaskFunction(data);
-      if(res.status){
-        print(res.data);
+      var res = await _repo.addTaskFunction(data);
+      if(res['success']== true){
+        Navigator.pop(context);
+        allFetchedTaskData.value = null;
+        fetchTaskData(taskStatus.value);
+      }else{
+        toast(res['message']);
       }
     }catch(e){
       print(e);

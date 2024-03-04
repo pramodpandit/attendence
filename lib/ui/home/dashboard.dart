@@ -456,6 +456,7 @@ class _DashBoardState extends State<DashBoard> {
                                             return CircularProgressIndicator();
                                           }
                                         return CarouselSlider.builder(
+
                                             itemCount: allDoingTaskData.length,
                                             itemBuilder: (context,index, realindex){
                                                 return GestureDetector(
@@ -464,96 +465,90 @@ class _DashBoardState extends State<DashBoard> {
                                                   },
                                                   child:  SizedBox(
                                                     height: 120,
-                                                    child: PageView.builder(
-
-                                                      itemBuilder: (context, index) {
-                                                        return Container(
-                                                          margin: EdgeInsets.all(5),
-                                                          padding: const EdgeInsets.symmetric(
-                                                              horizontal: 15, vertical: 10),
-                                                          decoration: BoxDecoration(
-                                                              borderRadius: BorderRadius.circular(10),
-                                                              color: Colors.white,
-                                                              boxShadow: [
-                                                                BoxShadow(
-                                                                    spreadRadius: 0,
-                                                                    blurRadius: 3,
-                                                                    color: Colors.black.withOpacity(0.2))
-                                                              ]),
-                                                          child:  Column(
-                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                    child: Container(
+                                                      margin: EdgeInsets.all(5),
+                                                      padding: const EdgeInsets.symmetric(
+                                                          horizontal: 15, vertical: 10),
+                                                      decoration: BoxDecoration(
+                                                          borderRadius: BorderRadius.circular(10),
+                                                          color: Colors.white,
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                                spreadRadius: 0,
+                                                                blurRadius: 3,
+                                                                color: Colors.black.withOpacity(0.2))
+                                                          ]),
+                                                      child:  Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          Row(
                                                             children: [
-                                                              Row(
-                                                                children: [
-                                                                  Icon(Icons.computer),
-                                                                  SizedBox(
-                                                                    width: 10,
-                                                                  ),
-                                                                  Flexible(
-                                                                    child: Text(
-                                                                      "${allDoingTaskData[index]['title']}",
-                                                                      style: TextStyle(
-                                                                          fontSize: 14,
-                                                                          color: Colors.black,
-                                                                          fontWeight: FontWeight.w500),
-                                                                    ),
-                                                                  ),
-                                                                  Spacer(),
-                                                                  const DashedCircularProgressBar.square(
-                                                                    dimensions: 50,
-                                                                    progress: 60,
-                                                                    startAngle: 0,
-                                                                    sweepAngle: 360,
-                                                                    foregroundColor: Color(0xff4BCD36),
-                                                                    backgroundColor: Color(0xffeeeeee),
-                                                                    foregroundStrokeWidth: 5,
-                                                                    backgroundStrokeWidth: 5,
-                                                                    animation: true,
-                                                                    seekSize: 4,
-                                                                    seekColor: Colors.white,
-                                                                    child: Center(
-                                                                        child: Text(
-                                                                          '65%',
-                                                                          style: TextStyle(
-                                                                              fontSize: 12,
-                                                                              fontWeight: FontWeight.w600),
-                                                                        )),
-                                                                  ),
-                                                                ],
+                                                              Icon(Icons.computer),
+                                                              SizedBox(
+                                                                width: 10,
                                                               ),
-                                                              Container(
-                                                                child: Html(
-                                                                  // data:"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-                                                                  data:
-                                                                  "${allDoingTaskData[index]['description']}",
-                                                                  style: {
-                                                                    "body": Style(
-                                                                        color: Colors.black,
-                                                                        fontWeight:
-                                                                        FontWeight.w600,
-
-                                                                        display: Display.inline,
-                                                                        fontSize: FontSize(10),
-                                                                        textAlign:
-                                                                        TextAlign.start),
-                                                                    "p": Style(
-                                                                        color: Colors.black,
-
-                                                                        display: Display.inline,
-                                                                        fontSize: FontSize(10),
-                                                                        textAlign:
-                                                                        TextAlign.start),
-                                                                  },
+                                                              Flexible(
+                                                                child: Text(
+                                                                  "${allDoingTaskData[index]['title']}",
+                                                                  style: TextStyle(
+                                                                      fontSize: 14,
+                                                                      color: Colors.black,
+                                                                      fontWeight: FontWeight.w500),
                                                                 ),
+                                                              ),
+                                                              Spacer(),
+                                                              const DashedCircularProgressBar.square(
+                                                                dimensions: 50,
+                                                                progress: 60,
+                                                                startAngle: 0,
+                                                                sweepAngle: 360,
+                                                                foregroundColor: Color(0xff4BCD36),
+                                                                backgroundColor: Color(0xffeeeeee),
+                                                                foregroundStrokeWidth: 5,
+                                                                backgroundStrokeWidth: 5,
+                                                                animation: true,
+                                                                seekSize: 4,
+                                                                seekColor: Colors.white,
+                                                                child: Center(
+                                                                    child: Text(
+                                                                      '65%',
+                                                                      style: TextStyle(
+                                                                          fontSize: 12,
+                                                                          fontWeight: FontWeight.w600),
+                                                                    )),
                                                               ),
                                                             ],
                                                           ),
-                                                        );
-                                                      },
+                                                          Container(
+                                                            child: Html(
+                                                              // data:"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+                                                              data:
+                                                              "${allDoingTaskData[index]['description']}",
+                                                              style: {
+                                                                "body": Style(
+                                                                    color: Colors.black,
+                                                                    fontWeight:
+                                                                    FontWeight.w600,
+
+                                                                    display: Display.inline,
+                                                                    fontSize: FontSize(10),
+                                                                    textAlign:
+                                                                    TextAlign.start),
+                                                                "p": Style(
+                                                                    color: Colors.black,
+
+                                                                    display: Display.inline,
+                                                                    fontSize: FontSize(10),
+                                                                    textAlign:
+                                                                    TextAlign.start),
+                                                              },
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
                                                     ),
                                                   ),
                                                 );
-                                              return Offstage();
 
                                             },
                                             options: CarouselOptions(

@@ -709,7 +709,7 @@ class _addTask extends State<addTask> {
                             title: "Submit",
                             onTap: () {
                               if (formKey.currentState!.validate()) {
-                                bloc.addTask();
+                                bloc.addTask(context);
                               }
                             },
                             margin: EdgeInsets.zero,

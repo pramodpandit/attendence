@@ -27,7 +27,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
 
   TextEditingController searchController = TextEditingController();
   String search=" No User Found ";
-  List<User> searchedUser=[];
+  List searchedUser=[];
 
   // List<String> _foundUsers = [];
   // @override
@@ -101,7 +101,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                       return Column(
                         children: [
                           SizedBox(
-                            height: MediaQuery.of(context).size.width * 1,
+                            height: MediaQuery.of(context).size.height * 0.3,
                           ),
                           const Center(child: CircularProgressIndicator()),
                         ],
@@ -109,13 +109,23 @@ class _ContactsScreenState extends State<ContactsScreen> {
                     }
                   return ValueListenableBuilder(
                     valueListenable: profileBloc.allUserDetail,
-                    builder: (context,List<User>?data,__){
+                    builder: (context, allUserDetail,__){
                      // print('htd$data');
-                      if(data==null){
+                      if(allUserDetail == null){
                         return Column(
                           children: [
                             SizedBox(
-                              height: MediaQuery.of(context).size.width * 1,
+                              height: MediaQuery.of(context).size.height * 0.3,
+                            ),
+                            const Center(child: CircularProgressIndicator()),
+                          ],
+                        );
+                      }
+                      if(allUserDetail.isEmpty){
+                        return Column(
+                          children: [
+                            SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.3,
                             ),
                             const Center(child: Text("No data found!")),
                           ],
@@ -153,14 +163,21 @@ class _ContactsScreenState extends State<ContactsScreen> {
                                       controller: searchController,
                                       decoration: const InputDecoration(
                                           border: InputBorder.none, hintText: "Search"),
-                                      onChanged: (String? value){
+                                      onChanged: (String? value) {
                                         setState(() {
-                                          searchedUser = profileBloc.allUserDetail.value!
-                                              .where((element) =>
-                                          "${element.firstName
-                                                            .toString()
-                                                            .toLowerCase()
-                                                      } ${element.middleName.toString().toLowerCase()} ${element.lastName.toString().toLowerCase()}".contains(value!.toLowerCase())).toList();
+                                          searchedUser =
+                                              profileBloc.allUserDetail.value!
+                                                  .where((element) =>
+                                                  "${element.firstName
+                                                      .toString()
+                                                      .toLowerCase()
+                                                  } ${element.middleName
+                                                      .toString()
+                                                      .toLowerCase()} ${element
+                                                      .lastName.toString()
+                                                      .toLowerCase()}".contains(
+                                                      value!.toLowerCase()))
+                                                  .toList();
                                         });
                                       },
                                     ),
@@ -174,7 +191,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                                 shrinkWrap: true,
                                 physics: const ScrollPhysics(),
                                 itemCount: searchController.text.isEmpty
-                                    ? data.length
+                                    ? allUserDetail.length
                                     : searchedUser.length,
                                 itemBuilder: (context, index) {
                                 // int i=0;
@@ -198,8 +215,8 @@ class _ContactsScreenState extends State<ContactsScreen> {
                                                 CircleAvatar(
                                                   radius: 23,
                                                   child: ClipOval(
-                                                    child: searchedUser[index].image != null?Image.network(
-                                                      "https://freeze.talocare.co.in/public/${searchedUser[index].image}",
+                                                    child: searchedUser[index]['image'] != null?Image.network(
+                                                      "https://freeze.talocare.co.in/public/${searchedUser[index]['image']}",
                                                       loadingBuilder: (context, child, loadingProgress) {
                                                         if(loadingProgress == null){
                                                           return child;
@@ -228,15 +245,15 @@ class _ContactsScreenState extends State<ContactsScreen> {
                                                     crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
                                                       Text(
-                                                        "${searchedUser[index].firstName??""} ${searchedUser[index].middleName??""} ${searchedUser[index].lastName??""}",
+                                                        "${searchedUser[index]['first_name']??""} ${searchedUser[index]['middle_name']??""} ${searchedUser[index]['last_name']??""}",
                                                         style: const TextStyle(fontWeight: FontWeight.w500,fontSize: 15,),
                                                       ),
-                                                      Text(
-                                                        searchedUser[index].departmentname ?? "",
-                                                        style: TextStyle(
-                                                            fontSize: 13,
-                                                            color: Colors.black.withOpacity(0.8)),
-                                                      ),
+                                                      // Text(
+                                                      //   searchedUser[index].departmentname ?? "",
+                                                      //   style: TextStyle(
+                                                      //       fontSize: 13,
+                                                      //       color: Colors.black.withOpacity(0.8)),
+                                                      // ),
                                                     ],
                                                   ),
                                                 )
@@ -251,7 +268,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                                   return GestureDetector(
                                     onTap: () {
                                       Navigator.of(context).push(
-                                          MaterialPageRoute(builder: (context) => ChatScreen(data[index])));
+                                          MaterialPageRoute(builder: (context) => ChatScreen(allUserDetail[index])));
                                     },
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 5,vertical: 5),
@@ -267,8 +284,8 @@ class _ContactsScreenState extends State<ContactsScreen> {
                                               CircleAvatar(
                                                 radius: 23,
                                                 child: ClipOval(
-                                                  child: data[index].image != null?Image.network(
-                                                    "https://freeze.talocare.co.in/public/${data[index].image}",
+                                                  child: allUserDetail[index]['image'] != null?Image.network(
+                                                    "https://freeze.talocare.co.in/public/${allUserDetail[index]['image']}",
                                                     loadingBuilder: (context, child, loadingProgress) {
                                                       if(loadingProgress == null){
                                                         return child;
@@ -297,15 +314,15 @@ class _ContactsScreenState extends State<ContactsScreen> {
                                                   crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
-                                                      "${data[index].firstName??""} ${data[index].middleName??""} ${data[index].lastName??""}",
+                                                      "${allUserDetail[index]['first_name']??""} ${allUserDetail[index]['middle_name']??""} ${allUserDetail[index]['last_name']??""}",
                                                       style: const TextStyle(fontWeight: FontWeight.w500,fontSize: 15,),
                                                     ),
-                                                    Text(
-                                                      data[index].departmentname ?? "",
-                                                      style: TextStyle(
-                                                          fontSize: 13,
-                                                          color: Colors.black.withOpacity(0.8)),
-                                                    ),
+                                                    // Text(
+                                                    //   allUserDetail[index]['departmentname'] ?? "",
+                                                    //   style: TextStyle(
+                                                    //       fontSize: 13,
+                                                    //       color: Colors.black.withOpacity(0.8)),
+                                                    // ),
                                                   ],
                                                 ),
                                               )

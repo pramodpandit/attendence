@@ -32,26 +32,13 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   void initState() {
     attendanceBloc = AttendanceBloc(context.read<AttendanceRepository>());
     super.initState();
+    attendanceBloc.getAttendanceType();
     attendanceBloc.fetchAttendanceData();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: MyAppBar(
-      //   title: 'Attendance',
-      //   actions: [
-      //     Padding(
-      //       padding: EdgeInsets.only(right: 10.0),
-      //       child: GestureDetector(
-      //           onTap: () {
-      //             Navigator.of(context).push(MaterialPageRoute(
-      //                 builder: (context) => AttendancePolicyScreen()));
-      //           },
-      //           child: Icon(Icons.question_mark)),
-      //     )
-      //   ],
-      // ),
       body: Stack(
         children: [
           Container(
@@ -494,17 +481,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                         child: CircularProgressIndicator(),
                                       );
                                     }
-                                    // if(attendance.isEmpty){
-                                    //   return Center(
-                                    //     child: Text(
-                                    //       "No Data Found",
-                                    //       style: TextStyle(
-                                    //         fontWeight: FontWeight.w600,
-                                    //         fontSize: 18,
-                                    //       ),
-                                    //     ),
-                                    //   );
-                                    // }
                                     return Column(
                                       children: [
                                         Container(
@@ -538,7 +514,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                                   Icon(PhosphorIcons.arrow_down,size: 15,color: Colors.red,)
                                                 ],
                                               ),
-                                              Text('Working Hour' ,style: TextStyle(fontSize: 12),),
                                               Text('Status' ,style: TextStyle(fontSize: 12),),
                                             ],
                                           )
@@ -548,19 +523,28 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                             valueListenable: attendanceBloc.allAttendanceData,
                                             builder: (context, allData, child) {
                                               if(allData == null){
-                                                return Center(child: CircularProgressIndicator(strokeWidth: 2,));
+                                                return Center(child: CircularProgressIndicator(strokeWidth: 3,));
                                               }
                                               if(allData.isEmpty){
                                                 return Center(child: Text("No data available"));
                                               }
-                                            return ListView.builder(
-                                              physics: const ScrollPhysics(),
-                                              itemCount: allData.length,
-                                              // attendance.length,
-                                              itemBuilder: (_, index) {
-                                                return AttendanceList(data: allData[index]);
-                                              },
-                                            );
+                                            return ValueListenableBuilder(
+                                              valueListenable: attendanceBloc.allAttendanceType,
+                                              builder: (context, allAttendanceType, child) {
+                                                if(allAttendanceType == null){
+                                                  return Center(child: CircularProgressIndicator(strokeWidth: 3,));
+                                                }
+                                              return ListView.builder(
+                                                physics: const ScrollPhysics(),
+                                                itemCount: allData.length,
+                                                // attendance.length,
+                                                itemBuilder: (_, index) {
+                                                  Map<String,dynamic> attendanceType = allAttendanceType.where((element) => element['short_name'] == allData[index]['status']).toList()[0];
+                                                  print("the attendance is : $attendanceType");
+                                                  return AttendanceList(data: allData[index],attendanceTypeData : attendanceType);
+                                                },
+                                              );
+                                            },);
                                           },),
                                         ),
                                       ],
@@ -585,7 +569,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
 class AttendanceList extends StatelessWidget {
   final Map data;
-  const AttendanceList({super.key,required this.data});
+  final Map attendanceTypeData;
+  const AttendanceList({super.key,required this.data, required this.attendanceTypeData});
 
   String calculateTimeGap() {
     if(data["check_in"]!=null && data["checkout"] != null){
@@ -644,10 +629,6 @@ class AttendanceList extends StatelessWidget {
                   ),
                 ],
               ),
-              // const SizedBox(height: 30, child: VerticalDivider()),
-              // const SizedBox(
-              //   width: 10,
-              // ),
               Text(
                 // data[index].reason ??
                 data["check_in"]!=null?DateFormat("h:mm a").format(DateTime.parse(data["check_in"])):"",
@@ -664,29 +645,32 @@ class AttendanceList extends StatelessWidget {
                   fontSize: 14,
                 ),
               ),
-               Text(
-                // data[index].reason ??
-                 calculateTimeGap(),
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                ),
-              ),
+              //  Text(
+              //   // data[index].reason ??
+              //    calculateTimeGap(),
+              //   style: const TextStyle(
+              //     fontWeight: FontWeight.w600,
+              //     fontSize: 14,
+              //   ),
+              // ),
                Container(
+                 height: 40,
+                width: 40,
                 padding: EdgeInsets.all(5),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(2)
+                  shape: BoxShape.circle,
+                  color: Color(int.parse("0xFF${attendanceTypeData['color_code'].toString().splitAfter("#")}")),
                 ),
-                 child: Text(
-                  // data[index].reason ??
-                  data["status_type"].toString().capitalizeFirstLetter(),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                    color: Colors.green
-                  ),
-                             ),
+                 child: Center(
+                   child: Text(
+                    data["status"].toString().capitalizeFirstLetter(),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      color: Colors.white
+                    ),
+                   ),
+                 ),
                ),
             ],
           )),

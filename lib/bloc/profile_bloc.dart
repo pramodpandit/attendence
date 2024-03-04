@@ -68,7 +68,7 @@ class ProfileBloc extends Bloc {
   ValueNotifier<bool> isAssetsLoad=ValueNotifier(false);
   ValueNotifier<bool> isAssetsLoadDetail=ValueNotifier(false);
   ValueNotifier<bool> isAllUserDetailLoad = ValueNotifier(false);
-  ValueNotifier<List<User>?> allUserDetail = ValueNotifier([]);
+  ValueNotifier<List?> allUserDetail = ValueNotifier(null);
 
   ValueNotifier<String?> currentLatitude = ValueNotifier(null);
   ValueNotifier<String?> currentLongitude = ValueNotifier(null);
@@ -119,10 +119,13 @@ class ProfileBloc extends Bloc {
     try{
       isAllUserDetailLoad.value = true;
       var result = await _repo.allUserDetails();
+      print("the date is : ${result.data}");
       if(result.status){
         allUserDetail.value = result.data;
       }
     }catch (e, s) {
+      allUserDetail.value = [];
+      print("a error $e");
       print(s);
     }finally{
       isAllUserDetailLoad.value = false;

@@ -25,8 +25,18 @@ class AttendanceBloc extends Bloc {
   updateStartMonth(DateTime value) => startmonth.value = value;
   updateYear(DateTime value) => year.value = value;
 
+  ValueNotifier<List?> allAttendanceType = ValueNotifier(null);
+
+  getAttendanceType() async {
+    try{
+      var result = await _repo.fetchAttendanceTypeList();
+      allAttendanceType.value = result;
+    }catch (e,s) {
+      debugPrint("$e");
+      debugPrint("$s");
+    }
+  }
   fetchAttendanceData() async {
-    print("this is print");
     try{
       isHolidayLoading.value = true;
       String months = DateFormat('MM').format(startmonth.value!);
