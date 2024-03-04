@@ -12,8 +12,8 @@ import 'memus/task_notes.dart';
 
 
 class TaskDetails extends StatefulWidget {
-  final TaskData data;
-  const TaskDetails({Key? key, required this.data}) : super(key: key);
+  final  data;
+  const TaskDetails({Key? key,  this.data}) : super(key: key);
 
   @override
   State<TaskDetails> createState() => _TaskDetailsState();
@@ -27,7 +27,6 @@ class _TaskDetailsState extends State<TaskDetails> {
     "Comment",
     "Timesheet",
     "Notes"
-
   ];
   List<Widget> projectMenusWidgets = [
 
@@ -41,11 +40,11 @@ class _TaskDetailsState extends State<TaskDetails> {
     // TODO: implement initState
     super.initState();
     projectMenusWidgets = [
-      TaskOverView(id: widget.data.id!,),
-      TaskFile(id: widget.data.id!),
-      TaskComment(id: widget.data.id!),
-      TaskTimesheet(id: widget.data.id!),
-      TaskNotes(id: widget.data.id!),
+      TaskOverView(id: widget.data['id']!,),
+      TaskFile(id: widget.data['id']!),
+      TaskComment(id: widget.data['id']!),
+      TaskTimesheet(id: widget.data['id']!),
+      TaskNotes(id: widget.data['id']!),
     ];
   }
 
@@ -131,7 +130,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                                       SizedBox(height: 10,),
                                       Row(mainAxisAlignment: MainAxisAlignment.end,
                                         children: [
-                                          Text("${widget.data.status}",
+                                          Text("${widget.data['status']}",
                                             style: const TextStyle(
                                                 fontFamily: "Poppins",
                                                 fontSize: 11,
@@ -141,7 +140,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                                         ],),
                                       Expanded(
                                         child: Text(
-                                          "${widget.data.title}",
+                                          "${widget.data['title']}",
                                           // "The prevalence of trauma related disorders in children and adolescents affected by forest fires.",
                                           style: TextStyle(
                                               fontFamily: "Poppins",
@@ -182,7 +181,6 @@ class _TaskDetailsState extends State<TaskDetails> {
                             GestureDetector(
                               onTap: () {
                                 selectMenu(index);
-                                // userDetailsNotifier.selectMenu(index);
                               },
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 10),
