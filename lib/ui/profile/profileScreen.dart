@@ -364,7 +364,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             heading: "Setting",
                             image: "images/setting.png",
                             onTap: (){
-                          //    Navigator.of(context).push(MaterialPageRoute(builder: (context)=>Setting()));
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>Setting()));
                             },
                           ),
                           if (bloc.hasAccess(department, 15,'1'))BoxContainer(

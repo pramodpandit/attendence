@@ -36,7 +36,6 @@ class _LeavesDetailState extends State<LeavesDetail> {
     bloc = context.read<LeaveBloc>();
     super.initState();
     init();
-
     bloc.msgController!.stream.listen((event) {
       AppMessageHandler().showSnackBar(context, event);
     });

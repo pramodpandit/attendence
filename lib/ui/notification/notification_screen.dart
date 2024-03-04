@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:office/utils/constants.dart';
 
 class NotificationScreen extends StatefulWidget {
@@ -24,52 +25,48 @@ class _NotificationScreenState extends State<NotificationScreen> {
       child: Scaffold(
         body: Stack(
           children: [
-            Image.asset("images/back.png",fit: BoxFit.cover,height: 220,width: double.infinity,),
-             Padding(
-              padding: const EdgeInsets.only(left: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
+            Container(
+              height: 100,
+              width: 1.sw,
+              decoration: const BoxDecoration(
+                  color: Color(0xFF009FE3),
+                  borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(20),
+                      bottomRight: Radius.circular(20))
+              ),
+              child: const Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 60,),
-                  GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Icon(
-                        PhosphorIcons.caret_left_bold,
-                        color: Colors.black,
-                      )),
-                  const SizedBox(height: 10,),
-                  const Text(
-                    "Notifications",
+                  SizedBox(height: 56,),
+                  Text(
+                    "Notification",
+                    textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      fontSize: 22
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20
                     ),
                   ),
-                  RichText(text: const TextSpan(
-                    children: [
-                      TextSpan(
-                          text: 'You Have ',
-                          style: TextStyle(
-                               color: Colors.black,fontSize: 12)),
-                      TextSpan(
-                          text: '3 New ',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w500, color: Colors.blue,fontSize: 12)),
-                      TextSpan(
-                          text: 'Notifications',
-                          style: TextStyle(color: Colors.black,fontSize: 12))
-                    ]
-                  )),
                 ],
+              ),
+            ),
+            Positioned(
+              top: 56,
+              left: 10,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: const CircleAvatar(
+                  backgroundColor: Colors.white,
+                  radius: 15,
+                  child: Icon(Icons.arrow_back, size: 18,),
+                ),
               ),
             ),
             Column(
               children: [
-                const SizedBox(height: 140,),
+                const SizedBox(height: 100,),
                 Expanded(
                   child: ListView.builder(
                     itemCount: 20,

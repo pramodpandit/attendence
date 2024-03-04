@@ -130,7 +130,7 @@ class _TaskScreenState extends State<TaskScreen> {
                     itemBuilder: (context,index){
                         return GestureDetector(
                           onTap: () {
-                            Navigator.of(context).push(MaterialPageRoute(builder: (context)=>TaskDetails(data: allFetchedTaskData[index],)));
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context)=>TaskDetails(data:allFetchedTaskData[index],)));
                           },
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 25),
