@@ -93,7 +93,7 @@ class _WorkFromHomeRequestState extends State<WorkFromHomeRequest> {
                 children: [
                   SizedBox(height: 56,),
                   Text(
-                    "Work from home records",
+                    "Work from home request",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         color: Colors.white,
@@ -304,7 +304,8 @@ class _WorkFromHomeRequestState extends State<WorkFromHomeRequest> {
                                                               fontWeight: FontWeight.w500,
                                                             ),),
                                                             const SizedBox(width: 5),
-                                                            if(workFromHomeData[i]['end_date']!=null) Row(
+                                                            workFromHomeData[i]['duration_type']=="multiple"?
+                                                            workFromHomeData[i]['end_date']!=null? Row(
                                                               children: [
                                                                 CircleAvatar(radius: 4, backgroundColor: Colors.grey[200]),
                                                                 const SizedBox(width: 5),
@@ -316,7 +317,7 @@ class _WorkFromHomeRequestState extends State<WorkFromHomeRequest> {
                                                                   fontWeight: FontWeight.w500,
                                                                 ),),
                                                               ],
-                                                            ),
+                                                            ):Offstage():Offstage()
                                                           ],
                                                         ),
                                                       ],

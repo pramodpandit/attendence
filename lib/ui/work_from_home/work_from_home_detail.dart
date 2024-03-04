@@ -20,29 +20,20 @@ class WorkFromHomeDetail extends StatefulWidget {
 
 class _WorkFromHomeDetailState extends State<WorkFromHomeDetail> {
   late WorkFromHomeBloc bloc;
-  String uid="";
-
   @override
   void initState() {
-    bloc = WorkFromHomeBloc(context.read<WorkFromHomeRepository>());
+    bloc =context.read<WorkFromHomeBloc>();
     super.initState();
-    init();
-    bloc.msgController!.stream.listen((event) {
-      AppMessageHandler().showSnackBar(context, event);
-    });
     bloc.CancelStream.stream.listen((event) {
       if (event == 'Post') {
         bloc.getWorkFromHomeRecords();
         Navigator.pop(context);
       }
     });
+    bloc.msgController!.stream.listen((event) {
+      AppMessageHandler().showSnackBar(context, event);
+    });
   }
-  init()async{
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    uid=prefs.getString('uid')??"";
-    setState(() {});
-  }
-
   void showDialogBoxcancel(){
     showDialog(context: context, builder: (context){
       return AlertDialog(
@@ -68,7 +59,6 @@ class _WorkFromHomeDetailState extends State<WorkFromHomeDetail> {
                         Navigator.pop(context);
                       }, child: Text('Yes',style: TextStyle(color: Colors.white),));
                 },
-
               )
             ],
           )
@@ -79,7 +69,6 @@ class _WorkFromHomeDetailState extends State<WorkFromHomeDetail> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: const MyAppBar(title: "Leave Details"),
       body: Stack(
         children: [
           Container(
@@ -186,7 +175,6 @@ class _WorkFromHomeDetailState extends State<WorkFromHomeDetail> {
                                 ),
                               ],
                             ),
-
                             IconTittle(
                                 icon: Icons.calendar_month,
                                 tittle: widget.data['end_date']==null?DateFormat.yMMMMd().format(DateTime.parse(widget.data['start_date'] ?? "")):
@@ -262,7 +250,6 @@ class _WorkFromHomeDetailState extends State<WorkFromHomeDetail> {
                               ],
                           )
                         ),
-
                     ],
                   ),
                 ),
@@ -271,59 +258,6 @@ class _WorkFromHomeDetailState extends State<WorkFromHomeDetail> {
           ),
         ],
       ),
-      bottomNavigationBar: widget.data['status']! == "pending" && widget.responseButton==true  && uid!=widget.data['user_id']
-          ? Row(
-        children: [
-          const SizedBox(
-            width: 5,
-          ),
-          ValueListenableBuilder(
-              valueListenable: bloc.isResponseApproveLoad,
-              builder: (context, bool loading, __) {
-                return Expanded(
-                  child: AppButton(
-                    title: "Approve",
-                    loading: loading?true:false,
-                    onTap: () {
-                      print(
-                          "leave id: ${widget.data['id']}, status : approve");
-                      // bloc.respondLeaveRequest(
-                      //     "${widget.data.id}", 'approve');
-                    },
-                    color: const Color(0xff4BCD36),
-                    margin: EdgeInsets.zero,
-                    // loading: loading,
-                  ),
-                );
-              }),
-          const SizedBox(
-            width: 5,
-          ),
-          ValueListenableBuilder(
-              valueListenable: bloc.isResponseRejectLoad,
-              builder: (context, bool loading, __) {
-                return Expanded(
-                  child: AppButton(
-                    title: "Reject",
-                    loading: loading?true:false,
-                    onTap: () {
-                      print(
-                          "leave id: ${widget.data['id']}, status : reject");
-                      // bloc.respondLeaveRequest(
-                      //     "${widget.data.id}", 'reject');
-                    },
-                    color:  Colors.red,
-                    margin: EdgeInsets.zero,
-                    // loading: loading,
-                  ),
-                );
-              }),
-          const SizedBox(
-            width: 5,
-          ),
-        ],
-      )
-          : const SizedBox(),
     );
   }
 }
@@ -333,7 +267,6 @@ class IconTittle extends StatelessWidget {
       : super(key: key);
   final String tittle;
   final IconData icon;
-
   @override
   Widget build(BuildContext context) {
     return Container(

@@ -114,19 +114,19 @@ class LeaveBloc extends Bloc {
         return;
       }
       if(startDate.value==null) {
-        showMessage(const MessageType.success("Please enter date!"));
+        showMessage(const MessageType.info("Please enter date!"));
         return;
       }
       if(selectedDurationType.value==null) {
-        showMessage(const MessageType.success("Please select duration type!"));
+        showMessage(const MessageType.info("Please select duration type!"));
         return;
       }
       if(selectedLeaveCategory==null) {
-        showMessage(const MessageType.success("Please select leave category!"));
+        showMessage(const MessageType.info("Please select leave category!"));
         return;
       }
       if(selectedDurationType.value=="multiple" && endDate.value==null) {
-        showMessage(const MessageType.success("Please enter date!"));
+        showMessage(const MessageType.info("Please enter date!"));
         return;
       }
       requesting.value = true;

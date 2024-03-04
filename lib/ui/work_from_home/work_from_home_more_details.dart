@@ -31,7 +31,6 @@ class _WorkFromHomeMoreDetailPageState extends State<WorkFromHomeMoreDetailPage>
         bloc.getWorkFromHomeRecords();
       }
     });
-    // bloc.getLeaveCategory();
     bloc.getWorkFromHomeRecords();
   }
 
@@ -120,20 +119,6 @@ class _WorkFromHomeMoreDetailPageState extends State<WorkFromHomeMoreDetailPage>
                 ),
               ),
             ),
-            // Positioned(
-            //   top: 56,
-            //   right: 10,
-            //   child: GestureDetector(
-            //     onTap: () {
-            //       Navigator.of(context).push(MaterialPageRoute(builder: (context)=> const LeavePolicy()));
-            //     },
-            //     child: const CircleAvatar(
-            //       backgroundColor: Colors.white,
-            //       radius: 15,
-            //       child: Icon(Icons.question_mark, size: 18,),
-            //     ),
-            //   ),
-            // ),
             Column(
               children: [
                 const SizedBox(height: 100,),
@@ -231,7 +216,7 @@ class _WorkFromHomeMoreDetailPageState extends State<WorkFromHomeMoreDetailPage>
                                           return GestureDetector(
                                             onTap: (){
                                               // Navigator.of(context).push(MaterialPageRoute(builder: (context)=>LeavesDetail(data: leaves[i])));
-                                              Navigator.of(context).push(MaterialPageRoute(
+                                             var result = Navigator.of(context).push(MaterialPageRoute(
                                                 builder: (context) => Provider.value(
                                                   value: bloc,
                                                   child: WorkFromHomeDetail(data: workFromHomeData[i],responseButton: false,),
@@ -304,7 +289,8 @@ class _WorkFromHomeMoreDetailPageState extends State<WorkFromHomeMoreDetailPage>
                                                               fontWeight: FontWeight.w500,
                                                             ),),
                                                             const SizedBox(width: 5),
-                                                            if(workFromHomeData[i]['end_date']!=null) Row(
+                                                            workFromHomeData[i]['duration_type']=="multiple"?
+                                                            workFromHomeData[i]['end_date']!=null? Row(
                                                               children: [
                                                                 CircleAvatar(radius: 4, backgroundColor: Colors.grey[200]),
                                                                 const SizedBox(width: 5),
@@ -316,7 +302,8 @@ class _WorkFromHomeMoreDetailPageState extends State<WorkFromHomeMoreDetailPage>
                                                                   fontWeight: FontWeight.w500,
                                                                 ),),
                                                               ],
-                                                            ),
+                                                            )
+                                                           :Offstage():Offstage()
                                                           ],
                                                         ),
                                                       ],

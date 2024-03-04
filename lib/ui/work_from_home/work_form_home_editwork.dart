@@ -30,7 +30,7 @@ class _EditLeavePageState extends State<EditworkPage> {
 
   @override
   void initState() {
-    bloc = WorkFromHomeBloc(context.read<WorkFromHomeRepository>());
+    bloc = context.read<WorkFromHomeBloc>();
     super.initState();
     bloc.leaveEditController.stream.listen((event) {
       if (event == 'LEAVE_Edit') {
@@ -44,12 +44,8 @@ class _EditLeavePageState extends State<EditworkPage> {
     bloc.reasonTitleEdit.text = widget.data['reason_title'].toString();
     bloc.reasonEdit.text = widget.data['reason'].toString();
     bloc.selectedDurationType.value = widget.data['duration_type'];
-   // bloc.selectedLeaveCategory = widget.data['leaveType'];
     bloc.leaveId.value = widget.data['id'];
   }
-
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

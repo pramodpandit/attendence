@@ -90,19 +90,15 @@ class WorkFromHomeBloc extends Bloc {
         return;
       }
       if(startDate.value==null) {
-        showMessage(const MessageType.success("Please enter date!"));
+        showMessage(MessageType.info("Please enter date!"));
         return;
       }
-      if(selectedDurationType.value==null) {
-        showMessage(const MessageType.success("Please select duration type!"));
+      if(selectedDurationType.value==null){
+        showMessage(const MessageType.info("Please select duration type!"));
         return;
       }
-      // if(selectedLeaveCategory==null) {
-      //   showMessage(const MessageType.success("Please select leave category!"));
-      //   return;
-      // }
       if(selectedDurationType.value=="multiple" && endDate.value==null) {
-        showMessage(const MessageType.success("Please enter date!"));
+        showMessage(const MessageType.info("Please enter date!"));
         return;
       }
       requesting.value = true;
@@ -112,7 +108,6 @@ class WorkFromHomeBloc extends Bloc {
         startDate.value=null;
         endDate.value=null;
         selectedDurationType.value = null;
-        // selectedLeaveCategory = null;
         reasonTitle.clear();
         reason.clear();
         showMessage(const MessageType.success("WFH requested successfully!"));

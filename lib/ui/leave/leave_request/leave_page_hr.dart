@@ -43,45 +43,7 @@ class _LeavesRecordsPagehrState extends State<LeavesRecordsPagehr> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        // floatingActionButton: FloatingActionButton.extended(
-        //     onPressed: () {
-        //       Navigator.push(
-        //         context,
-        //         MaterialPageRoute(
-        //             builder: (_) => Provider.value(
-        //               value: bloc,
-        //               child: const ApplyLeavePage(),
-        //             )),
-        //       );
-        //     },
-        //     backgroundColor: const Color(0xFF253772),
-        //     label: AnimatedSwitcher(
-        //       duration: const Duration(seconds: 1),
-        //       transitionBuilder: (Widget child, Animation<double> animation) =>
-        //           FadeTransition(
-        //             opacity: animation,
-        //             child: SizeTransition(
-        //               sizeFactor: animation,
-        //               axis: Axis.horizontal,
-        //               child: child,
-        //             ),
-        //           ),
-        //       child: const Row(
-        //         children: [
-        //           Padding(
-        //             padding: EdgeInsets.only(right: 10.0),
-        //             child: Icon(
-        //               Icons.add,
-        //               color: Colors.white,
-        //             ),
-        //           ),
-        //           Text(
-        //             "Leave",
-        //             style: TextStyle(color: Colors.white),
-        //           )
-        //         ],
-        //       ),
-        //     )),
+
       body: Stack(
         children: [
           Container(
@@ -98,7 +60,7 @@ class _LeavesRecordsPagehrState extends State<LeavesRecordsPagehr> {
               children: [
                 SizedBox(height: 56,),
                 Text(
-                  "Leave Records",
+                  "Leave Request",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: Colors.white,
@@ -125,20 +87,7 @@ class _LeavesRecordsPagehrState extends State<LeavesRecordsPagehr> {
               ),
             ),
           ),
-          // Positioned(
-          //   top: 56,
-          //   right: 10,
-          //   child: GestureDetector(
-          //     onTap: () {
-          //       Navigator.of(context).push(MaterialPageRoute(builder: (context)=> const LeavePolicy()));
-          //     },
-          //     child: const CircleAvatar(
-          //       backgroundColor: Colors.white,
-          //       radius: 15,
-          //       child: Icon(Icons.question_mark, size: 18,),
-          //     ),
-          //   ),
-          // ),
+
           Column(
             children: [
               const SizedBox(height: 100,),
@@ -248,11 +197,6 @@ class _LeavesRecordsPagehrState extends State<LeavesRecordsPagehr> {
                                         margin: const EdgeInsets.symmetric(vertical: 5),
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(5),
-                                          // boxShadow: [
-                                          //   BoxShadow(
-                                          //     color: Colors.grey,
-                                          //   )
-                                          // ],
                                           border: Border.all(color: borderColor),
                                         ),
                                         child: Column(
@@ -340,7 +284,7 @@ class _LeavesRecordsPagehrState extends State<LeavesRecordsPagehr> {
                                                 color: Colors.grey[700],
                                               ),),
                                             ),
-                                                                                 ],
+                                          ],
                                         ),
                                       ),
                                     );

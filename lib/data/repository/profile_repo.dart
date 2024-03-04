@@ -49,7 +49,6 @@ class ProfileRepository {
     }
     List<dynamic> list = response['data1'] ?? [];
     print('response profile ${list}');
-
     List<User> user =
     list.map<User>((e) => User.fromJson(e)).toList();
     return ApiResponse2<List<User>>.fromJson(response, user);

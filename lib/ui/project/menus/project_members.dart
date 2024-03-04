@@ -64,43 +64,53 @@ class _ProjectMembersState extends State<ProjectMembers> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ListView.builder(
-                        itemCount: projectMember.length,
-                        padding: const EdgeInsets.only(top: 10),
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          var data  = projectMember[index];
-                          return GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => UserProfile(userid: data['user_id'],)));
-                            },
-                            child: Container(
-                              margin: const EdgeInsets.only(bottom: 20),
-                              child: Row(
-                                children: [
-                                  CircleAvatar(
-                                    backgroundImage:data['employee_img']==null?null:NetworkImage('https://freeze.talocare.co.in/public/${data['employee_img']}'),
-                                    child: data['employee_img']==null?Icon(Icons.person):Offstage(),
-                                  ),
-                                  SizedBox(width: 10),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "${data['first_name']??''} ${data['l_name']==null?data['m_name']??'':data['l_name']??''}",
-                                          style: TextStyle(fontWeight: FontWeight.bold,fontSize: 15),
-                                        ),
-                                      ],
+                      RefreshIndicator(
+                        displacement: 250,
+                        backgroundColor: Colors.yellow,
+                        color: Colors.red,
+                        strokeWidth: 3,
+                        triggerMode: RefreshIndicatorTriggerMode.onEdge,
+                        onRefresh: ()async {
+                          await Future.delayed(Duration(seconds: 5));
+                          },
+                        child: ListView.builder(
+                          itemCount: projectMember.length,
+                          padding: const EdgeInsets.only(top: 10),
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            var data  = projectMember[index];
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => UserProfile(userid: data['user_id'],)));
+                              },
+                              child: Container(
+                                margin: const EdgeInsets.only(bottom: 20),
+                                child: Row(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundImage:data['employee_img']==null?null:NetworkImage('https://freeze.talocare.co.in/public/${data['employee_img']}'),
+                                      child: data['employee_img']==null?Icon(Icons.person):Offstage(),
                                     ),
-                                  ),
-                                ],
+                                    SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "${data['first_name']??''} ${data['l_name']==null?data['m_name']??'':data['l_name']??''}",
+                                            style: TextStyle(fontWeight: FontWeight.bold,fontSize: 15),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          );
-                        },
+                            );
+                          },
+                        ),
                       ),
                     ],
                   ),

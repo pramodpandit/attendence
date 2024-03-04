@@ -47,17 +47,6 @@ class _EditLeavePageState extends State<EditLeavePage> {
     bloc.leaveId.value = widget.data.id;
     bloc.filepath.text =widget.data.document.toString();
   }
-  Future<void> _openImagePicker(ImageSource source) async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: source);
-    if (pickedFile != null) {
-      setState(() {
-        galleryFile = File(pickedFile.path);
-        bloc.image = galleryFile;
-        bloc.filepath.text = pickedFile.path.toString().split('/').last;
-      });
-    }
-  }
 
 
   @override

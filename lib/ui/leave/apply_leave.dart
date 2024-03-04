@@ -12,6 +12,8 @@ import 'package:office/ui/widget/app_text_field.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 
+import '../../utils/message_handler.dart';
+
 class ApplyLeavePage extends StatefulWidget {
   const ApplyLeavePage({Key? key}) : super(key: key);
 
@@ -28,19 +30,10 @@ class _ApplyLeavePageState extends State<ApplyLeavePage> {
   void initState() {
     bloc = context.read<LeaveBloc>();
     super.initState();
+    bloc.msgController!.stream.listen((event) {
+      AppMessageHandler().showSnackBar(context, event);
+    });
   }
-  Future<void> _openImagePicker(ImageSource source) async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: source);
-    if (pickedFile != null) {
-      setState(() {
-        galleryFile = File(pickedFile.path);
-        bloc.image = galleryFile;
-        bloc.filepath.text = pickedFile.path.toString().split('/').last;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -9,6 +9,8 @@ import 'package:office/ui/widget/app_dropdown.dart';
 import 'package:office/ui/widget/app_text_field.dart';
 import 'package:provider/provider.dart';
 
+import '../../utils/message_handler.dart';
+
 class ApplyWorkFromHome extends StatefulWidget {
   const ApplyWorkFromHome({Key? key}) : super(key: key);
 
@@ -24,7 +26,11 @@ class _ApplyWorkFromHomeState extends State<ApplyWorkFromHome> {
   void initState() {
     bloc = context.read<WorkFromHomeBloc>();
     super.initState();
+    bloc.msgController!.stream.listen((event) {
+      AppMessageHandler().showSnackBar(context, event);
+    });
   }
+
 
   @override
   Widget build(BuildContext context) {

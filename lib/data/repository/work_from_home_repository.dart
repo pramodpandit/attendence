@@ -67,7 +67,7 @@ class WorkFromHomeRepository {
     Map<String, dynamic> data = {
       "id":id,
       "user_id": _pref.getString('uid'),
-      "title": title,
+      "reason_title": title,
       "reason": description,
       "start_date": DateFormat("yyyy-MM-dd").format(startDate),
       "duration_type": durationType,
