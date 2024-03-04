@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:office/bloc/bloc.dart';
 import 'package:office/data/repository/post_repo.dart';
 import 'package:office/ui/widget/top_snackbar/top_snack_bar.dart';
@@ -73,6 +74,21 @@ class PostBloc extends Bloc {
       print(s);
     }finally{
       isUserDetailLoad.value = false;
+    }
+  }
+  
+  likePost(String postId,String like)async{
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    Map<String,dynamic> data = {
+      "post_id" : postId,
+      "user_id" : pref.getString("uid"),
+      "user_post_like" : like,
+    };
+    try{
+      var result = await _repo.likePostApi(data);
+      print(result);
+    }catch(e){
+      print(e);
     }
   }
 }

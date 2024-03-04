@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:office/bloc/post_bloc.dart';
 import 'package:office/ui/widget/comment_sheet.dart';
 import 'package:office/ui/widget/like_sheet.dart';
 
@@ -7,8 +8,9 @@ import '../../data/model/community_list.dart';
 
 class LikeShareComment extends StatefulWidget {
   final Data data;
+  final PostBloc bloc;
 
-  const LikeShareComment({super.key, required this.data});
+  const LikeShareComment({super.key, required this.data, required this.bloc});
 
   @override
   State<LikeShareComment> createState() => _LikeShareCommentState();
@@ -31,6 +33,7 @@ class _LikeShareCommentState extends State<LikeShareComment> {
                 return GestureDetector(
                   onTap: () {
                     isLike.value = !isLike.value;
+                    widget.bloc.likePost(widget.data.id.toString(),isLike.value ? "1": "0");
                   },
                   child: Icon(
                     liked ? Icons.favorite : Icons.favorite_border,

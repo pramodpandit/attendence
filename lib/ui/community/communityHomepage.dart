@@ -30,16 +30,16 @@ class _CommunityHomePageState extends State<CommunityHomePage> {
 
   bool _isLoadMoreRunning = false;
 
-  late PostBloc block;
+  late PostBloc bloc;
   @override
   void initState() {
     // TODO: implement initState
-    block = PostBloc(context.read<PostRepository>(), context.read<CommunityRepositary>()  );
+    bloc = PostBloc(context.read<PostRepository>(), context.read<CommunityRepositary>()  );
     super.initState();
-    block.fetchPostData();
+    bloc.fetchPostData();
     _scrollController.addListener(_loadMoreData);
-    block.fetchPostData();
-    block.deleteStream.stream.listen((event) {
+    bloc.fetchPostData();
+    bloc.deleteStream.stream.listen((event) {
       if (event == 'Post') {
       setState(() {
       });
@@ -49,7 +49,7 @@ class _CommunityHomePageState extends State<CommunityHomePage> {
   @override
   void dispose() {
     _scrollController.dispose();
-    block.postStream.close();
+    bloc.postStream.close();
     super.dispose();
   }
 
@@ -109,7 +109,7 @@ class _CommunityHomePageState extends State<CommunityHomePage> {
                         context,
                         MaterialPageRoute(
                           builder: (_) => Provider.value(
-                            value: block,
+                            value: bloc,
                             child: const AddPost(),
                           ),
                         ),
@@ -153,7 +153,7 @@ class _CommunityHomePageState extends State<CommunityHomePage> {
             ),
             Expanded(
               child: ValueListenableBuilder(
-                  valueListenable: block.isUserDetailLoad,
+                  valueListenable: bloc.isUserDetailLoad,
                   builder: (BuildContext context,bool isLoading,Widget? child){
                   if(isLoading){
                   return const Center(
@@ -189,27 +189,27 @@ class PostList extends StatefulWidget {
 }
 
 class _PostListState extends State<PostList> {
-  late PostBloc block;
+  late PostBloc bloc;
   @override
   void initState() {
     // TODO: implement initState
-    block = PostBloc(context.read<PostRepository>(), context.read<CommunityRepositary>()  );
+    bloc = PostBloc(context.read<PostRepository>(), context.read<CommunityRepositary>()  );
     super.initState();
-    block.deleteStream.stream.listen((event) {
+    bloc.deleteStream.stream.listen((event) {
       if (event == 'Post') {
         setState(() {
         });
       }
     });
 
-    block.fetchPostData();
+    bloc.fetchPostData();
   }
 
   @override
   Widget build(BuildContext context) {
     ValueNotifier<bool> isLike = ValueNotifier(false);
     return  ValueListenableBuilder(
-        valueListenable: block.isUserDetailLoad,
+        valueListenable: bloc.isUserDetailLoad,
         builder: (BuildContext context,bool isLoading,Widget? child){
           if(isLoading){
             return const Center(
@@ -220,7 +220,7 @@ class _PostListState extends State<PostList> {
             height: MediaQuery.of(context).size.height,
             child: Column(
               children: [
-                block.feedbackData.isEmpty?
+                bloc.feedbackData.isEmpty?
                     Column(
                       children: [
                         200.height,
@@ -231,9 +231,9 @@ class _PostListState extends State<PostList> {
                   child:
                   ListView.builder(
                       scrollDirection: Axis.vertical,
-                      itemCount: block.feedbackData.length,
+                      itemCount: bloc.feedbackData.length,
                       itemBuilder: (context, index){
-                        var data  = block.feedbackData[index];
+                        var data  = bloc.feedbackData[index];
                         var date = data.dateTime!.split(' ');
                         var date1 = date[0] ;
                         return Container(
@@ -304,10 +304,10 @@ class _PostListState extends State<PostList> {
                                               ctx: context,
                                               deleteOnTap: () {
                                                 Navigator.pop(context);
-                                                var result= block.DeletePost(data.postId!);
+                                                var result= bloc.DeletePost(data.postId!);
                                                 if(result !=null){
                                                   print(result.toString());
-                                                  block.feedbackData.remove(data);
+                                                  bloc.feedbackData.remove(data);
                                                 }
                                               },
                                               icons: [
@@ -391,7 +391,7 @@ class _PostListState extends State<PostList> {
                               const SizedBox(
                                 height: 10,
                               ),
-                              LikeShareComment(data: data,)
+                              LikeShareComment(data: data,bloc: bloc)
                               // Row(
                               //   children: [
                               //     ValueListenableBuilder(
