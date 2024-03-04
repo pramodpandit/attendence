@@ -26,33 +26,19 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   late AttendanceBloc attendanceBloc;
   int month = DateTime.now().month;
   var value;
-  var condition;
   int? selectedYear;
 
   @override
   void initState() {
     attendanceBloc = AttendanceBloc(context.read<AttendanceRepository>());
     super.initState();
+    attendanceBloc.getAttendanceType();
     attendanceBloc.fetchAttendanceData();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: MyAppBar(
-      //   title: 'Attendance',
-      //   actions: [
-      //     Padding(
-      //       padding: EdgeInsets.only(right: 10.0),
-      //       child: GestureDetector(
-      //           onTap: () {
-      //             Navigator.of(context).push(MaterialPageRoute(
-      //                 builder: (context) => AttendancePolicyScreen()));
-      //           },
-      //           child: Icon(Icons.question_mark)),
-      //     )
-      //   ],
-      // ),
       body: Stack(
         children: [
           Container(
@@ -111,40 +97,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           ),
           Column(
             children: [
-              const SizedBox(height: 110,),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  InkWell(
-                    onTap: (){
-                      setState(() {
-                        condition = '2';
-                      });
-                    },
-                    child: Container(
-                        height: 40,
-                        width: 40,
-                        child: Image.asset('images/img.png',fit: BoxFit.cover,)),
-                  ),
-                  InkWell(
-                    onTap: (){
-                      setState(() {
-                        condition = '1';
-                      });
-                    },
-                    child: Container(
-                        height: 22,
-                        width: 22,
-                        child: Image.asset('images/img_1.png',height: 30,width: 30,)),
-                  ),
-                  SizedBox(width: 20,)
-                ],
-              ),
+              const SizedBox(height: 120,),
 
               Expanded(
                 child: Column(
                   children: [
-                    condition =='1'?
+                    // condition =='1'?
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.end,
@@ -382,128 +340,128 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                           ],
                         ),
                       ],
-                    )
-                        :condition =='2'?
-                    ValueListenableBuilder(
-                      valueListenable: attendanceBloc.calendar,
-                      builder: (context, calendarFormatValue, child) {
-                        return ValueListenableBuilder(
-                          valueListenable: attendanceBloc.allAttendanceData,
-                          builder: (BuildContext context, value, Widget? child) {
-                            Map<DateTime, List<dynamic>> eventsList = {};
-                            final events = LinkedHashMap(
-                              equals: isSameDay,
-                            )..addAll(eventsList);
-                            List _getEventsForDay(DateTime day) {
-                              return events[day] ?? [];
-                            }
-                            print("focusDay1 ${attendanceBloc.focusDay}");
-                           return TableCalendar(
-                              eventLoader: (day) {
-                              return _getEventsForDay(day);
-                              },
-                              firstDay: DateTime.utc(DateTime.now().year, 01, 01),
-                              lastDay: DateTime.utc(DateTime.now().year, 12, 31),
-                              focusedDay: attendanceBloc.focusDay,
-                              currentDay: attendanceBloc.focusDay/*DateTime.now()*/,
-                              headerStyle: const HeaderStyle(
-                                formatButtonVisible: false,
-                              ),
-                              calendarStyle: const CalendarStyle(
-                                weekendTextStyle: TextStyle(color: Colors.red),
-                              ),
-                              daysOfWeekStyle: const DaysOfWeekStyle(
-                                weekendStyle: TextStyle(color: Colors.red),
-                              ),
-                              startingDayOfWeek: StartingDayOfWeek.monday,
-                              calendarFormat: calendarFormatValue,
-                              onPageChanged: (focusedDay) {
-                                if(focusedDay.month != month){
-                                  print(attendanceBloc.focusDay);
-                                  month = focusedDay.month;
-                                  attendanceBloc.focusDay = focusedDay;
-                                }
-                              },
-                              onFormatChanged: (format) {
-                                if (value != format) {
-                                  attendanceBloc.calendar.value = format;
-                                }
-                              },
-                             onDaySelected: (selectedDay, focusedDay) {
-                                print("Selected Day: $selectedDay");
-                               setState(() {
-                                 attendanceBloc.focusDay = selectedDay;
-                               });
-                             },
-                              availableCalendarFormats: const {
-                                CalendarFormat.month: 'Month',
-                                CalendarFormat.week: 'Weeks',
-                              },
-                            );
-                          },
-                        );
-                      },
-                    ):
-                    ValueListenableBuilder(
-                      valueListenable: attendanceBloc.calendar,
-                      builder: (context, calendarFormatValue, child) {
-                        return ValueListenableBuilder(
-                          valueListenable: attendanceBloc.allAttendanceData,
-                          builder: (BuildContext context, value, Widget? child) {
-                            Map<DateTime, List<dynamic>> eventsList = {};
-                            final events = LinkedHashMap(
-                              equals: isSameDay,
-                            )..addAll(eventsList);
-                            List _getEventsForDay(DateTime day) {
-                              return events[day] ?? [];
-                            }
-                            print("focusDay1 ${attendanceBloc.focusDay}");
-                            return TableCalendar(
-                              eventLoader: (day) {
-                                return _getEventsForDay(day);
-                              },
-                              firstDay: DateTime.utc(DateTime.now().year, 01, 01),
-                              lastDay: DateTime.utc(DateTime.now().year, 12, 31),
-                              focusedDay: attendanceBloc.focusDay,
-                              currentDay: attendanceBloc.focusDay/*DateTime.now()*/,
-                              headerStyle: const HeaderStyle(
-                                formatButtonVisible: false,
-                              ),
-                              calendarStyle: const CalendarStyle(
-                                weekendTextStyle: TextStyle(color: Colors.red),
-                              ),
-                              daysOfWeekStyle: const DaysOfWeekStyle(
-                                weekendStyle: TextStyle(color: Colors.red),
-                              ),
-                              startingDayOfWeek: StartingDayOfWeek.monday,
-                              calendarFormat: calendarFormatValue,
-                              onPageChanged: (focusedDay) {
-                                if(focusedDay.month != month){
-                                  print(attendanceBloc.focusDay);
-                                  month = focusedDay.month;
-                                  attendanceBloc.focusDay = focusedDay;
-                                }
-                              },
-                              onFormatChanged: (format) {
-                                if (value != format) {
-                                  attendanceBloc.calendar.value = format;
-                                }
-                              },
-                              onDaySelected: (selectedDay, focusedDay) {
-                                print("Selected Day: $selectedDay");
-                                setState(() {
-                                  attendanceBloc.focusDay = selectedDay;
-                                });
-                              },
-                              availableCalendarFormats: const {
-                                CalendarFormat.month: 'Month',
-                                CalendarFormat.week: 'Weeks',
-                              },
-                            );
-                          },
-                        );
-                      },
                     ),
+                        // :condition =='2'?
+                    // ValueListenableBuilder(
+                    //   valueListenable: attendanceBloc.calendar,
+                    //   builder: (context, calendarFormatValue, child) {
+                    //     return ValueListenableBuilder(
+                    //       valueListenable: attendanceBloc.allAttendanceData,
+                    //       builder: (BuildContext context, value, Widget? child) {
+                    //         Map<DateTime, List<dynamic>> eventsList = {};
+                    //         final events = LinkedHashMap(
+                    //           equals: isSameDay,
+                    //         )..addAll(eventsList);
+                    //         List _getEventsForDay(DateTime day) {
+                    //           return events[day] ?? [];
+                    //         }
+                    //         print("focusDay1 ${attendanceBloc.focusDay}");
+                    //        return TableCalendar(
+                    //           eventLoader: (day) {
+                    //           return _getEventsForDay(day);
+                    //           },
+                    //           firstDay: DateTime.utc(DateTime.now().year, 01, 01),
+                    //           lastDay: DateTime.utc(DateTime.now().year, 12, 31),
+                    //           focusedDay: attendanceBloc.focusDay,
+                    //           currentDay: attendanceBloc.focusDay/*DateTime.now()*/,
+                    //           headerStyle: const HeaderStyle(
+                    //             formatButtonVisible: false,
+                    //           ),
+                    //           calendarStyle: const CalendarStyle(
+                    //             weekendTextStyle: TextStyle(color: Colors.red),
+                    //           ),
+                    //           daysOfWeekStyle: const DaysOfWeekStyle(
+                    //             weekendStyle: TextStyle(color: Colors.red),
+                    //           ),
+                    //           startingDayOfWeek: StartingDayOfWeek.monday,
+                    //           calendarFormat: calendarFormatValue,
+                    //           onPageChanged: (focusedDay) {
+                    //             if(focusedDay.month != month){
+                    //               print(attendanceBloc.focusDay);
+                    //               month = focusedDay.month;
+                    //               attendanceBloc.focusDay = focusedDay;
+                    //             }
+                    //           },
+                    //           onFormatChanged: (format) {
+                    //             if (value != format) {
+                    //               attendanceBloc.calendar.value = format;
+                    //             }
+                    //           },
+                    //          onDaySelected: (selectedDay, focusedDay) {
+                    //             print("Selected Day: $selectedDay");
+                    //            setState(() {
+                    //              attendanceBloc.focusDay = selectedDay;
+                    //            });
+                    //          },
+                    //           availableCalendarFormats: const {
+                    //             CalendarFormat.month: 'Month',
+                    //             CalendarFormat.week: 'Weeks',
+                    //           },
+                    //         );
+                    //       },
+                    //     );
+                    //   },
+                    // ):
+                    // ValueListenableBuilder(
+                    //   valueListenable: attendanceBloc.calendar,
+                    //   builder: (context, calendarFormatValue, child) {
+                    //     return ValueListenableBuilder(
+                    //       valueListenable: attendanceBloc.allAttendanceData,
+                    //       builder: (BuildContext context, value, Widget? child) {
+                    //         Map<DateTime, List<dynamic>> eventsList = {};
+                    //         final events = LinkedHashMap(
+                    //           equals: isSameDay,
+                    //         )..addAll(eventsList);
+                    //         List _getEventsForDay(DateTime day) {
+                    //           return events[day] ?? [];
+                    //         }
+                    //         print("focusDay1 ${attendanceBloc.focusDay}");
+                    //         return TableCalendar(
+                    //           eventLoader: (day) {
+                    //             return _getEventsForDay(day);
+                    //           },
+                    //           firstDay: DateTime.utc(DateTime.now().year, 01, 01),
+                    //           lastDay: DateTime.utc(DateTime.now().year, 12, 31),
+                    //           focusedDay: attendanceBloc.focusDay,
+                    //           currentDay: attendanceBloc.focusDay/*DateTime.now()*/,
+                    //           headerStyle: const HeaderStyle(
+                    //             formatButtonVisible: false,
+                    //           ),
+                    //           calendarStyle: const CalendarStyle(
+                    //             weekendTextStyle: TextStyle(color: Colors.red),
+                    //           ),
+                    //           daysOfWeekStyle: const DaysOfWeekStyle(
+                    //             weekendStyle: TextStyle(color: Colors.red),
+                    //           ),
+                    //           startingDayOfWeek: StartingDayOfWeek.monday,
+                    //           calendarFormat: calendarFormatValue,
+                    //           onPageChanged: (focusedDay) {
+                    //             if(focusedDay.month != month){
+                    //               print(attendanceBloc.focusDay);
+                    //               month = focusedDay.month;
+                    //               attendanceBloc.focusDay = focusedDay;
+                    //             }
+                    //           },
+                    //           onFormatChanged: (format) {
+                    //             if (value != format) {
+                    //               attendanceBloc.calendar.value = format;
+                    //             }
+                    //           },
+                    //           onDaySelected: (selectedDay, focusedDay) {
+                    //             print("Selected Day: $selectedDay");
+                    //             setState(() {
+                    //               attendanceBloc.focusDay = selectedDay;
+                    //             });
+                    //           },
+                    //           availableCalendarFormats: const {
+                    //             CalendarFormat.month: 'Month',
+                    //             CalendarFormat.week: 'Weeks',
+                    //           },
+                    //         );
+                    //       },
+                    //     );
+                    //   },
+                    // ),
                     SizedBox(height: 20,),
                     Expanded(
                       child:
@@ -523,17 +481,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                         child: CircularProgressIndicator(),
                                       );
                                     }
-                                    // if(attendance.isEmpty){
-                                    //   return Center(
-                                    //     child: Text(
-                                    //       "No Data Found",
-                                    //       style: TextStyle(
-                                    //         fontWeight: FontWeight.w600,
-                                    //         fontSize: 18,
-                                    //       ),
-                                    //     ),
-                                    //   );
-                                    // }
                                     return Column(
                                       children: [
                                         Container(
@@ -567,7 +514,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                                   Icon(PhosphorIcons.arrow_down,size: 15,color: Colors.red,)
                                                 ],
                                               ),
-                                              Text('Working Hour' ,style: TextStyle(fontSize: 12),),
                                               Text('Status' ,style: TextStyle(fontSize: 12),),
                                             ],
                                           )
@@ -577,19 +523,28 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                             valueListenable: attendanceBloc.allAttendanceData,
                                             builder: (context, allData, child) {
                                               if(allData == null){
-                                                return Center(child: CircularProgressIndicator(strokeWidth: 2,));
+                                                return Center(child: CircularProgressIndicator(strokeWidth: 3,));
                                               }
                                               if(allData.isEmpty){
                                                 return Center(child: Text("No data available"));
                                               }
-                                            return ListView.builder(
-                                              physics: const ScrollPhysics(),
-                                              itemCount: allData.length,
-                                              // attendance.length,
-                                              itemBuilder: (_, index) {
-                                                return AttendanceList(data: allData[index]);
-                                              },
-                                            );
+                                            return ValueListenableBuilder(
+                                              valueListenable: attendanceBloc.allAttendanceType,
+                                              builder: (context, allAttendanceType, child) {
+                                                if(allAttendanceType == null){
+                                                  return Center(child: CircularProgressIndicator(strokeWidth: 3,));
+                                                }
+                                              return ListView.builder(
+                                                physics: const ScrollPhysics(),
+                                                itemCount: allData.length,
+                                                // attendance.length,
+                                                itemBuilder: (_, index) {
+                                                  Map<String,dynamic> attendanceType = allAttendanceType.where((element) => element['short_name'] == allData[index]['status']).toList()[0];
+                                                  print("the attendance is : $attendanceType");
+                                                  return AttendanceList(data: allData[index],attendanceTypeData : attendanceType);
+                                                },
+                                              );
+                                            },);
                                           },),
                                         ),
                                       ],
@@ -614,7 +569,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
 class AttendanceList extends StatelessWidget {
   final Map data;
-  const AttendanceList({super.key,required this.data});
+  final Map attendanceTypeData;
+  const AttendanceList({super.key,required this.data, required this.attendanceTypeData});
 
   String calculateTimeGap() {
     if(data["check_in"]!=null && data["checkout"] != null){
@@ -673,10 +629,6 @@ class AttendanceList extends StatelessWidget {
                   ),
                 ],
               ),
-              // const SizedBox(height: 30, child: VerticalDivider()),
-              // const SizedBox(
-              //   width: 10,
-              // ),
               Text(
                 // data[index].reason ??
                 data["check_in"]!=null?DateFormat("h:mm a").format(DateTime.parse(data["check_in"])):"",
@@ -693,29 +645,32 @@ class AttendanceList extends StatelessWidget {
                   fontSize: 14,
                 ),
               ),
-               Text(
-                // data[index].reason ??
-                 calculateTimeGap(),
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                ),
-              ),
+              //  Text(
+              //   // data[index].reason ??
+              //    calculateTimeGap(),
+              //   style: const TextStyle(
+              //     fontWeight: FontWeight.w600,
+              //     fontSize: 14,
+              //   ),
+              // ),
                Container(
+                 height: 40,
+                width: 40,
                 padding: EdgeInsets.all(5),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(2)
+                  shape: BoxShape.circle,
+                  color: Color(int.parse("0xFF${attendanceTypeData['color_code'].toString().splitAfter("#")}")),
                 ),
-                 child: Text(
-                  // data[index].reason ??
-                  data["status_type"].toString().capitalizeFirstLetter(),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                    color: Colors.green
-                  ),
-                             ),
+                 child: Center(
+                   child: Text(
+                    data["status"].toString().capitalizeFirstLetter(),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      color: Colors.white
+                    ),
+                   ),
+                 ),
                ),
             ],
           )),

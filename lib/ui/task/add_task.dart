@@ -215,6 +215,41 @@ class _addTask extends State<addTask> {
                                       hintText: "Select",
                                     );
                                   },),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 10),
+                                  child: Row(
+                                    children: [
+                                      Text("Helper", style: TextStyle(fontSize: 13)),
+                                      Text("*", style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                ValueListenableBuilder(
+                                  valueListenable: bloc.allEmployeesData,
+                                  builder: (context, allEmployeesData, child) {
+                                    if(allEmployeesData == null){
+                                      return AppDropdown(
+                                        items: const [],
+                                        onChanged: (value) {
+                                          bloc.helper.value = value.toString();
+                                        },
+                                        value: null,
+                                        hintText: "Select",
+                                      );
+                                    }
+                                    return AppDropdown(
+                                      items: allEmployeesData.map((e) => DropdownMenuItem(value: e['id'].toString(),child: Text(e['user_details']['name'].toString()),)).toList(),
+                                      onChanged: (value) {
+                                        bloc.helper.value = value.toString();
+                                      },
+                                      value: bloc.helper.value,
+                                      hintText: "Select",
+                                    );
+                                  },),
                               ],
                             );
                           },),
@@ -674,7 +709,7 @@ class _addTask extends State<addTask> {
                             title: "Submit",
                             onTap: () {
                               if (formKey.currentState!.validate()) {
-                                bloc.addTask();
+                                bloc.addTask(context);
                               }
                             },
                             margin: EdgeInsets.zero,

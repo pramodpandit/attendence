@@ -12,6 +12,11 @@ class AttendanceRepository {
 
   AttendanceRepository(this.prefs, this._api);
 
+  Future<List> fetchAttendanceTypeList ()async{
+    var response=await _api.getRequest("attendence/get_attendence_type");
+    List<dynamic> list = response["data"] ?? [];
+    return list;
+  }
   Future<List> attendanceList (String month,String year)async{
     var response=await _api.postRequest("attendence_record", {
       "user_id":prefs.getString('uid'),

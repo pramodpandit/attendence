@@ -638,6 +638,18 @@ TextEditingController cp_location = TextEditingController();
       print(s);
     }
   }
+  getSpecificEmployeeDetails(String branchId) async{
+    try{
+      var result = await _repo.fetchSpecificEmployeeList(branchId);
+      if(result.status && result.data != null){
+        specificEmployeeData.value = result.data;
+        print("specific data : ${specificEmployeeData.value}");
+      }
+    }catch (e, s) {
+      print(e);
+      print(s);
+    }
+  }
   getProjectCodeByProjectType(String projectTypeId) async{
     try{
       var result = await _repo.fetchProjectCodeByType(projectTypeId);

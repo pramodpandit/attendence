@@ -478,6 +478,15 @@ class LeadsRepository {
     }
     return ApiResponse2.fromJson(response,response['data1']);
   }
+  Future<ApiResponse2> fetchSpecificEmployeeList(String branchId) async{
+    var response= await _api.postRequest("project/get-mamber", {
+      "branch_id" : branchId,
+    });
+    if(response==null){
+      throw ApiException.fromString("response null");
+    }
+    return ApiResponse2.fromJson(response,response['data']);
+  }
   Future<ApiResponse2> fetchProjectCodeByType(String projectTypeId) async{
     var response= await _api.postRequest("project/type-project",{
       "projectType_id" : projectTypeId,

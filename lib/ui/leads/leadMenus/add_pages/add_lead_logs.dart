@@ -238,7 +238,8 @@ class _AddLeadLogsState extends State<AddLeadLogs> {
                                                   items: allBranchData.map((e) => DropdownMenuItem<String>(value: e['id'].toString(),child: Text(e['title']),)).toList(),
                                                   onChanged: (value) {
                                                     widget.bloc.branchId.value = value;
-                                                    widget.bloc.specificEmployeeData.value = widget.bloc.allEmployeeData.value!.where((element) => element['branch_id'].toString() == value.toString()).toList();
+                                                    widget.bloc.specificEmployeeData.value = null;
+                                                    widget.bloc.getSpecificEmployeeDetails(value.toString());
                                                   },
                                                   value: widget.bloc.branchId.value,
                                                   hintText: "Branch",
@@ -268,7 +269,7 @@ class _AddLeadLogsState extends State<AddLeadLogs> {
                                                       onOptionSelected: (selectedOptions) {
                                                         widget.bloc.employeeId.value = selectedOptions.map((e) => e.value).toList().join(",");
                                                       },
-                                                      options: specificEmployeeData.map((e) => ValueItem<String>(value: e['id'].toString(),label: "${e['first_name'] ?? ''} ${e['middle_name'] ?? ''} ${e['last_name'] ?? ''}",)).toList()
+                                                      options: specificEmployeeData.map((e) => ValueItem<String>(value: e['id'].toString(),label: e['text'].toString(),)).toList()
                                                   );
                                                 },)
                                             ],

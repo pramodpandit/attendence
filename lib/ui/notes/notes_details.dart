@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:office/bloc/notes_bloc.dart';
 import 'package:office/data/model/notes_model.dart';
@@ -43,140 +44,167 @@ class _NotesDetailsState extends State<NotesDetails> {
         return false;
       },
       child: Scaffold(
-        appBar: AppBar(
-          leading: GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-                bloc.descriptionController.clear();
-                bloc.tittleController.clear();
-                bloc.fetchNotesList();
-              },
-              child: const Icon(
-                PhosphorIcons.caret_left_bold,
-                color: Colors.black,
-              )),
-        ),
         body: SingleChildScrollView(
-          child: Form(
-            key: formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(left: 20, right: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Notes",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 20,
-                            letterSpacing: 0.5,
-                            color: Colors.black),
+          child: Column(
+            children: [
+              Stack(
+                children: [
+                  Container(
+                    height: 100,
+                    width: 1.sw,
+                    decoration: const BoxDecoration(
+                        color: Color(0xFF009FE3),
+                        borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(20),
+                            bottomRight: Radius.circular(20))
+                    ),
+                    child: const Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(height: 56,),
+                        Text(
+                          "Notes",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    top: 56,
+                    left: 10,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: const CircleAvatar(
+                        backgroundColor: Colors.white,
+                        radius: 15,
+                        child: Icon(Icons.arrow_back, size: 18,),
                       ),
-                      const SizedBox(
-                        height: 50,
-                      ),
-                      if(widget.data!=null)Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                    ),
+                  ),
+                ],
+              ),
+              Form(
+                key: formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(left: 20, right: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Flexible(
-                            child: Text(
-                              "Created By:${widget.data?.fName??""} ${widget.data?.mName??" "} ${widget.data?.lName??""}",
-                              style: const TextStyle(
-                                  color: Colors.black54, fontSize: 10),
-                            ),
+
+                          const SizedBox(
+                            height: 50,
+                          ),
+                          if(widget.data!=null)Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  "Created By:${widget.data?.fName??""} ${widget.data?.mName??" "} ${widget.data?.lName??""}",
+                                  style: const TextStyle(
+                                      color: Colors.black54, fontSize: 10),
+                                ),
+                              )
+                            ],
+                          ),
+                          ValueListenableBuilder(
+                            valueListenable: readonlyValue,
+                            builder: (context,bool isTrue,_) {
+                              return TextFormField(
+                                keyboardType: TextInputType.multiline,
+                                maxLines: null,
+                                readOnly: widget.data==null?false:isTrue,
+                                style: const TextStyle(color: Colors.black,fontWeight: FontWeight.w700,),
+                                controller: bloc.tittleController,
+                                decoration: const InputDecoration(
+                                  // filled: true,
+                                  fillColor: Color(0xffffffff),
+                                  focusedBorder: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  hintText: "Title",
+                                  focusColor: Colors.white,
+                                  counterStyle: TextStyle(color: Colors.white),
+                                  hintStyle: TextStyle(
+                                      color: Color(0xff777777),
+                                      fontWeight: FontWeight.w700,
+                                      fontFamily: "Poppins"),
+                                ),
+                                textAlign: TextAlign.left,
+                                validator: (value) {
+                                  if (value.toString().isEmpty) {
+                                    return "Title is required";
+                                  }
+                                  return null;
+                                },
+                                onTap: () {},
+                              );
+                            }
+                          ),
+                          Text(
+                            widget.data==null?"${DateFormat.yMMMMd().format(DateTime.now())}":"${widget.data?.updatedAt!=null?DateFormat.yMMMMd().format(DateTime.parse(widget.data?.updatedAt.toString()?? "")):""}",
+                            textAlign: TextAlign.start,
+                            style:
+                                const TextStyle(color: Colors.black54, fontSize: 8),
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          ValueListenableBuilder(
+                            valueListenable: readonlyValue,
+                            builder: (context,bool isTrue,_) {
+                              return TextFormField(
+                                keyboardType: TextInputType.multiline,
+                                maxLines: null,
+                                readOnly: widget.data==null?false:isTrue,
+                                controller: bloc.descriptionController,
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 13,
+                                    color: Colors.black54),
+                                decoration: const InputDecoration(
+                                  // filled: true,
+                                  fillColor: Color(0xffffffff),
+                                  focusedBorder: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  hintText: "Description",
+                                  focusColor: Colors.white,
+                                  counterStyle: TextStyle(color: Colors.white),
+                                  hintStyle: TextStyle(
+                                      color: Color(0xff777777),
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 13,
+                                      fontFamily: "Poppins"),
+                                ),
+                                validator: (value) {
+                                  if (value.toString().isEmpty) {
+                                    return "Title is required";
+                                  }
+                                  return null;
+                                },
+                                onTap: () {},
+                              );
+                            }
+                          ),
+                          const SizedBox(
+                            height: 15,
                           )
                         ],
                       ),
-                      ValueListenableBuilder(
-                        valueListenable: readonlyValue,
-                        builder: (context,bool isTrue,_) {
-                          return TextFormField(
-                            keyboardType: TextInputType.multiline,
-                            maxLines: null,
-                            readOnly: widget.data==null?false:isTrue,
-                            style: const TextStyle(color: Colors.black,fontWeight: FontWeight.w700,),
-                            controller: bloc.tittleController,
-                            decoration: const InputDecoration(
-                              // filled: true,
-                              fillColor: Color(0xffffffff),
-                              focusedBorder: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              hintText: "Title",
-                              focusColor: Colors.white,
-                              counterStyle: TextStyle(color: Colors.white),
-                              hintStyle: TextStyle(
-                                  color: Color(0xff777777),
-                                  fontWeight: FontWeight.w700,
-                                  fontFamily: "Poppins"),
-                            ),
-                            textAlign: TextAlign.left,
-                            validator: (value) {
-                              if (value.toString().isEmpty) {
-                                return "Title is required";
-                              }
-                              return null;
-                            },
-                            onTap: () {},
-                          );
-                        }
-                      ),
-                      Text(
-                        widget.data==null?"${DateFormat.yMMMMd().format(DateTime.now())}":"${widget.data?.updatedAt!=null?DateFormat.yMMMMd().format(DateTime.parse(widget.data?.updatedAt.toString()?? "")):""}",
-                        textAlign: TextAlign.start,
-                        style:
-                            const TextStyle(color: Colors.black54, fontSize: 8),
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      ValueListenableBuilder(
-                        valueListenable: readonlyValue,
-                        builder: (context,bool isTrue,_) {
-                          return TextFormField(
-                            keyboardType: TextInputType.multiline,
-                            maxLines: null,
-                            readOnly: widget.data==null?false:isTrue,
-                            controller: bloc.descriptionController,
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 13,
-                                color: Colors.black54),
-                            decoration: const InputDecoration(
-                              // filled: true,
-                              fillColor: Color(0xffffffff),
-                              focusedBorder: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              hintText: "Description",
-                              focusColor: Colors.white,
-                              counterStyle: TextStyle(color: Colors.white),
-                              hintStyle: TextStyle(
-                                  color: Color(0xff777777),
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 13,
-                                  fontFamily: "Poppins"),
-                            ),
-                            validator: (value) {
-                              if (value.toString().isEmpty) {
-                                return "Title is required";
-                              }
-                              return null;
-                            },
-                            onTap: () {},
-                          );
-                        }
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      )
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
           floatingActionButton:Column(
