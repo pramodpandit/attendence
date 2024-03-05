@@ -6,11 +6,11 @@ import 'package:office/bloc/water_bloc.dart';
 import 'package:office/data/model/water_model.dart';
 import 'package:office/ui/water/water_list.dart';
 import 'package:provider/provider.dart';
-
 import '../../data/model/water_type_model.dart';
 import '../../data/repository/water_repo.dart';
 import '../../utils/message_handler.dart';
 import '../widget/app_button.dart';
+import '../widget/app_dropdown.dart';
 import '../widget/app_text_field.dart';
 
 class AddWater extends StatefulWidget {
@@ -34,6 +34,7 @@ class _AddWaterState extends State<AddWater> {
     });
     waterBloc.fetchWaterType();
     waterBloc.fetchWaterDaily();
+    waterBloc.fetchDailyActiviy();
   }
   @override
   Widget build(BuildContext context) {
@@ -145,6 +146,46 @@ class _AddWaterState extends State<AddWater> {
                               );
                             }
                           ),
+                          const Padding(
+                            padding: EdgeInsets.only(left: 1),
+                            child: Row(
+                              children: [
+                                Text("Branch", style: TextStyle(fontSize: 13,fontWeight: FontWeight.w500)),
+                                Text("*", style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 10,),
+                          ValueListenableBuilder(
+                            valueListenable: waterBloc.getbranchName,
+                            builder: (context, member, child) {
+                              if(member ==null){
+                                return AppDropdown(
+                                  items:[],
+                                  onChanged: (v) {waterBloc.UpdateBranchName=v;
+                                  print(v);
+                                  },
+                                  value: null,
+                                  hintText: "Choose Member",
+                                );
+                              }
+                              if(member.isEmpty){
+                                return SizedBox(
+                                    height: MediaQuery.of(context).size.height * 0.7,
+                                    child: Center(child: Text("No data available")));
+                              }
+                              return AppDropdown(
+                                items: member!.map((e) => DropdownMenuItem(value: '${e['id']}', child: Text(e['title']??""))
+                                ).toList(),
+                                onChanged: (v) {waterBloc.UpdateBranchName.value = v;
+                                },
+                                value: waterBloc.UpdateBranchName.value,
+                                hintText: "Choose Member",
+                              );
+                            },
+
+                          ),
+                          SizedBox(height: 10,),
                           ValueListenableBuilder(
                              valueListenable: waterBloc.isWaterTypeLoad,
                              builder: (context, bool loading,__) {
@@ -252,7 +293,7 @@ class _AddWaterState extends State<AddWater> {
                                               valueListenable: waterBloc.water,
                                               builder: (context, Water? water,__) {
                                                 if (water != null) {
-                                                  waterBloc.quantityController.text=water.quantity=="0"?'':water.quantity??"";
+                                                  waterBloc.quantityController.text=water.numberOfBotal=="0"?'':water.numberOfBotal??"";
                                                 }
 
                                               return AppTextField(

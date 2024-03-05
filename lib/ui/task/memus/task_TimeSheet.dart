@@ -59,10 +59,12 @@ class _TaskTimesheetListState extends State<TaskTimesheet> {
                         shrinkWrap: true,
                         itemBuilder: (context, index) {
                           var data = projectNotes[index];
+                          var startTime =data['start_time'].toString().split(':');
+                          var endTime =data['end_time'].toString().split(':');
                           return  Container(
                             margin: const EdgeInsets.only(bottom: 20),
                             child:ListTile(
-                              title:Text('${data['first_name']??''} ${data['last_name']??''}',style: TextStyle(fontWeight: FontWeight.w500,fontSize: 16),),
+                              title:Text('${data['first_name']??''} ${data['last_name']??''}',style: TextStyle(fontWeight: FontWeight.w500,fontSize: 14),),
                               subtitle:   Container(
                                 child: Html(
                                   data:
@@ -88,7 +90,7 @@ class _TaskTimesheetListState extends State<TaskTimesheet> {
                               leading:CircleAvatar(
                                 child: Icon(Icons.person),
                               ),
-                              trailing: Text('${data['start_time']} - ${data['end_time']}'),
+                              trailing: Text('${startTime[0]}:${startTime[1]} - ${endTime[0]}:${endTime[1]}',style: TextStyle(fontSize: 10),),
                             )
                           );
                         }),

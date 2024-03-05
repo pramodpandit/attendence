@@ -30,6 +30,7 @@ import 'package:office/ui/work_from_home/workFromHomePage.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Settings/setting.dart';
+import '../Team/team_homePage.dart';
 import '../bill/add_bill.dart';
 import '../leave/employee_leave.dart';
 import '../leave/leave_request/leave_page_hr.dart';
@@ -330,9 +331,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           if (bloc.hasAccess(department,11,'1')) BoxContainer(
                             heading: "Team",
                             onTap: () {
-                              // Navigator.of(context).push(MaterialPageRoute(
-                              //     builder: (context) =>
-                              //     const IntroductionPage()));
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) =>
+                                TeamHomePage(branchid:user.branchId!.toInt(),)));
                             },
                             image: "images/team.png",
                           ),

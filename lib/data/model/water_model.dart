@@ -1,43 +1,48 @@
-import 'package:flutter/cupertino.dart';
-
 class Water {
-  String? name;
   int? id;
-  String? userId;
-  String? branchId;
-  String? quantity;
-  String? date;
-  String? typeId;
-
+  String? empId;
+  String? fDate;
+  String? waterType;
+  String? numberOfBotal;
+  String? bussinessAddress;
+  String? waterTypeRate;
+  String? createdAt;
+  String? updatedAt;
 
   Water(
-      {this.name,
-        this.id,
-        this.userId,
-        this.branchId,
-        this.quantity,
-        this.date,
-        this.typeId});
+      {this.id,
+        this.empId,
+        this.fDate,
+        this.waterType,
+        this.numberOfBotal,
+        this.bussinessAddress,
+        this.waterTypeRate,
+        this.createdAt,
+        this.updatedAt});
 
   Water.fromJson(Map<String, dynamic> json) {
-    name = json['name'];
     id = json['id'];
-    userId = json['user_id'];
-    branchId = json['branch_id'];
-    quantity = json['quantity'];
-    date = json['date'];
-    typeId = json['type_id'];
+    empId = json['emp_id'];
+    fDate = json['f_date'];
+    waterType = json['water_type'];
+    numberOfBotal = json['number_of_botal'];
+    bussinessAddress = json['bussiness_address'];
+    waterTypeRate = json['water_type_rate'];
+    createdAt = json['created_at'];
+    updatedAt = json['updated_at'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['name'] = this.name;
     data['id'] = this.id;
-    data['user_id'] = this.userId;
-    data['branch_id'] = this.branchId;
-    data['quantity'] = this.quantity;
-    data['date'] = this.date;
-    data['type_id'] = this.typeId;
+    data['emp_id'] = this.empId;
+    data['f_date'] = this.fDate;
+    data['water_type'] = this.waterType;
+    data['number_of_botal'] = this.numberOfBotal;
+    data['bussiness_address'] = this.bussinessAddress;
+    data['water_type_rate'] = this.waterTypeRate;
+    data['created_at'] = this.createdAt;
+    data['updated_at'] = this.updatedAt;
     return data;
   }
 }
