@@ -31,6 +31,7 @@ import 'data/network/api_service.dart';
 import 'data/network/interceptors.dart';
 import 'data/repository/community.dart';
 import 'data/repository/task_repo.dart';
+import 'data/repository/team_repo.dart';
 import 'utils/constants.dart';
 import 'utils/routes.dart';
 
@@ -135,6 +136,8 @@ class MyApp extends StatelessWidget {
             value: CommunityRepositary(prefs, apiService)),
         Provider<TaskRepositary>.value(
             value: TaskRepositary(prefs, apiService)),
+        Provider<TeamRepo>.value(
+            value: TeamRepo(prefs, apiService)),
         Provider<SharedPreferences>.value(value: prefs),
         Provider<ProfileRepository>.value(
             value: ProfileRepository(prefs, apiService)),

@@ -50,8 +50,6 @@ class EBillBloc extends Bloc {
       String? id = _pref.getString('uid');
       String date = DateFormat('yyyy-MM-dd').format(startDate.value!);
       List<Map<String, dynamic>> mapList = [];
-
-
       for (var item in eBill.value) {
         Map<String, dynamic> eBillDaily = {};
         eBillDaily['user_id']=id;
@@ -62,10 +60,7 @@ class EBillBloc extends Bloc {
         mapList.add(eBillDaily);
       }
 
-
-
       var response = await _repo.addEBillDaily(mapList);
-
       if (response != null && response['message'] == 'EBill Added successfully') {
         showMessage(const MessageType.success("EBill Updated successfully"));
         fetchEBill();
@@ -76,6 +71,100 @@ class EBillBloc extends Bloc {
     } finally {
       isAddEBillLoad.value = false;
     }
+  }
+
+  ValueNotifier<String?> Updatemetertype = ValueNotifier(null);
+  ValueNotifier<String?> UpdateBranchName = ValueNotifier(null);
+  ValueNotifier<List?>  getbranchName = ValueNotifier(null);
+  ValueNotifier<bool> isLoadingvalue = ValueNotifier(false);
+  ValueNotifier<bool> isLoadingupdatebill = ValueNotifier(false);
+  TextEditingController reading=TextEditingController();
+
+
+  fetchDailyActiviy()async{
+    isLoadingvalue.value = true;
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    try {
+      Map<String, dynamic> data = {
+        "user_id": pref.getString('uid')
+      };
+      ApiResponse2 res = await _repo.Add('get-branch',data) ;
+      if(res.status) {
+        getbranchName.value = res.data;
+      } else {
+        showMessage(MessageType.error(res.message.toString()));
+      }
+    } catch(e,s) {
+      print("the error is : $e");
+      debugPrint('$e');
+      debugPrintStack(stackTrace: s);
+      showMessage(const MessageType.error("Some error occurred! Please try again!"));
+    }finally{
+      isLoadingvalue.value = false;
+    }
+  }
+
+  fetchteamList()async{
+    isLoadingvalue.value = true;
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    try {
+      Map<String, dynamic> data = {
+        "user_id": pref.getString('uid')
+      };
+      ApiResponse2 res = await _repo.Add('get-branch',data) ;
+      if(res.status) {
+        getbranchName.value = res.data;
+      } else {
+        showMessage(MessageType.error(res.message.toString()));
+      }
+    } catch(e,s) {
+      print("the error is : $e");
+      debugPrint('$e');
+      debugPrintStack(stackTrace: s);
+      showMessage(const MessageType.error("Some error occurred! Please try again!"));
+    }finally{
+      isLoadingvalue.value = false;
+    }
+  }
+
+  UpdateBill()async{
+    String date = DateFormat('yyyy-MM-dd').format(startDate.value!);
+
+    if(UpdateBranchName.value==null){
+      showMessage(MessageType.info('Please select branch'));
+    }else if(Updatemetertype.value ==null){
+      showMessage(MessageType.info('Please select type'));
+
+    }else if(reading.text.isEmpty){
+      showMessage(MessageType.info('Please enter reading'));
+    }
+    else {
+      isLoadingupdatebill.value = true;
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      try {
+        Map<String, dynamic> data = {
+          "user_id": pref.getString('uid'),
+          "date":date,
+          "branch_id":UpdateBranchName.value,
+          "meter_type_id":Updatemetertype.value,
+          "meter_reading":reading.text
+        };
+        ApiResponse2 res = await _repo.Add2('post-add-electbill',data) ;
+        if(res.status) {
+          showMessage(MessageType.success(res.message.toString()));
+        } else {
+          showMessage(MessageType.error(res.message.toString()));
+        }
+      } catch(e,s) {
+        print("the error is : $e");
+        debugPrint('$e');
+        debugPrintStack(stackTrace: s);
+        showMessage(const MessageType.error("Some error occurred! Please try again!"));
+      }finally{
+        isLoadingupdatebill.value = false;
+      }
+    }
+
   }
 
 }

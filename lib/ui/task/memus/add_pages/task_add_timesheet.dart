@@ -137,7 +137,7 @@ class _TaskAddTimeSheetState extends State<TaskAddTimeSheet> {
                                   child: Center(child: Text("No data available")));
                             }
                             return  AppDropdown(
-                              items: paymentType!.map((e) => DropdownMenuItem(value: '${e['id']}', child: Text('${e['first_name']??""} ${e['last_name']??''}'))
+                              items: paymentType!.map((e) => DropdownMenuItem(value: '${int.parse(e['user_id'])}', child: Text('${e['first_name']??""} ${e['last_name']??''}'))
                               ).toList(),
                               onChanged: (v) {widget.bloc.updateemployelist.value = v;},
                               value: widget.bloc.updateemployelist.value,

@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import '../../data/model/e_bill_model.dart';
 import '../../utils/message_handler.dart';
 import '../widget/app_button.dart';
+import '../widget/app_dropdown.dart';
 import '../widget/app_text_field.dart';
 
 class AddBill extends StatefulWidget {
@@ -31,6 +32,7 @@ class _AddBillState extends State<AddBill> {
       AppMessageHandler().showSnackBar(context, event);
     });
     eBillBloc.fetchEBill();
+    eBillBloc.fetchteamList();
   }
 
   @override
@@ -52,7 +54,7 @@ class _AddBillState extends State<AddBill> {
               children: [
                 SizedBox(height: 56,),
                 Text(
-                  "Bill",
+                  " Add Electricity",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: Colors.white,
@@ -82,9 +84,7 @@ class _AddBillState extends State<AddBill> {
             right: 10,
             child: GestureDetector(
               onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
+                Navigator.push(context, MaterialPageRoute(
                         builder: (context) =>const BillList()));
               },
               child: const CircleAvatar(
@@ -108,18 +108,23 @@ class _AddBillState extends State<AddBill> {
                           children: [
                             const SizedBox(height: 30,),
                             const Padding(
-                              padding: EdgeInsets.only(left: 10),
-                              child: Text("Date", style: TextStyle(fontSize: 13)),
+                              padding: EdgeInsets.only(left: 1),
+                              child: Row(
+                                children: [
+                                  Text("Date", style: TextStyle(fontSize: 13,fontWeight: FontWeight.w500)),
+                                //  Text("*", style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)
+                                ],
+                              ),
                             ),
                             ValueListenableBuilder(
                                 valueListenable: eBillBloc.startDate,
                                 builder: (context, DateTime? date, _) {
                                   return InkWell(
                                     onTap: () async {
-                                      DateTime? dt = await showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime.now().subtract(Duration(days: 15)), lastDate:  DateTime.now().add(Duration(days: 30)),);
+                                      DateTime? dt = await showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime.now().subtract(Duration(days: 15)), lastDate:  DateTime.now(),);
                                       if(dt!=null) {
                                        await eBillBloc.updateStartDate(dt);
-                                        eBillBloc.fetchEBill();
+                                       // eBillBloc.fetchEBill();
                                       }
                                     },
                                     child: Container(
@@ -143,7 +148,57 @@ class _AddBillState extends State<AddBill> {
                                   );
                                 }
                             ),
-                            const SizedBox(height: 30,),
+                            const Padding(
+                              padding: EdgeInsets.only(left: 1),
+                              child: Row(
+                                children: [
+                                  Text("Branch", style: TextStyle(fontSize: 13,fontWeight: FontWeight.w500)),
+                                  Text("*", style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 10,),
+                            ValueListenableBuilder(
+                              valueListenable: eBillBloc.getbranchName,
+                              builder: (context, member, child) {
+                                if(member ==null){
+                                  return AppDropdown(
+                                    items:[],
+                                    onChanged: (v) {eBillBloc.UpdateBranchName=v;
+                                    print(v);
+                                    },
+                                    value: null,
+                                    hintText: "Choose Member",
+                                  );
+                                }
+                                if(member.isEmpty){
+                                  return SizedBox(
+                                      height: MediaQuery.of(context).size.height * 0.7,
+                                      child: Center(child: Text("No data available")));
+                                }
+                                return AppDropdown(
+                                  items: member!.map((e) => DropdownMenuItem(value: '${e['id']}', child: Text(e['title']??""))
+                                  ).toList(),
+                                  onChanged: (v) {eBillBloc.UpdateBranchName.value = v;
+                                  },
+                                  value: eBillBloc.UpdateBranchName.value,
+                                  hintText: "Choose Member",
+                                );
+                              },
+
+                            ),
+                            SizedBox(height: 10,),
+                            const Padding(
+                              padding: EdgeInsets.only(left: 1),
+                              child: Row(
+                                children: [
+                                  Text("Type", style: TextStyle(fontSize: 13,fontWeight: FontWeight.w500)),
+                                  Text("*", style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 5,),
+
                             ValueListenableBuilder(
                               valueListenable: eBillBloc.isEBillLoad,
                               builder: (context, bool loading,__) {
@@ -155,9 +210,9 @@ class _AddBillState extends State<AddBill> {
                                       SizedBox(
                                         height: 50,
                                       ),
-                                      Center(
-                                        child: CircularProgressIndicator(color: Colors.blue,),
-                                      ),
+                                      // Center(
+                                      //   child: CircularProgressIndicator(color: Colors.blue,),
+                                      // ),
                                     ],
                                   );
                                 }
@@ -177,99 +232,162 @@ class _AddBillState extends State<AddBill> {
                                         ),
                                       );
                                     }
-                                    return Container(
-                                      decoration: BoxDecoration(
-                                        border: Border.all(color: Colors.black),
-                                        borderRadius: BorderRadius.all(Radius.circular(15))
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          Align(
-                                            child: Padding(
-                                              padding: EdgeInsets.symmetric(horizontal:30,vertical: 3),
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.end,
-                                                children: [
-                                                  Text("E",style: TextStyle(fontSize: 15,fontWeight: FontWeight.w500),),
-                                                  const SizedBox(width: 60,),
-                                                  Text("M",style: TextStyle(fontSize: 15,fontWeight: FontWeight.w500),),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          ListView.builder(
-                                            physics: const NeverScrollableScrollPhysics(),
-                                            itemCount: eBill.length,
-                                              shrinkWrap: true,
-                                              padding: EdgeInsets.zero,
-                                              itemBuilder: (context,index){
-                                                return Container(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 10),
-                                                  child: Column(
-                                                    children: [
-                                                      Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                        children: [
-                                                          Row(
-                                                            children: [
-                                                              Text("${index + 1}.",style: const TextStyle(fontSize: 15,fontWeight: FontWeight.w500),),
-                                                              const SizedBox(width: 5,),
-                                                              Text("${eBill[index].name}",style: const TextStyle(fontSize: 15,fontWeight: FontWeight.w500),),
-                                                            ],
-                                                          ),
-                                                          Row(
-                                                            children: [
-                                                              SizedBox(
-                                                                height: 50,
-                                                                width: 60,
-                                                                child: AppTextField(
-                                                                  controller: eBill[index].eController,
-                                                                  title: "",
-                                                                  keyboardType: TextInputType.number,
-                                                                  showTitle: false,
-                                                                ),
-                                                              ),
-                                                              const SizedBox(width: 7,),
-                                                              SizedBox(
-                                                                height: 50,
-                                                                width: 60,
-                                                                child: AppTextField(
-                                                                  controller: eBill[index].mController,
-                                                                  title: "",
-                                                                  keyboardType: TextInputType.number,
-                                                                  showTitle: false,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ],
-                                                  ),
-                                                );
-                                              },
-
-                                          ),
-                                        ],
-                                      ),
+                                    return AppDropdown(
+                                      items: eBill.map((e) => DropdownMenuItem(value: '${e.id}', child: Text(e.name??""))
+                                      ).toList(),
+                                      onChanged: (v) {eBillBloc.Updatemetertype.value = v;
+                                      print(v);
+                                      },
+                                      value: eBillBloc.Updatemetertype.value,
+                                      hintText: "Choose Member",
                                     );
+                                    // return Container(
+                                    //   decoration: BoxDecoration(
+                                    //     border: Border.all(color: Colors.black),
+                                    //     borderRadius: BorderRadius.all(Radius.circular(15))
+                                    //   ),
+                                    //   child: Column(
+                                    //     children: [
+                                    //       Align(
+                                    //         child: Padding(
+                                    //           padding: EdgeInsets.symmetric(horizontal:30,vertical: 3),
+                                    //           child: Row(
+                                    //             mainAxisAlignment: MainAxisAlignment.end,
+                                    //             children: [
+                                    //               Text("E",style: TextStyle(fontSize: 15,fontWeight: FontWeight.w500),),
+                                    //               const SizedBox(width: 60,),
+                                    //               Text("M",style: TextStyle(fontSize: 15,fontWeight: FontWeight.w500),),
+                                    //             ],
+                                    //           ),
+                                    //         ),
+                                    //       ),
+                                    //       ListView.builder(
+                                    //         physics: const NeverScrollableScrollPhysics(),
+                                    //         itemCount: eBill.length,
+                                    //           shrinkWrap: true,
+                                    //           padding: EdgeInsets.zero,
+                                    //           itemBuilder: (context,index){
+                                    //             return Container(
+                                    //               padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 10),
+                                    //               child: Column(
+                                    //                 children: [
+                                    //                   Row(
+                                    //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    //                     children: [
+                                    //                       Row(
+                                    //                         children: [
+                                    //                           Text("${index + 1}.",style: const TextStyle(fontSize: 15,fontWeight: FontWeight.w500),),
+                                    //                           const SizedBox(width: 5,),
+                                    //                           Text("${eBill[index].name}",style: const TextStyle(fontSize: 15,fontWeight: FontWeight.w500),),
+                                    //                         ],
+                                    //                       ),
+                                    //                       Row(
+                                    //                         children: [
+                                    //                           SizedBox(
+                                    //                             height: 50,
+                                    //                             width: 60,
+                                    //                             child: AppTextField(
+                                    //                               controller: eBill[index].eController,
+                                    //                               title: "",
+                                    //                               keyboardType: TextInputType.number,
+                                    //                               showTitle: false,
+                                    //                             ),
+                                    //                           ),
+                                    //                           const SizedBox(width: 7,),
+                                    //                           SizedBox(
+                                    //                             height: 50,
+                                    //                             width: 60,
+                                    //                             child: AppTextField(
+                                    //                               controller: eBill[index].mController,
+                                    //                               title: "",
+                                    //                               keyboardType: TextInputType.number,
+                                    //                               showTitle: false,
+                                    //                             ),
+                                    //                           ),
+                                    //                         ],
+                                    //                       ),
+                                    //                     ],
+                                    //                   ),
+                                    //                 ],
+                                    //               ),
+                                    //             );
+                                    //           },
+                                    //
+                                    //       ),
+                                    //     ],
+                                    //   ),
+                                    // );
                                   }
                                 );
                               }
                             ),
+                            SizedBox(height: 10,),
+                            const Padding(
+                              padding: EdgeInsets.only(left: 1),
+                              child: Row(
+                                children: [
+                                  Text("Reading", style: TextStyle(fontSize: 13,fontWeight: FontWeight.w500)),
+                                  Text("*", style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 10,),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.all(Radius.circular(11))
+                          ),
+                           height: 50,
+                          child: TextFormField(
+                            textCapitalization: TextCapitalization.sentences,
+                            keyboardType: TextInputType.number,
+                            maxLines: null,
+                            controller: eBillBloc.reading,
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 13,
+                                color: Colors.black54),
+                            decoration: const InputDecoration(
+                              fillColor: Color(0xffffffff),
+                              focusedBorder:OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(11))
+                              ),
+                              enabledBorder:OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(11))
+                              ),
+                              hintText: "Reading",
+                              focusColor: Colors.white,
+                              counterStyle: TextStyle(color: Colors.white),
+                              contentPadding: EdgeInsets.only(top: 20,left: 10),
+                              hintStyle: TextStyle(
+                                  color: Color(0xff777777),
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 13,
+                                  fontFamily: "Poppins"),
+                            ),
+                            validator: (value) {
+                              if (value.toString().isEmpty) {
+                                eBillBloc.showMessage(MessageType.info('Please fill Reading'));
+                              }
+                              return null;
+                            },
+                            onTap: () {},
+                          ),
+                        ),
                             const SizedBox(
                               height: 20,
                             ),
+
                            ValueListenableBuilder(
-                              valueListenable: eBillBloc.isAddEBillLoad,
+                              valueListenable: eBillBloc.isLoadingupdatebill,
                               builder: (context,bool loading,__) {
                                 return AppButton(
                                   title: "Submit",
-                                  loading: loading?true:false,
+                                  loading: loading,
                                   onTap: () async{
-                                    eBillBloc.addEBillDaily();
                                     if (formKey.currentState!.validate()) {
-                                      // bloc.addComplaint();
+                                      eBillBloc.UpdateBill();
                                     }
                                   },
                                   margin: EdgeInsets.zero,

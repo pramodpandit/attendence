@@ -447,7 +447,8 @@ class _WaterListState extends State<WaterList> {
                                                         Padding(
                                                           padding: EdgeInsets.all(5.0),
                                                           child: Text(
-                                                            DateFormat("dd-MM-yyyy").format(DateTime.parse(item.date!)),
+                                                            DateFormat("dd-MM-yyyy").format(DateTime.parse(item.fDate
+                                                            !)),
                                                             style: const TextStyle(color: Color(0xff20263c),fontWeight: FontWeight.w600),),
                                                         ),
                                                         for (var type in waterType)
@@ -455,7 +456,7 @@ class _WaterListState extends State<WaterList> {
                                                             padding: EdgeInsets.all(5.0),
                                                             child: Text(
                                                               // Check if water ID and type ID are the same, then show quantity
-                                                              (item.typeId == "${type.id}") ? item.quantity ?? "" : "",
+                                                              (item.waterType == "${type.id}") ? item.numberOfBotal ?? "" : "",
                                                               style: const TextStyle(color: Color(0xff20263c),fontWeight: FontWeight.w600),
                                                             ),
                                                           ),

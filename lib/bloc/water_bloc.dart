@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../data/model/api_response.dart';
 import '../data/model/water_model.dart';
 import '../data/model/water_type_model.dart';
 import '../data/repository/water_repo.dart';
@@ -70,7 +72,7 @@ class WaterBloc extends Bloc {
         showMessage(const MessageType.info("Please Enter water Quantity"));
         return;
       }
-      var result = await _repo.addWaterTypeDaily(date,waterString.value,quantityController.text);
+      var result = await _repo.addWaterTypeDaily(date,waterString.value,quantityController.text,UpdateBranchName.value);
       if(result.message!=''&& result.message=="WaterBill Added successfully"){
         showMessage(const MessageType.success("WaterBill Updated successfully"));
         fetchWaterDaily();
@@ -108,5 +110,30 @@ class WaterBloc extends Bloc {
       isWaterListLoad.value = false;
     }
   }
+  ValueNotifier<bool> isLoadingvalue = ValueNotifier(false);
+  ValueNotifier<List?>  getbranchName = ValueNotifier(null);
+  ValueNotifier<String?> UpdateBranchName = ValueNotifier(null);
 
+  fetchDailyActiviy()async{
+    isLoadingvalue.value = true;
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    try {
+      Map<String, dynamic> data = {
+        "user_id": pref.getString('uid')
+      };
+      ApiResponse2 res = await _repo.Add('get-branch',data) ;
+      if(res.status) {
+        getbranchName.value = res.data;
+      } else {
+        showMessage(MessageType.error(res.message.toString()));
+      }
+    } catch(e,s) {
+      print("the error is : $e");
+      debugPrint('$e');
+      debugPrintStack(stackTrace: s);
+      showMessage(const MessageType.error("Some error occurred! Please try again!"));
+    }finally{
+      isLoadingvalue.value = false;
+    }
+  }
 }

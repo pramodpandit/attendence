@@ -37,5 +37,32 @@ class EBillRepository {
     }
     return response;
   }
+  Future<ApiResponse2> Add(String url,Map<String,dynamic> data,) async {
+    try{
+      SharedPreferences _pref = await SharedPreferences.getInstance();
+      var response= await _api.getRequest(url,data: data);
+      if (response == null) {
+        ApiException.fromString("response null");
+      }
+      return ApiResponse2.fromJson(response,response["data"]);
+    }catch(e){
+      print("data is not avaible ${e.toString()}");
+      throw Exception('data is not avaible ${e.toString()}');
+    }
+  }
+  Future<ApiResponse2> Add2(String url,Map<String,dynamic> data,) async {
+    try{
+      SharedPreferences _pref = await SharedPreferences.getInstance();
+      var response= await _api.postRequest(url, data);
+      if (response == null) {
+        ApiException.fromString("response null");
+      }
+      return ApiResponse2.fromJson(response,response["data"]);
+    }catch(e){
+      print("data is not avaible ${e.toString()}");
+      throw Exception('data is not avaible ${e.toString()}');
+    }
+  }
+
 
 }

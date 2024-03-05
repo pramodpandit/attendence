@@ -27,13 +27,9 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
       }
     });
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: const MyAppBar(
-      //   title: "Give Feedback",
-      // ),
       body: Stack(
         children: [
           Container(

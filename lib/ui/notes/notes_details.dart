@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:office/bloc/notes_bloc.dart';
 import 'package:office/data/model/notes_model.dart';
 import 'package:provider/provider.dart';
@@ -116,36 +117,54 @@ class _NotesDetailsState extends State<NotesDetails> {
                               )
                             ],
                           ),
+                          const Padding(
+                            padding: EdgeInsets.only(left: 1),
+                            child: Row(
+                              children: [
+                                Text("Title", style: TextStyle(fontSize: 13,fontWeight: FontWeight.w500)),
+                                Text("*", style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)
+                              ],
+                            ),
+                          ),
+                          5.height,
                           ValueListenableBuilder(
                             valueListenable: readonlyValue,
                             builder: (context,bool isTrue,_) {
-                              return TextFormField(
-                                keyboardType: TextInputType.multiline,
-                                maxLines: null,
-                                readOnly: widget.data==null?false:isTrue,
-                                style: const TextStyle(color: Colors.black,fontWeight: FontWeight.w700,),
-                                controller: bloc.tittleController,
-                                decoration: const InputDecoration(
-                                  // filled: true,
-                                  fillColor: Color(0xffffffff),
-                                  focusedBorder: InputBorder.none,
-                                  enabledBorder: InputBorder.none,
-                                  hintText: "Title",
-                                  focusColor: Colors.white,
-                                  counterStyle: TextStyle(color: Colors.white),
-                                  hintStyle: TextStyle(
-                                      color: Color(0xff777777),
-                                      fontWeight: FontWeight.w700,
-                                      fontFamily: "Poppins"),
+                              return SizedBox(
+                                height: 50,
+                                child: TextFormField(
+                                  keyboardType: TextInputType.multiline,
+                                  textCapitalization: TextCapitalization.sentences,
+                                  maxLines: null,
+                                  readOnly: widget.data==null?false:isTrue,
+                                  style: const TextStyle(color: Colors.black,fontWeight: FontWeight.w500,),
+                                  controller: bloc.tittleController,
+                                  decoration: const InputDecoration(
+                                    fillColor: Color(0xffffffff),
+                                    focusedBorder:OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(Radius.circular(11))
+                                    ),
+                                    enabledBorder:OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(Radius.circular(11))
+                                    ),
+                                    hintText: "Title",
+                                    focusColor: Colors.white,
+                                    contentPadding: EdgeInsets.only(top: 10,left: 10),
+                                    counterStyle: TextStyle(color: Colors.white),
+                                    hintStyle: TextStyle(
+                                        color: Color(0xff777777),
+                                        fontWeight: FontWeight.w700,
+                                        fontFamily: "Poppins"),
+                                  ),
+                                  textAlign: TextAlign.left,
+                                  validator: (value) {
+                                    if (value.toString().isEmpty) {
+                                      return "Title is required";
+                                    }
+                                    return null;
+                                  },
+                                  onTap: () {},
                                 ),
-                                textAlign: TextAlign.left,
-                                validator: (value) {
-                                  if (value.toString().isEmpty) {
-                                    return "Title is required";
-                                  }
-                                  return null;
-                                },
-                                onTap: () {},
                               );
                             }
                           ),
@@ -156,42 +175,61 @@ class _NotesDetailsState extends State<NotesDetails> {
                                 const TextStyle(color: Colors.black54, fontSize: 8),
                           ),
                           const SizedBox(
-                            height: 5,
+                            height: 10,
                           ),
+                          const Padding(
+                            padding: EdgeInsets.only(left: 1),
+                            child: Row(
+                              children: [
+                                Text("Description", style: TextStyle(fontSize: 13,fontWeight: FontWeight.w500)),
+                                Text("*", style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)
+                              ],
+                            ),
+                          ),
+                          5.height,
                           ValueListenableBuilder(
                             valueListenable: readonlyValue,
                             builder: (context,bool isTrue,_) {
-                              return TextFormField(
-                                keyboardType: TextInputType.multiline,
-                                maxLines: null,
-                                readOnly: widget.data==null?false:isTrue,
-                                controller: bloc.descriptionController,
-                                textAlign: TextAlign.left,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 13,
-                                    color: Colors.black54),
-                                decoration: const InputDecoration(
-                                  // filled: true,
-                                  fillColor: Color(0xffffffff),
-                                  focusedBorder: InputBorder.none,
-                                  enabledBorder: InputBorder.none,
-                                  hintText: "Description",
-                                  focusColor: Colors.white,
-                                  counterStyle: TextStyle(color: Colors.white),
-                                  hintStyle: TextStyle(
-                                      color: Color(0xff777777),
+                              return SizedBox(
+                               // height: 50,
+                                child: TextFormField(
+                                  textCapitalization: TextCapitalization.sentences,
+                                  keyboardType: TextInputType.multiline,
+                                  minLines: 6,
+                                  maxLines: null,
+                                  readOnly: widget.data==null?false:isTrue,
+                                  controller: bloc.descriptionController,
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
                                       fontWeight: FontWeight.w500,
                                       fontSize: 13,
-                                      fontFamily: "Poppins"),
+                                      color: Colors.black54),
+                                  decoration: const InputDecoration(
+                                    fillColor: Color(0xffffffff),
+                                    focusedBorder:OutlineInputBorder(
+                                      borderRadius: BorderRadius.all(Radius.circular(11))
+                                    ),
+                                    enabledBorder:OutlineInputBorder(
+                                      borderRadius: BorderRadius.all(Radius.circular(11))
+                                    ),
+                                    hintText: "Description",
+                                    focusColor: Colors.white,
+                                    counterStyle: TextStyle(color: Colors.white),
+                                    contentPadding: EdgeInsets.only(top: 10,left: 10),
+                                    hintStyle: TextStyle(
+                                        color: Color(0xff777777),
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 13,
+                                        fontFamily: "Poppins"),
+                                  ),
+                                  validator: (value) {
+                                    if (value.toString().isEmpty) {
+                                      return "Title is required";
+                                    }
+                                    return null;
+                                  },
+                                  onTap: () {},
                                 ),
-                                validator: (value) {
-                                  if (value.toString().isEmpty) {
-                                    return "Title is required";
-                                  }
-                                  return null;
-                                },
-                                onTap: () {},
                               );
                             }
                           ),
