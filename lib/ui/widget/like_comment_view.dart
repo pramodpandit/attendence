@@ -18,30 +18,45 @@ class LikeShareComment extends StatefulWidget {
 
 class _LikeShareCommentState extends State<LikeShareComment> {
  var valueLike = 0;
+ late SharedPreferences pref;
 
+ @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    widget.bloc.getLikedPostUserDetails(widget.data.postId.toString());
+  }
+  
   @override
   Widget build(BuildContext context) {
-    ValueNotifier<bool> isLike = ValueNotifier(false);
+    ValueNotifier<int?> totalLike = ValueNotifier(widget.data.totalLike);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Row(
           children: [
-            ValueListenableBuilder(
-              valueListenable: isLike,
-              builder: (BuildContext context, bool liked, Widget? child) {
-                return GestureDetector(
-                  onTap: () {
-                    isLike.value = !isLike.value;
-                    widget.bloc.likePost(widget.data.id.toString(),isLike.value ? "1": "0");
-                  },
-                  child: Icon(
-                    liked ? Icons.favorite : Icons.favorite_border,
+            GestureDetector(
+              onTap: () {
+                widget.bloc.liked.value = !widget.bloc.liked.value!;
+                widget.bloc.likePost(widget.data.postId.toString(),widget.bloc.liked.value! ? "1": "0");
+                totalLike.value = widget.bloc.liked.value!? totalLike.value!+1 :totalLike.value!-1;
+              },
+              child: ValueListenableBuilder(
+                valueListenable: widget.bloc.liked,
+                builder: (context, alreadyLiked, child) {
+                  if(alreadyLiked== null){
+                    return SizedBox(
+                      height : 10,
+                      width: 10,
+                      child: CircularProgressIndicator(strokeWidth: 1),
+                    );
+                  }
+                  return Icon(
+                    alreadyLiked ? Icons.favorite : Icons.favorite_border,
                     color: Colors.red,
                     size: 18,
-                  ),
-                );
-              },
+                  );
+                },),
             ),
             5.width,
             GestureDetector(
@@ -60,10 +75,14 @@ class _LikeShareCommentState extends State<LikeShareComment> {
                   },
                 );
               },
-              child: Text(
-                "${widget.data.totalLike! }",
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
+              child: ValueListenableBuilder(
+                valueListenable: totalLike,
+                builder: (context, totalLike, child) {
+                return Text(
+                  "${totalLike}",
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                );
+              },),
             ),
           ],
         ),

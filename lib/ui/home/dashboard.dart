@@ -453,7 +453,10 @@ class _DashBoardState extends State<DashBoard> {
                                         valueListenable: bloc.allDoingTaskData,
                                         builder: (context, allDoingTaskData, child) {
                                           if(allDoingTaskData == null){
-                                            return CircularProgressIndicator();
+                                            return SizedBox(
+                                                height: 120,
+                                                child: Center(child: CircularProgressIndicator()),
+                                            );
                                           }
                                         return CarouselSlider.builder(
 

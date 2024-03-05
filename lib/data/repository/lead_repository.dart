@@ -215,7 +215,7 @@ class LeadsRepository {
         List.from((res['data'] ?? []).map((e) => ClientDetail.fromJson(e))));
   }
 
-  Future<ApiResponse> createNewLead(Map<String,dynamic> lead) async {
+  Future createNewLead(Map<String,dynamic> lead) async {
     Map<String, dynamic> data = {
 
     };
@@ -226,7 +226,7 @@ class LeadsRepository {
     // }
     var res = await _api.postRequest('lead/add_lead', data);
     print("the main data is : ${res}");
-    return ApiResponse.fromJson(res);
+    return res;
   }
 
   Future<ApiResponse> createNewClient(String client, {File? image}) async {

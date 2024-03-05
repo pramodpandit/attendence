@@ -43,4 +43,12 @@ class PostRepository {
     }
     return ApiResponse3.fromJson(response);
   }
+  Future<ApiResponse3> fetchLikedPostUserDetails(Map<String,dynamic> data) async {
+
+    var response = await _api.postRequest("post-like-details", data);
+    if (response == null) {
+      ApiException.fromString("response null");
+    }
+    return ApiResponse3.fromJson(response,response['data']);
+  }
 }

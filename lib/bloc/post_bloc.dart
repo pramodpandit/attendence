@@ -91,4 +91,20 @@ class PostBloc extends Bloc {
       print(e);
     }
   }
+
+  ValueNotifier<bool?> liked = ValueNotifier(null);
+  getLikedPostUserDetails(String postId)async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Map<String,dynamic> data = {
+      "post_id" : postId,
+    };
+    try{
+      var result = await _repo.fetchLikedPostUserDetails(data);
+      List finalResult = result.data;
+      liked.value = finalResult.where((element) => element['user_id'].toString()==prefs.getString("uid").toString()).toList().isNotEmpty;
+      print("the result ${liked.value}");
+    }catch(e){
+      print(e);
+    }
+  }
 }

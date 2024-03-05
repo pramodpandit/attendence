@@ -32,8 +32,15 @@ class _ChatListScreenState extends State<ChatListScreen> {
     super.initState();
     bloc = ProfileBloc(context.read<ProfileRepository>());
     bloc.fetchUserDetail();
+    bloc.getRecentChats();
+    bloc.fetchAllUserDetail();
   }
 
+  // bool containsId(String id){
+  //   for(var i=0;i<bloc.allUserDetail.value!.length;i++){
+  //
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -212,13 +219,21 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                       await Future.delayed(
                                           Duration(milliseconds: 1200));
                                     },
-                                    child: ListView.builder(
-                                      itemCount: 15,
-                                      shrinkWrap: true,
-                                      itemBuilder: (context, index) {
-                                        return const SingleChat();
-                                      },
-                                    ),
+                                    child: ValueListenableBuilder(
+                                      valueListenable: bloc.allLastChats,
+                                      builder: (context, allLastChats, child) {
+                                        if(allLastChats != null){
+                                          return Center(child: CircularProgressIndicator());
+                                        }
+                                        // List recentChats = bloc.allUserDetail.value.where((element) => allLastChats.contains(element) element['id'])
+                                      return ListView.builder(
+                                        itemCount: 15,
+                                        shrinkWrap: true,
+                                        itemBuilder: (context, index) {
+                                          return const SingleChat();
+                                        },
+                                      );
+                                    },),
                                   ),
                                   Positioned(
                                     bottom: 110,
@@ -264,9 +279,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                       await Future.delayed(
                                           const Duration(milliseconds: 1500));
                                     },
-                                    child: Container(
-                                      child: Text("its ok"),
-                                    )),
+                                    child: ListView.builder(
+                                      itemCount: 15,
+                                      shrinkWrap: true,
+                                      itemBuilder: (context, index) {
+                                        return const GroupChat();
+                                      },
+                                    ),
+                                ),
                                 Positioned(
                                   bottom: 110,
                                   right: 10,
@@ -395,6 +415,41 @@ class _SingleChatState extends State<SingleChat> {
       leading: CircleAvatar(
             child: Icon(Icons.person),
           ),
+    );
+  }
+}
+
+class GroupChat extends StatefulWidget {
+  const GroupChat({super.key});
+  @override
+  State<GroupChat> createState() => _GroupChatState();
+}
+
+class _GroupChatState extends State<GroupChat> {
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      onTap: () {
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => ChatScreen({"first_name": "Pramod"})));
+      },
+      contentPadding: EdgeInsets.symmetric(horizontal: 5),
+      title: const Text(
+        "Flutter Developer Group",
+        style: TextStyle(fontWeight: FontWeight.w500),
+      ),
+      subtitle: Text(
+        "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi",
+        softWrap: true,
+        style: TextStyle(
+            fontWeight: FontWeight.w400,
+            overflow: TextOverflow.ellipsis,
+            fontSize: 12,
+            color: Colors.grey.shade400),
+      ),
+      leading: CircleAvatar(
+        child: Icon(Icons.person),
+      ),
     );
   }
 }

@@ -234,4 +234,11 @@ class ProfileRepository {
     return ApiResponse2.fromJson(response,response['data']['task'][type]);
   }
 
+  Future<ApiResponse2> fetchRecentChats()async{
+    var response=await _api.postRequest("chats/fetch_friends", {
+      "user_id":prefs.getString('uid'),
+    });
+    return ApiResponse2.fromJson(response,response['data']['last_chat']);
+  }
+
 }

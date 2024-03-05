@@ -1,48 +1,27 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:office/bloc/expense_bloc.dart';
 import 'package:office/ui/widget/app_bar.dart';
 import 'package:office/ui/widget/app_button.dart';
+import 'package:office/ui/widget/app_dropdown.dart';
 import 'package:office/ui/widget/app_text_field.dart';
 
 class AddExpense extends StatefulWidget {
-  const AddExpense({Key? key}) : super(key: key);
+  ExpenseBloc bloc;
+  AddExpense({Key? key,required this.bloc}) : super(key: key);
 
   @override
   State<AddExpense> createState() => _AddExpenseState();
 }
 
 class _AddExpenseState extends State<AddExpense> {
-  GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  TextEditingController reason = TextEditingController();
-  TextEditingController expense = TextEditingController();
-  TextEditingController reasonTitle = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text(
-      //     "Add Expenses",
-      //     style: TextStyle(
-      //         fontWeight: FontWeight.w600,
-      //         fontSize: 20,
-      //         letterSpacing: 0.5,
-      //         color: Colors.black),
-      //   ),
-      //   centerTitle: true,
-      //   leading: GestureDetector(
-      //       onTap: () {
-      //         Navigator.pop(context);
-      //       },
-      //       child: const Icon(
-      //         PhosphorIcons.caret_left_bold,
-      //         color: Colors.black,
-      //       )),
-      // ),
-      // appBar: const MyAppBar(
-      //   title: "Add Expenses",
-      // ),
       body: Stack(
         children: [
           Container(
@@ -86,27 +65,102 @@ class _AddExpenseState extends State<AddExpense> {
           ),
           Column(
             children: [
-              const SizedBox(height: 100,),
+              const SizedBox(height: 90,),
               Expanded(
                 child: SingleChildScrollView(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 40),
                     child: Form(
-                      key: formKey,
+                      key: widget.bloc.formKey,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          AppTextField(
-                            controller: reasonTitle,
-                            title: "Title",
-                            validate: true,
+                          const Row(
+                            children: [
+                              SizedBox(width: 10),
+                              Text("Expense type"),
+                              Text("*",style: TextStyle(color: Colors.red),)
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          ValueListenableBuilder(
+                            valueListenable: widget.bloc.allExpenseTypeData,
+                            builder: (context, allExpenseTypeData, child) {
+                              if(allExpenseTypeData == null){
+                                return AppDropdown(
+                                  items: const [],
+                                  onChanged: (value) {
+
+                                  },
+                                  value: null,
+                                  hintText: "Expense type",
+                                );
+                              }
+                            return AppDropdown(
+                              items: allExpenseTypeData.map((e) => DropdownMenuItem<String>(value: e['id'].toString(),child: Text(e['name']))).toList(),
+                              onChanged: (value) {
+                                widget.bloc.expense.value = value.toString();
+                              },
+                              value: widget.bloc.expense.value,
+                              hintText: "Expense type",
+                            );
+                          },),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          const Row(
+                            children: [
+                              SizedBox(width: 10),
+                              Text("Select Date"),
+                              Text("*",style: TextStyle(color: Colors.red),)
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          InkWell(
+                            onTap: () async {
+                              await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime(2000),
+                                lastDate: DateTime(3000),
+                              ).then((value) {
+                                if(value != null){
+                                  widget.bloc.date.value = value.toString().split(" ").first;
+                                }
+                              });
+                            },
+                            child: Container(
+                              height: 50,
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(PhosphorIcons.clock),
+                                  SizedBox(width: 15),
+                                  ValueListenableBuilder(
+                                    valueListenable: widget.bloc.date,
+                                    builder: (context, date, child) {
+                                    return Text(
+                                      date ?? "Select Date",
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    );
+                                  },),
+                                ],
+                              ),
+                            ),
                           ),
                           const SizedBox(
                             height: 20,
                           ),
                           AppTextField(
-                            controller: reason,
+                            controller: widget.bloc.description,
                             title: "Description",
                             validate: true,
                             maxLines: 5,
@@ -116,61 +170,29 @@ class _AddExpenseState extends State<AddExpense> {
                             height: 20,
                           ),
                           AppTextField(
-                            controller: reasonTitle,
-                            title: "Expense Amount",
+                            controller: widget.bloc.amount,
+                            title: "Amount",
                             validate: true,
-                            keyboardType: TextInputType.phone,
+                            keyboardType: TextInputType.number,
                           ),
                           const SizedBox(
                             height: 20,
                           ),
-                          InkWell(
-                            onTap: () async {
-                              DateTime? dt = await showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime.now(),
-                                lastDate: DateTime.now().add(Duration(days: 30)),
-                              );
-                              if (dt != null) {
-                                // bloc.updateStartDate(dt);
-                              }
-                            },
-                            child: Container(
-                              height: 50,
-                              padding: const EdgeInsets.symmetric(horizontal: 20),
-                              decoration: BoxDecoration(
-                                color: Colors.grey[100],
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: const Row(
-                                children: [
-                                  Icon(PhosphorIcons.clock),
-                                  SizedBox(width: 15),
-                                  Text(
-                                    "Select Date",
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 30,
-                          ),
-                          AppButton(
-                            title: "Submit",
-                            onTap: () {
-                              if (formKey.currentState!.validate()) {
-                                // bloc.addComplaint();
-                              }
-                            },
-                            margin: EdgeInsets.zero,
-                            // loading: loading,
-                          )
+                          ValueListenableBuilder(
+                            valueListenable: widget.bloc.isAddLoading,
+                            builder: (context, isAddLoading, child) {
+                            return AppButton(
+                              title: "Submit",
+                              loading: isAddLoading,
+                              onTap: () {
+                                if (widget.bloc.formKey.currentState!.validate()) {
+                                  widget.bloc.addExpense(context);
+                                }
+                              },
+                              margin: EdgeInsets.zero,
+                              // loading: loading,
+                            );
+                          },)
                         ],
                       ),
                     ),

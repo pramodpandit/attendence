@@ -12,6 +12,7 @@ import 'package:office/utils/constants.dart';
 import 'package:fl_country_code_picker/fl_country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
+import 'package:office/utils/message_handler.dart';
 import 'package:provider/provider.dart';
 import 'dart:io';
 import 'package:flutter/services.dart';
@@ -36,6 +37,9 @@ class _CreateNewLeadPageState extends State<CreateNewLeadPage> {
   @override
   void initState() {
     bloc = context.read<LeadsBloc>();
+    bloc.msgController?.stream.listen((event) {
+      AppMessageHandler().showSnackBar(context, event);
+    });
     super.initState();
     bloc.getLeadSourceData();
     bloc.getAllDesignationData();
@@ -666,7 +670,9 @@ class _CreateNewLeadPageState extends State<CreateNewLeadPage> {
                         return AppButton(
                           title: 'Submit',
                           onTap: () {
-                            bloc.createNewEmployee();
+                            if(bloc.formState.currentState!.validate()){
+                              bloc.createNewEmployee(context);
+                            }
                           },
                           margin: EdgeInsets.zero,
                           loading: loading,

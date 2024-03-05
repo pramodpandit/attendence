@@ -93,13 +93,13 @@ class _TaskAddTimeSheetState extends State<TaskAddTimeSheet> {
               ),
             ),
           ),
-          Column(
-            children: [
-              const SizedBox(
-                height: 100,
-              ),
-              Expanded(
-                child: Padding(
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                const SizedBox(
+                  height: 100,
+                ),
+                Padding(
                   padding:
                   const EdgeInsets.symmetric(horizontal: 18, vertical: 25),
                   child: Form(
@@ -287,8 +287,8 @@ class _TaskAddTimeSheetState extends State<TaskAddTimeSheet> {
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

@@ -297,4 +297,19 @@ class ProfileBloc extends Bloc {
       isUserDetailLoad.value = false;
     }
   }
+
+  ValueNotifier<List?> allLastChats = ValueNotifier(null);
+  getRecentChats() async{
+    try{
+      var result = await _repo.fetchRecentChats();
+      if(result.status && result.data != null){
+        allLastChats.value = result.data;
+      }else{
+        allLastChats.value = [];
+      }
+    }catch (e, s) {
+      print(e);
+      print(s);
+    }
+  }
 }

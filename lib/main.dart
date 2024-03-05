@@ -11,6 +11,7 @@ import 'package:office/data/repository/attendance_repo.dart';
 import 'package:office/data/repository/auth_repo.dart';
 import 'package:office/data/repository/complaint_repo.dart';
 import 'package:office/data/repository/e_bill_repo.dart';
+import 'package:office/data/repository/expense_repo.dart';
 import 'package:office/data/repository/feedback_repo.dart';
 import 'package:office/data/repository/holiday_repo.dart';
 import 'package:office/data/repository/lead_repository.dart';
@@ -153,6 +154,8 @@ class MyApp extends StatelessWidget {
             value: WorkFromHomeRepository(prefs, apiService)),
         Provider<AttendanceRepository>.value(
             value: AttendanceRepository(prefs, apiService)),
+        Provider<ExpenseRepository>.value(
+            value: ExpenseRepository(prefs, apiService)),
         // Provider<HiveService>.value(value: HiveService()),
         // ChangeNotifierProvider<ThemeBloc>(
         //   create: (_) => ThemeBloc(AppRepository(prefs, apiService)),

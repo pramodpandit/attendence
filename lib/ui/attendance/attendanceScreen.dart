@@ -523,7 +523,10 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                             valueListenable: attendanceBloc.allAttendanceData,
                                             builder: (context, allData, child) {
                                               if(allData == null){
-                                                return Center(child: CircularProgressIndicator(strokeWidth: 3,));
+                                                return const Center(child: SizedBox(
+                                                    height: 20,
+                                                    width: 20,
+                                                    child: CircularProgressIndicator(strokeWidth: 2)));
                                               }
                                               if(allData.isEmpty){
                                                 return Center(child: Text("No data available"));

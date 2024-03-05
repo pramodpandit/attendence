@@ -343,15 +343,9 @@ class LeadsBloc extends Bloc {
     }
   }
 
-  createNewEmployee() async {
+  createNewEmployee(BuildContext context) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     try {
-      // if(await validateEmployee()) {
-      //   return;
-      // }
-      // if(creating.value) {
-      //   return;
-      // }
       creating.value = true;
       String leadsJSON = "";
       Map<String, dynamic> lead = {
@@ -403,17 +397,43 @@ class LeadsBloc extends Bloc {
         });
       }
       // print("the data is : $lead");
-      ApiResponse res = await _repo.createNewLead(lead);
-      if(res.status) {
+      var res = await _repo.createNewLead(lead);
+      if(res["status"].toString() == "success") {
         showMessage(const MessageType.success("Employee Created Successfully"));
         createLeadController.add("SUCCESS");
-        // name.clear();
-        phone.clear();
-        // phone2.clear();
+        title.clear();
+        source.value = null;
+        remark.clear();
+        leadStatus.value = null;
+        nextFollowUp.clear();
+        forLead.value = null;
+        portfolioCat.value = null;
+        designation.value = null;
+        yourDepartment.value = null;
+        requirements.clear();
+        alreadyClient.value = null;
+        selectClient.value = null;
+        firstName.clear();
+        middleName.clear();
+        lastName.clear();
         email.clear();
-        // requirement.clear();
-        // image.value = null;
+        alternateEmail.clear();
+        phone.clear();
+        alternatePhone.clear();
+        clientGender.value = null;
+        address.clear();
+        country.value = null;
+        countryState.value = null;
+        city.value = null;
+        pincode.clear();
+        companyName.value = null;
+        preferenceTechnology.value = [];
+        probabilityConversion.clear();
+        lastFollowUp.clear();
 
+        Navigator.pop(context);
+        leadData.value = null;
+        getLeadData(leadType.value);
       } else {
         showMessage(MessageType.error(res.message));
       }
