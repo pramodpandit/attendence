@@ -30,9 +30,7 @@ class _NoticeBoardScreenState extends State<NoticeBoardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: const MyAppBar(
-      //   title: "Notice Board",
-      // ),
+
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

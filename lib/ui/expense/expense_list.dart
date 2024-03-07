@@ -142,7 +142,7 @@ class _ExpenseListState extends State<ExpenseList> {
                               return GestureDetector(
                                 onTap: () {
                                   Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => const ExpenseDetails()));
+                                      builder: (context) =>  ExpenseDetails(expensedata: allExpenseData[index],)));
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -209,7 +209,6 @@ class _ExpenseListState extends State<ExpenseList> {
                                         ),
                                         const SizedBox(height: 10,),
                                         Text(
-                                          // "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi.Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi. Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi.Neque porro quisquam.",
                                           "Created at : ${DateFormat.yMMMd().format(DateTime.parse(allExpenseData[index]['created_at']))}",
                                           textAlign: TextAlign.left,
                                           style: TextStyle(

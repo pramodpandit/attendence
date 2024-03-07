@@ -12,15 +12,8 @@ import 'package:office/ui/leads/leadMenus/lead_logs.dart';
 import 'package:office/ui/leads/leadMenus/lead_notes.dart';
 import 'package:office/ui/leads/leadMenus/lead_overview.dart';
 import 'package:office/ui/leads/leadMenus/lead_technology.dart';
-import 'package:office/ui/project/menus/logs.dart';
 import 'package:provider/provider.dart';
-
 import '../profile/menus/basic_info.dart';
-import '../project/menus/project_files.dart';
-import '../project/menus/project_links.dart';
-import '../project/menus/project_members.dart';
-import '../project/menus/project_notes_list.dart';
-import '../project/menus/project_overview.dart';
 
 class LeadDetails extends StatefulWidget {
   final Map<String, dynamic> data;
@@ -180,7 +173,6 @@ class _LeadDetailsState extends State<LeadDetails> {
                             ),
                           DetailsContainer(
                             title:"${widget.data['status']}",
-                            //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
                             heading: 'Status', isHtml: false,
                           ),
                         ],
