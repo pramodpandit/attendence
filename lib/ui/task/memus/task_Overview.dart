@@ -125,7 +125,7 @@ class _TaskOverViewState extends State<TaskOverView> {
                       const SizedBox(height: 10,),
                       DetailsContainer(
                         title: allTaskData['description']??'',
-                        heading: 'Description', isHtml: false,
+                        heading: 'Description', isHtml: true,
                       ),
                       Dash(
                         dashColor: Colors.grey.withOpacity(0.3),

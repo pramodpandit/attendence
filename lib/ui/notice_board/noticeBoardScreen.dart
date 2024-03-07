@@ -98,7 +98,11 @@ class _NoticeBoardScreenState extends State<NoticeBoardScreen> {
           if(noticeBoards.isEmpty){
             return Row(
               crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.width * 0.8,
+                ),
                 const Center(child: Text('Data Not Exist!')),
               ],
             );

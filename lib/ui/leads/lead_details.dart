@@ -61,7 +61,6 @@ class _LeadDetailsState extends State<LeadDetails> {
       LeadTechnology(data : widget.data['id']),
       LeadBranches(data : widget.data['id']),
     ];
-
   }
   @override
   Widget build(BuildContext context) {
@@ -134,16 +133,22 @@ class _LeadDetailsState extends State<LeadDetails> {
                         children: [
                           const SizedBox(height: 5,),
                           const SizedBox(height: 10,),
-                          DetailsContainer(
-                            title:"${widget.data['createdby_fname'] ?? ''} ${widget.data['createdby_lname'] ?? ''}",
-                            //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
-                            heading: 'Created By', isHtml: false,
+                          widget.data['createdby_fname']==null?Offstage():
+                          Column(
+                            children: [
+                              DetailsContainer(
+                                title:"${widget.data['createdby_fname'] ?? ''} ${widget.data['createdby_lname'] ?? ''}",
+                                //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
+                                heading: 'Created By', isHtml: false,
+                              ),
+                              Dash(
+                                dashColor: Colors.grey.withOpacity(0.3),
+                                dashGap: 3,
+                                length: 270.w,
+                              ),
+                            ],
                           ),
-                          Dash(
-                            dashColor: Colors.grey.withOpacity(0.3),
-                            dashGap: 3,
-                            length: 270.w,
-                          ),
+
                           const SizedBox(height: 10,),
                           DetailsContainer(
                             title:"${DateFormat.yMMMd().format(DateTime.parse(widget.data['created_date']))}",
@@ -156,17 +161,22 @@ class _LeadDetailsState extends State<LeadDetails> {
                             length: 270.w,
                           ),
                           const SizedBox(height: 10,),
-                          DetailsContainer(
-                            title:"${widget.data['clientsurname'] ?? ''} ${widget.data['clientfirstname'] ?? ''} ${widget.data['clientlastname'] ?? ''}",
-                            //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
-                            heading: 'Client Name', isHtml: false,
+                          widget.data['clientsurname'] ==null?Offstage():
+                          Column(
+                            children: [
+                              DetailsContainer(
+                                title:"${widget.data['clientsurname'] ?? ''} ${widget.data['clientfirstname'] ?? ''} ${widget.data['clientlastname'] ?? ''}",
+                                //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
+                                heading: 'Client Name', isHtml: false,
+                              ),
+                              Dash(
+                                dashColor: Colors.grey.withOpacity(0.3),
+                                dashGap: 3,
+                                length: 270.w,
+                              ),
+                              const SizedBox(height: 10,),
+                            ],
                           ),
-                          Dash(
-                            dashColor: Colors.grey.withOpacity(0.3),
-                            dashGap: 3,
-                            length: 270.w,
-                          ),
-                          const SizedBox(height: 10,),
                           DetailsContainer(
                             title:"${widget.data['status']}",
                             //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",

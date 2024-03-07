@@ -32,75 +32,64 @@ class _TaskTimesheetListState extends State<TaskTimesheet> {
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            ValueListenableBuilder(
-              valueListenable: bloc.allTaskData,
-              builder: (context, projectNotes, child) {
-                if(projectNotes ==null){
-                  return SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.7,
-                      child: Center(child: CircularProgressIndicator()));
-                }
-                if(projectNotes.isEmpty){
-                  return SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.7,
-                      child: Center(child: Text("No data available")));
-                }
-                return Container(
-                  height: MediaQuery.of(context).size.height,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15,vertical:0),
-                    child: ListView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount:projectNotes.length,
-                        padding: EdgeInsets.only(top: 10),
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) {
-                          var data = projectNotes[index];
-                          var startTime =data['start_time'].toString().split(':');
-                          var endTime =data['end_time'].toString().split(':');
-                          return  Container(
-                            margin: const EdgeInsets.only(bottom: 20),
-                            child:ListTile(
-                              title:Text('${data['first_name']??''} ${data['last_name']??''}',style: TextStyle(fontWeight: FontWeight.w500,fontSize: 14),),
-                              subtitle:   Container(
-                                child: Html(
-                                  data:
-                                  "${data['memo']??''}",
-                                  style: {
-                                    "body": Style(
-                                        color: Colors.black,
-                                        fontWeight:
-                                        FontWeight.w500,
-                                        display: Display.inline,
-                                        fontSize: FontSize(16),
-                                        textAlign:
-                                        TextAlign.start),
-                                    "p": Style(
-                                        color: Colors.black,
-                                        display: Display.inline,
-                                        fontSize: FontSize(16),
-                                        textAlign:
-                                        TextAlign.start),
-                                  },
-                                ),
-                              ),
-                              leading:CircleAvatar(
-                                child: Icon(Icons.person),
-                              ),
-                              trailing: Text('${startTime[0]}:${startTime[1]} - ${endTime[0]}:${endTime[1]}',style: TextStyle(fontSize: 10),),
-                            )
-                          );
-                        }
+      body: ValueListenableBuilder(
+        valueListenable: bloc.allTaskData,
+        builder: (context, projectNotes, child) {
+          if(projectNotes ==null){
+            return SizedBox(
+                height: MediaQuery.of(context).size.height * 0.7,
+                child: Center(child: CircularProgressIndicator()));
+          }
+          if(projectNotes.isEmpty){
+            return SizedBox(
+                height: MediaQuery.of(context).size.height * 0.7,
+                child: Center(child: Text("No data available")));
+          }
+          return  Padding(
+              padding: const EdgeInsets.only(left: 10,right: 10),
+              child: ListView.builder(
+                  itemCount:projectNotes.length,
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    var data = projectNotes[index];
+                    var startTime =data['start_time'].toString().split(':');
+                    var endTime =data['end_time'].toString().split(':');
+                    return  Container(
+                     // margin: const EdgeInsets.only(bottom: 20),
+                      child:ListTile(
+                        title:Text('${data['first_name']??''} ${data['last_name']??''}',style: TextStyle(fontWeight: FontWeight.w500,fontSize: 14),),
+                        subtitle:   Container(
+                          child: Html(
+                            data:
+                            "${data['memo']??''}",
+                            style: {
+                              "body": Style(
+                                  color: Colors.black,
+                                  fontWeight:
+                                  FontWeight.w500,
+                                  display: Display.inline,
+                                  fontSize: FontSize(13),
+                                  textAlign:
+                                  TextAlign.start),
+                              "p": Style(
+                                  color: Colors.black,
+                                  display: Display.inline,
+                                  fontSize: FontSize(13),
+                                  textAlign:
+                                  TextAlign.start),
+                            },
+                          ),
                         ),
-                  ) ,
-                );
-              },),
-          ],
-        ),
-      ),
+                        leading:CircleAvatar(
+                          child: Icon(Icons.person),
+                        ),
+                        trailing: Text('${startTime[0]}:${startTime[1]} - ${endTime[0]}:${endTime[1]}',style: TextStyle(fontSize: 10),),
+                      )
+                    );
+                  }
+                  ),
+            ) ;
+        },),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -142,7 +131,7 @@ class _TaskTimesheetListState extends State<TaskTimesheet> {
                         ),
                       ),
                       Text(
-                        "Notes",
+                        "",
                         style: TextStyle(color: Colors.white),
                       )
                     ],

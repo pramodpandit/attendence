@@ -31,6 +31,9 @@ class _LeadLinksState extends State<LeadLinks> {
     super.initState();
     bloc = LeadsBloc(context.read<LeadsRepository>());
     bloc.getSpecificLeadData(widget.data.toString(),"lead_links");
+    bloc.msgController?.stream.listen((event) {
+      AppMessageHandler().showSnackBar(context, event);
+    });
   }
   @override
   Widget build(BuildContext context) {
@@ -51,7 +54,7 @@ class _LeadLinksState extends State<LeadLinks> {
             }
             return   Padding(
               padding: const EdgeInsets.only(
-                  left: 25, right: 25, top: 10, bottom: 10),
+                  left: 15, right: 15, top: 10, bottom: 10),
               child: ListView.builder(
                   physics: const NeverScrollableScrollPhysics(),
                   padding: EdgeInsets.only(top: 10),
@@ -160,8 +163,6 @@ class _LeadLinksState extends State<LeadLinks> {
                   }),
             );
           },),
-
-
       ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,

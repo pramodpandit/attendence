@@ -453,7 +453,7 @@ class LeadsBloc extends Bloc {
   StreamController<String> fileStream = StreamController.broadcast();
   ValueNotifier<bool> addfileLoading  = ValueNotifier(false);
 
-  addNewLeadFiles(int leadId,String private)async{
+  Future addNewLeadFiles(int leadId,String private)async{
     addfileLoading.value = true;
     SharedPreferences pref = await SharedPreferences.getInstance();
     try {
@@ -468,6 +468,7 @@ class LeadsBloc extends Bloc {
       ApiResponse res = await _repo.createNewLeadFile(data);
       if(res.status) {
         showMessage(const MessageType.success("File Created Successfully"));
+        return true;
       } else {
         showMessage(MessageType.error(res.message));
       }
@@ -485,6 +486,7 @@ class LeadsBloc extends Bloc {
   TextEditingController titleNotes = TextEditingController();
   TextEditingController descriptionNotes = TextEditingController();
   StreamController<String> NotesStream = StreamController.broadcast();
+  ValueNotifier<bool> isLoadingAddNotes = ValueNotifier(false);
 
   Future<void> AddNotes(int id,) async {
     SharedPreferences _pref = await SharedPreferences.getInstance();
@@ -495,7 +497,7 @@ class LeadsBloc extends Bloc {
         "title":titleNotes.text,
         "description":descriptionNotes.text
       };
-      addfileLoading.value = true;
+      isLoadingAddNotes.value = true;
       var result = await _repo.Add('lead/add_notes',data);
       if(result.status == true){
         NotesStream.sink.add('streamNotes');
@@ -505,7 +507,7 @@ class LeadsBloc extends Bloc {
       debugPrint("$e");
       debugPrint("$s");
     } finally {
-      addfileLoading.value = false;
+      isLoadingAddNotes.value = false;
     }
   }
 
@@ -518,6 +520,7 @@ TextEditingController cp_name = TextEditingController();
 TextEditingController cp_mobile = TextEditingController();
 TextEditingController cp_email = TextEditingController();
 TextEditingController cp_location = TextEditingController();
+ValueNotifier<bool> isLoadingAddBranch = ValueNotifier(false);
   Future<void> AddBranch(int id,) async {
     SharedPreferences _pref = await SharedPreferences.getInstance();
     try {
@@ -533,7 +536,7 @@ TextEditingController cp_location = TextEditingController();
         "cp_email":cp_email.text,
         "cp_location":cp_location.text,
       };
-      addfileLoading.value = true;
+      isLoadingAddBranch.value = true;
       var result = await _repo.Add('lead/add_branches',data);
       if(result.status == true){
         NotesStream.sink.add('streamNotes');
@@ -543,7 +546,7 @@ TextEditingController cp_location = TextEditingController();
       debugPrint("$e");
       debugPrint("$s");
     } finally {
-      addfileLoading.value = false;
+      isLoadingAddBranch.value = false;
     }
   }
   // link all data
@@ -570,16 +573,23 @@ TextEditingController cp_location = TextEditingController();
     }
   }
 
-  Future<void> addLeadLink(String leadId) async {
+  Future addLeadLink(String leadId) async {
     try {
-      addLinkLoading.value = true;
-      var result = await _repo.AddLink(leadId,linkType.value!,link.text,other.text);
-      if(result.status == true){
-        showMessage(MessageType.success(result.message.toString()));
-        linkSteam.sink.add('notes');
+      if(linkType.value ==null){
+        showMessage(MessageType.info('Please select link type'));
       }else{
-        showMessage(MessageType.error("Something went wrong"));
+        addLinkLoading.value = true;
+
+        var result = await _repo.AddLink(leadId,linkType.value!,link.text,other.text);
+        if(result.status == true){
+          showMessage(MessageType.success(result.message.toString()));
+          linkSteam.sink.add('notes');
+          return true;
+        }else{
+          showMessage(MessageType.error("Something went wrong"));
+        }
       }
+
     } catch (e, s) {
       debugPrint("$e");
       debugPrint("$s");
@@ -707,7 +717,7 @@ TextEditingController cp_location = TextEditingController();
     }
   }
 
-  Future<void> addLeadLogs(String leadId) async {
+  Future addLeadLogs(String leadId) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     Map<String,dynamic> data = {
       "user_id" : pref.getString("uid"),
@@ -766,22 +776,27 @@ TextEditingController cp_location = TextEditingController();
         });
       }
     }
-
-    try {
-      addLogsLoading.value = true;
-      var result = await _repo.AddLogs(data);
-      if(result.status == true){
-        showMessage(MessageType.success(result.message.toString()));
-        linkSteam.sink.add('notes');
-      }else{
-        showMessage(MessageType.error("Something went wrong"));
+    if(logStatus.value ==null){
+      showMessage(MessageType.info('Please select status'), );
+    }else{
+      try {
+        addLogsLoading.value = true;
+        var result = await _repo.AddLogs(data);
+        if(result.status == true){
+          showMessage(MessageType.success(result.message.toString()));
+          linkSteam.sink.add('notes');
+          return true;
+        }else{
+          showMessage(MessageType.error("Something went wrong"));
+        }
+      } catch (e, s) {
+        debugPrint("$e");
+        debugPrint("$s");
+      } finally {
+        addLogsLoading.value = false;
       }
-    } catch (e, s) {
-      debugPrint("$e");
-      debugPrint("$s");
-    } finally {
-      addLogsLoading.value = false;
     }
+
   }
 
   // leadLogs end

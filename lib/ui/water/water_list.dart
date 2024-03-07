@@ -457,6 +457,8 @@ class _WaterListState extends State<WaterList> {
                                                               style: const TextStyle(color: Color(0xff20263c),fontWeight: FontWeight.w600),
                                                             ),
                                                           ),
+
+
                                                       ]
                                                     );
                                                   }).toList()
@@ -483,20 +485,5 @@ class _WaterListState extends State<WaterList> {
       ),
     );
   }
-  Map<DateTime, List<String>> dateDataMap = {};
 
-  void addData(var date, String data) {
-    var dateq = date.toString().split('-');
-    int value = int.parse(dateq[0]);
-    int value1 = int.parse(dateq[1]);
-    int value2= int.parse(dateq[2]);
-    // Clear the time part of the DateTime object to make it date-wise
-    DateTime dateWithoutTime = DateTime(value, value1, value2);
-
-    if (waterBloc.waterList.value.contains(dateWithoutTime)) {
-      dateDataMap[dateWithoutTime]!.add(data);
-    } else {
-      dateDataMap[dateWithoutTime] = [data];
-    }
-  }
 }

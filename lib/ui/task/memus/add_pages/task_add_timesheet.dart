@@ -38,6 +38,9 @@ class _TaskAddTimeSheetState extends State<TaskAddTimeSheet> {
     super.initState();
     widget.bloc.comment.text ='';
     widget.bloc.fetchexpensePaymentType();
+    widget.bloc.msgController?.stream.listen((event) {
+      AppMessageHandler().showSnackBar(context, event);
+    });
     widget.bloc.timesheetStream.stream.listen((event) {
       if (event == 'timesheetStream') {
         widget.bloc.fetchTaskDetails(widget.taskId,'task_timesheet');

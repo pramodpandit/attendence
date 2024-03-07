@@ -108,6 +108,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                           child: TextFormField(
                             style: const TextStyle(color: Colors.black),
                             keyboardType: TextInputType.multiline,
+                            textCapitalization: TextCapitalization.sentences,
                             controller: bloc.feedbackController,
                             maxLines: null,
                             decoration: const InputDecoration(
@@ -146,8 +147,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                                     ? CircularProgressIndicator()
                                     : CustomButton2(
                                         onPressed: () {
-                                          if (formKey.currentState!
-                                              .validate()) {
+                                          if (formKey.currentState!.validate()) {
                                             bloc.addFeedback();
                                           }
                                         },

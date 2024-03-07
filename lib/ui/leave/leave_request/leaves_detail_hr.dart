@@ -107,12 +107,16 @@ class _LeavesDetailhrState extends State<LeavesDetailhr> {
                     child: CustomButton2(
                         onPressed: () {
                           if (bloc.remark.text !='') {
-                            bloc.AddRemarkLeave(editData.id!.toInt());
-                            if(value == 1){
-                              bloc.CanelLeave(int.parse(widget.data.id.toString()));
-                            }else{
-                              bloc.ApprovedLeave(int.parse(widget.data.id.toString()));
-                            }
+                            bloc.AddRemarkLeave(editData.id!.toInt()).then((value) {
+                              if(value==true){
+                                if(value == 1){
+                                  bloc.CanelLeave(int.parse(widget.data.id.toString()));
+                                }else{
+                                  bloc.ApprovedLeave(int.parse(widget.data.id.toString()));
+                                }
+                              }
+                            });
+
 
                           }else{
                             bloc.showMessage(const MessageType.info("Please enter your remark"));

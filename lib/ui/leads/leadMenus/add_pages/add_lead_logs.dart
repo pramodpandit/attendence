@@ -3,12 +3,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:office/bloc/leads_bloc.dart';
-import 'package:office/bloc/project_bloc.dart';
-import 'package:office/data/repository/project_repo.dart';
 import 'package:office/ui/widget/app_dropdown.dart';
 import 'package:office/ui/widget/app_text_field.dart';
 import 'package:office/ui/widget/custom_button.dart';
-import 'package:provider/provider.dart';
+
+import '../../../../utils/message_handler.dart';
 
 class AddLeadLogs extends StatefulWidget {
   final int leadId;
@@ -21,7 +20,6 @@ class AddLeadLogs extends StatefulWidget {
 
 class _AddLeadLogsState extends State<AddLeadLogs> {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
-
   @override
   void initState() {
     // TODO: implement initState
@@ -30,14 +28,14 @@ class _AddLeadLogsState extends State<AddLeadLogs> {
     widget.bloc.getAllCurrencyData();
     widget.bloc.getAllBranchDetails();
     widget.bloc.getAllEmployeeDetails();
+    widget.bloc.msgController?.stream.listen((event) {
+      AppMessageHandler().showSnackBar(context, event);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: const MyAppBar(
-      //   title: "Give Feedback",
-      // ),
       body: SingleChildScrollView(
         child: Stack(
           children: [
@@ -127,6 +125,7 @@ class _AddLeadLogsState extends State<AddLeadLogs> {
                                       });
                                     },
                                     child: AppTextField(
+
                                       controller: widget.bloc.nextFollowUpDate,
                                       title: "Next Follow Up Date",
                                       showTitle: false,
@@ -156,8 +155,9 @@ class _AddLeadLogsState extends State<AddLeadLogs> {
                         },),
                         const SizedBox(height: 10),
                         AppTextField(
+                          textCapitalization: TextCapitalization.sentences,
                             controller: widget.bloc.message,
-                            title: "message",
+                            title: "Message",
                           maxLines: 3,
                           showTitle: false,
                         ),
@@ -515,9 +515,12 @@ class _AddLeadLogsState extends State<AddLeadLogs> {
                                     onPressed: () {
                                       if (formKey.currentState!.validate()) {
                                         widget.bloc.addLeadLogs(widget.leadId.toString()).then((value){
-                                          Navigator.pop(context);
-                                          widget.bloc.specificLeadData.value = null;
-                                          widget.bloc.getSpecificLeadData(widget.leadId.toString(),"lead_logs");
+                                          if(value ==true){
+                                            Navigator.pop(context);
+                                            widget.bloc.specificLeadData.value = null;
+                                            widget.bloc.getSpecificLeadData(widget.leadId.toString(),"lead_logs");
+                                          }
+
                                         });
                                       }
                                     },

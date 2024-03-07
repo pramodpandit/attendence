@@ -92,7 +92,7 @@ class _ProjectMembersState extends State<ProjectMembers> {
                                 child: Row(
                                   children: [
                                     CircleAvatar(
-                                      backgroundImage:data['employee_img']==null?null:NetworkImage('https://freeze.talocare.co.in/public/${data['employee_img']}'),
+                                      backgroundImage:data['employee_img']==null?null:NetworkImage('https://freeze.talocare.co.in/public/${data['employee_img']}',),
                                       child: data['employee_img']==null?Icon(Icons.person):Offstage(),
                                     ),
                                     SizedBox(width: 10),

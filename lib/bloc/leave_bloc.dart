@@ -287,7 +287,7 @@ class LeaveBloc extends Bloc {
       isApprovedLoading.value = false;
     }
   }
-  AddRemarkLeave(int id) async {
+  Future AddRemarkLeave(int id) async {
     try {
       isResponseApproveLoad.value = true;
       var result = await _repo.AddRemark(id,remark.text);
@@ -295,6 +295,7 @@ class LeaveBloc extends Bloc {
         CancelStream.sink.add('Post');
         showMessage(MessageType.success("success"));
         remark.clear();
+        return true;
       } else {
         showMessage(MessageType.error("Something went wrong"));
       }

@@ -46,6 +46,7 @@ class _EditLeavePageState extends State<EditLeavePage> {
     bloc.selectedLeaveCategory = widget.data.leaveType;
     bloc.leaveId.value = widget.data.id;
     bloc.filepath.text =widget.data.document.toString();
+    bloc.getLeaveCategory();
   }
 
 
@@ -107,7 +108,9 @@ class _EditLeavePageState extends State<EditLeavePage> {
                           AppDropdown(
                             items: bloc.durationType.map((e) => DropdownMenuItem(value: '${e['value']}', child: Text("${e['title']}"))
                             ).toList(),
-                            onChanged: (v) {bloc.updateDT(v);},
+                            onChanged: (v) {bloc.updateDT(v);
+                              bloc.getLeaveCategory();
+                              },
                             value: bloc.selectedDurationType.value,
                             hintText: "Select Duration Type",
                           ),

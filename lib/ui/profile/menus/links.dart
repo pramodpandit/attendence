@@ -8,6 +8,8 @@ import 'package:office/data/repository/profile_repo.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../utils/message_handler.dart';
+
 class Links extends StatefulWidget {
   const Links({Key? key}) : super(key: key);
 
@@ -22,6 +24,9 @@ class _LinksState extends State<Links> {
     bloc = ProfileBloc(context.read<ProfileRepository>());
     super.initState();
     bloc.fetchLinks();
+    bloc.msgController?.stream.listen((event) {
+      AppMessageHandler().showSnackBar(context, event);
+    });
   }
 
   @override
@@ -132,10 +137,11 @@ class _LinksState extends State<Links> {
                                               try {
                                                 await launchUrl(url);
                                               } catch (e) {
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(SnackBar(
-                                                        content: Text(
-                                                            '${links[index].links} does not exist')));
+                                                bloc.showMessage(MessageType.info('${links[index].links} does not exist'));
+                                                // ScaffoldMessenger.of(context)
+                                                //     .showSnackBar(SnackBar(
+                                                //         content: Text(
+                                                //             '${links[index].links} does not exist')));
                                               }
                                             },
                                             child: Container(
