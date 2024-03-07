@@ -161,7 +161,7 @@ class _LeadDetailsState extends State<LeadDetails> {
                             length: 270.w,
                           ),
                           const SizedBox(height: 10,),
-                          widget.data['clientsurname'] ==null?Offstage():
+                          widget.data['clientsurname'] ==null? Offstage():
                           Column(
                             children: [
                               DetailsContainer(
