@@ -4,13 +4,13 @@ import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:office/ui/task/task_details.dart';
 import 'package:provider/provider.dart';
-
 import '../../bloc/task_bloc.dart';
 import '../../data/repository/task_repo.dart';
 import 'add_task.dart';
 
 class TaskScreen extends StatefulWidget {
-  const TaskScreen({Key? key}) : super(key: key);
+  final id;
+  const TaskScreen({Key? key, this.id}) : super(key: key);
 
   @override
   State<TaskScreen> createState() => _TaskScreenState();
@@ -25,14 +25,15 @@ class _TaskScreenState extends State<TaskScreen> {
     bloc = taskBloc(context.read<TaskRepositary>(), );
     super.initState();
     bloc.fetchTaskData("doing");
+    widget.id !=null?bloc.taskStatus.value = 'total':'';
     // _scrollController.addListener(_loadMoreData);
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
         children: [
+          widget.id ==null?
           Stack(
             children: [
               Container(
@@ -94,7 +95,7 @@ class _TaskScreenState extends State<TaskScreen> {
                 ),
               ),
             ],
-          ),
+          ):Offstage(),
           Expanded(
             child: Container(
               width: 1.sw,
@@ -123,11 +124,120 @@ class _TaskScreenState extends State<TaskScreen> {
                       ),
                     );
                   }
-                return ListView.builder(
-                    itemCount: allFetchedTaskData.length,
+                  List data = allFetchedTaskData.where((element) => element['project_id'].toString() == widget.id.toString()).toList();
+                  return ListView.builder(
+                    itemCount: widget.id !=null?data.length:allFetchedTaskData.length,
                     shrinkWrap: true,
                     physics: const ScrollPhysics(),
                     itemBuilder: (context,index){
+                      if(widget.id !=null){
+                        return GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(builder: (context)=>TaskDetails(data:data[index],)));
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 25),
+                              child: Container(
+                                margin: const EdgeInsets.only(bottom: 20),
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color: Colors.grey.withOpacity(0.2),
+                                          blurRadius: 3,
+                                          spreadRadius: 2)
+                                    ],
+                                    borderRadius: const BorderRadius.only(topRight: Radius.circular(10.0),bottomRight:Radius.circular(10.0),)
+                                ),
+                                child: IntrinsicHeight(
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 3,
+                                        decoration: const BoxDecoration(
+                                            color:Color(0xFF009FE3),
+                                            borderRadius: BorderRadius.only(topLeft: Radius.circular(10.0),bottomLeft:Radius.circular(10.0))
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Container(
+                                          decoration: const BoxDecoration(
+                                            color: Colors.transparent,
+                                          ),
+                                          padding: EdgeInsets.symmetric(horizontal: 10),
+                                          child:  Column(
+                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              SizedBox(height: 10,),
+                                              Expanded(
+                                                child: Text(
+                                                  "${data[index]['title']}",
+                                                  // "The prevalence of trauma related disorders in children and adolescents affected by forest fires.",
+                                                  style: TextStyle(
+                                                      fontFamily: "Poppins",
+                                                      fontSize: 12,
+                                                      fontWeight: FontWeight.w600,
+                                                      color: Colors.black
+                                                  ),),
+                                              ),
+                                              Text(
+                                                "11:00 Am - 12:00 Pm",
+                                                // "The prevalence of trauma related disorders in children and adolescents affected by forest fires.",
+                                                style: TextStyle(
+                                                    fontSize: 8,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Colors.black54
+                                                ),),
+                                              SizedBox(height: 10,),
+                                              Container(
+
+                                                child: Html(
+                                                  // data:"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+                                                  data:
+                                                  "${data[index]['description']}",
+                                                  style: {
+                                                    "body": Style(
+                                                        color: Colors.black,
+                                                        fontWeight:
+                                                        FontWeight.w600,
+
+                                                        display: Display.inline,
+                                                        fontSize: FontSize(10),
+                                                        textAlign:
+                                                        TextAlign.start),
+                                                    "p": Style(
+                                                        color: Colors.black,
+                                                        display: Display.inline,
+                                                        fontSize: FontSize(10),
+                                                        textAlign:
+                                                        TextAlign.start),
+                                                  },
+                                                ),
+                                              ),
+                                              SizedBox(height: 10,),
+                                              Row(mainAxisAlignment: MainAxisAlignment.end,
+                                                children: [
+                                                  Text("${allFetchedTaskData[index]['status']}",
+                                                    style: TextStyle(
+                                                        fontFamily: "Poppins",
+                                                        fontSize: 11,
+                                                        fontWeight: FontWeight.w600,
+                                                        color: Colors.blue
+                                                    ),),
+                                                ],),
+                                              SizedBox(height: 10,),
+                                            ],
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                      }else{
                         return GestureDetector(
                           onTap: () {
                             Navigator.of(context).push(MaterialPageRoute(builder: (context)=>TaskDetails(data:allFetchedTaskData[index],)));
@@ -240,6 +350,7 @@ class _TaskScreenState extends State<TaskScreen> {
                             ),
                           ),
                         );
+                      }
                     });
               },)
             ),
@@ -258,60 +369,71 @@ class _TaskScreenState extends State<TaskScreen> {
                     borderRadius: BorderRadius.all(Radius.circular(5.0))
                 ),
                 onPressed: () async{
-                  showModalBottomSheet(
-                    context: context,
-                    backgroundColor: Colors.white,
-                    builder: (context) {
-                      List taskTypeData = [
-                        {"title": "All", "value": "total"},
-                        {"title": "Doing", "value": "doing"},
-                        {"title": "incomplete", "value": "incomplete"},
-                        {"title": "Complete", "value": "complete"},
-                      ];
-                      return Container(
-                        padding: EdgeInsets.all(10),
-                        width: double.infinity,
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: taskTypeData.length,
-                          itemBuilder: (context, index) {
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).pop();
-                                bloc.allFetchedTaskData.value = null;
-                                bloc.taskStatus.value = taskTypeData[index]["value"];
-                                bloc.fetchTaskData(taskTypeData[index]["value"]);
-                              },
-                              child: ValueListenableBuilder(
-                                valueListenable: bloc.taskStatus,
-                                builder: (context, type, child) {
-                                  return Container(
-                                    margin: EdgeInsets.all(5),
-                                    padding : EdgeInsets.symmetric(horizontal: 10,vertical: 3),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                            taskTypeData[index]["title"],
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w500,
-                                              color: type == taskTypeData[index]["value"]?Colors.white:Colors.black,
-                                            )),
-                                        type == taskTypeData[index]["value"]?Icon(PhosphorIcons.check_circle_fill,color: Colors.white):Offstage(),
-                                      ],
-                                    ),
-                                    decoration: BoxDecoration(
-                                        color: type == taskTypeData[index]["value"]? Colors.green: Colors.white,
-                                        borderRadius: BorderRadius.circular(5)
-                                    ),
-                                  );
-                                },),
-                            );
-                          },
-                        ),
-                      );
-                    },);
+
+                  if(widget.id ==null){
+                    showModalBottomSheet(
+                      context: context,
+                      backgroundColor: Colors.white,
+                      builder: (context) {
+                        List taskTypeData = [
+                          {"title": "All", "value": "total"},
+                          {"title": "Doing", "value": "doing"},
+                          {"title": "incomplete", "value": "incomplete"},
+                          {"title": "Complete", "value": "complete"},
+                        ];
+                        return Container(
+                          padding: EdgeInsets.all(10),
+                          width: double.infinity,
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: taskTypeData.length,
+                            itemBuilder: (context, index) {
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).pop();
+                                  bloc.allFetchedTaskData.value = null;
+                                  bloc.taskStatus.value = taskTypeData[index]["value"];
+                                  bloc.fetchTaskData(taskTypeData[index]["value"]);
+                                },
+                                child: ValueListenableBuilder(
+                                  valueListenable: bloc.taskStatus,
+                                  builder: (context, type, child) {
+                                    return Container(
+                                      margin: EdgeInsets.all(5),
+                                      padding : EdgeInsets.symmetric(horizontal: 10,vertical: 3),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                              taskTypeData[index]["title"],
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500,
+                                                color: type == taskTypeData[index]["value"]?Colors.white:Colors.black,
+                                              )),
+                                          type == taskTypeData[index]["value"]?Icon(PhosphorIcons.check_circle_fill,color: Colors.white):Offstage(),
+                                        ],
+                                      ),
+                                      decoration: BoxDecoration(
+                                          color: type == taskTypeData[index]["value"]? Colors.green: Colors.white,
+                                          borderRadius: BorderRadius.circular(5)
+                                      ),
+                                    );
+                                  },),
+                              );
+                            },
+                          ),
+                        );
+                      },) ;
+                  }else{
+                    Navigator.push(context, MaterialPageRoute(
+                        builder: (context) => Provider.value(
+                          value: bloc,
+                          child: const addTask(),
+                        )
+                    ));
+                  }
+
                   // Navigator.push(
                   //   context,
                   //   MaterialPageRoute(
@@ -333,14 +455,14 @@ class _TaskScreenState extends State<TaskScreen> {
                           child: child,
                         ),
                       ),
-                  child: const Row(
+                  child:  Row(
                     children: [
                       Center(
                         // padding: EdgeInsets.only(right: 5.0),
-                        child: Icon(
+                        child: widget.id ==null?Icon(
                           Icons.filter_alt,
                           color: Colors.white,
-                        ),
+                        ):Icon(Icons.add,color: Colors.white,),
                       ),
                       // Text(
                       //   "Lead",

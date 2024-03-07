@@ -18,6 +18,7 @@ import 'package:provider/provider.dart';
 import '../../bloc/project_bloc.dart';
 import '../../data/model/user.dart';
 import '../../data/repository/project_repo.dart';
+import '../task/task_screen.dart';
 import '../widget/stack_user_list.dart';
 import 'menus/project_expenses.dart';
 
@@ -65,7 +66,7 @@ class _ProjectDetailsState extends State<ProjectDetails> {
     super.initState();
     projectMenusWidgets=[
      ProjectOverview(data: dataa,user: user,),
-      ProjectTask(data:dataa),
+      TaskScreen(id: dataa['id'],),
       ProjectFiles(data: dataa),
       ProjectComments(data: dataa),
       ProjectExpenses(data: dataa),

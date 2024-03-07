@@ -168,7 +168,7 @@ class _AddBillState extends State<AddBill> {
                                     print(v);
                                     },
                                     value: null,
-                                    hintText: "Choose Member",
+                                    hintText: "Choose Branch",
                                   );
                                 }
                                 if(member.isEmpty){
@@ -182,7 +182,7 @@ class _AddBillState extends State<AddBill> {
                                   onChanged: (v) {eBillBloc.UpdateBranchName.value = v;
                                   },
                                   value: eBillBloc.UpdateBranchName.value,
-                                  hintText: "Choose Member",
+                                  hintText: "Choose Branch",
                                 );
                               },
 
@@ -202,34 +202,18 @@ class _AddBillState extends State<AddBill> {
                             ValueListenableBuilder(
                               valueListenable: eBillBloc.isEBillLoad,
                               builder: (context, bool loading,__) {
-                                if (loading) {
-                                  return const Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      SizedBox(
-                                        height: 50,
-                                      ),
-                                      // Center(
-                                      //   child: CircularProgressIndicator(color: Colors.blue,),
-                                      // ),
-                                    ],
-                                  );
-                                }
                                 return ValueListenableBuilder(
                                   valueListenable: eBillBloc.eBill,
                                   builder: (context, List<EBill>eBill,__) {
                                     if (eBill.isEmpty) {
-                                      return  const Center(
-                                        child: Column(
-                                          children: [
-                                            SizedBox(height:50),
-                                            Text(
-                                              "No data Found",
-                                              style: TextStyle(color: Colors.black),
-                                            ),
-                                          ],
-                                        ),
+                                      return  AppDropdown(
+                                        items: eBill.map((e) => DropdownMenuItem(value: '${e.id}', child: Text(e.name??""))
+                                        ).toList(),
+                                        onChanged: (v) {eBillBloc.Updatemetertype.value = v;
+                                        print(v);
+                                        },
+                                        value: null,
+                                        hintText: "Choose Type",
                                       );
                                     }
                                     return AppDropdown(
@@ -239,7 +223,7 @@ class _AddBillState extends State<AddBill> {
                                       print(v);
                                       },
                                       value: eBillBloc.Updatemetertype.value,
-                                      hintText: "Choose Member",
+                                      hintText: "Choose Type",
                                     );
                                     // return Container(
                                     //   decoration: BoxDecoration(

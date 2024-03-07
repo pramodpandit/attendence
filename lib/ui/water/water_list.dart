@@ -3,7 +3,6 @@ import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-
 import '../../bloc/water_bloc.dart';
 import '../../data/model/water_model.dart';
 import '../../data/model/water_type_model.dart';
@@ -152,7 +151,7 @@ class _WaterListState extends State<WaterList> {
                             return ValueListenableBuilder(
                               valueListenable: waterBloc.waterList,
                               builder: (context,List<Water>waterList,__) {
-                                print("$waterList");
+                                print("the water list ${waterList[0].toJson()}");
                                 if (waterList.isEmpty) {
                                   return  const Center(
                                     child: Column(
@@ -364,7 +363,6 @@ class _WaterListState extends State<WaterList> {
                                                               );
                                                             },
                                                           );
-
                                                           if (selectedYear != null) {
                                                             DateTime selectedDate =
                                                                 DateTime(selectedYear);
@@ -444,12 +442,11 @@ class _WaterListState extends State<WaterList> {
                                                           border: Border.all(color: Colors.black)
                                                       ),
                                                       children:[
+
                                                         Padding(
                                                           padding: EdgeInsets.all(5.0),
                                                           child: Text(
-                                                            DateFormat("dd-MM-yyyy").format(DateTime.parse(item.fDate
-                                                            !)),
-                                                            style: const TextStyle(color: Color(0xff20263c),fontWeight: FontWeight.w600),),
+                                                            DateFormat("dd-MM-yyyy").format(DateTime.parse(item.fDate!)), style: const TextStyle(color: Color(0xff20263c),fontWeight: FontWeight.w600),),
                                                         ),
                                                         for (var type in waterType)
                                                           Padding(
@@ -485,5 +482,21 @@ class _WaterListState extends State<WaterList> {
         ],
       ),
     );
+  }
+  Map<DateTime, List<String>> dateDataMap = {};
+
+  void addData(var date, String data) {
+    var dateq = date.toString().split('-');
+    int value = int.parse(dateq[0]);
+    int value1 = int.parse(dateq[1]);
+    int value2= int.parse(dateq[2]);
+    // Clear the time part of the DateTime object to make it date-wise
+    DateTime dateWithoutTime = DateTime(value, value1, value2);
+
+    if (waterBloc.waterList.value.contains(dateWithoutTime)) {
+      dateDataMap[dateWithoutTime]!.add(data);
+    } else {
+      dateDataMap[dateWithoutTime] = [data];
+    }
   }
 }

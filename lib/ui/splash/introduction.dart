@@ -25,7 +25,6 @@ class _IntroductionPageState extends State<IntroductionPage> {
     _pageController.dispose();
     super.dispose();
   }
-
   void _nextPage(int delta) {
     _pageController.animateToPage(
         _currentIndex + delta,

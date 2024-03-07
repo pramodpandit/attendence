@@ -93,7 +93,8 @@ class _TaskTimesheetListState extends State<TaskTimesheet> {
                               trailing: Text('${startTime[0]}:${startTime[1]} - ${endTime[0]}:${endTime[1]}',style: TextStyle(fontSize: 10),),
                             )
                           );
-                        }),
+                        }
+                        ),
                   ) ,
                 );
               },),

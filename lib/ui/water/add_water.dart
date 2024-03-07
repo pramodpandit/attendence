@@ -185,6 +185,18 @@ class _AddWaterState extends State<AddWater> {
                             },
 
                           ),
+
+                          SizedBox(height: 15,),
+
+                          const Padding(
+                            padding: EdgeInsets.only(left: 1),
+                            child: Row(
+                              children: [
+                                Text("Water Type", style: TextStyle(fontSize: 13,fontWeight: FontWeight.w500)),
+                                Text("*", style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)
+                              ],
+                            ),
+                          ),
                           SizedBox(height: 10,),
                           ValueListenableBuilder(
                              valueListenable: waterBloc.isWaterTypeLoad,
@@ -207,26 +219,21 @@ class _AddWaterState extends State<AddWater> {
                                   valueListenable: waterBloc.waterType,
                                   builder: (context, List<WaterType>waterType,__) {
                                     if (waterType.isEmpty) {
-                                      return  const Center(
-                                        child: Column(
-                                          children: [
-                                            SizedBox(height:50),
-                                            Text(
-                                              "No data Found",
-                                              style: TextStyle(color: Colors.black),
-                                            ),
-                                          ],
-                                        ),
-                                      );
+                                      return  AppDropdown(
+                                      items: waterType.map((e) => DropdownMenuItem(value: '${e.id}', child: Text(e.name??""))
+                                          ).toList(),
+                                          onChanged: (v) {
+                                          print(v);
+                                          },
+                                          value: null,
+                                          hintText: "Choose Type",
+                                          );
+
                                     }
                                   return Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      const SizedBox(height: 15,),
-                                      const Padding(
-                                        padding: const EdgeInsets.only(left: 10),
-                                        child: Text("Water Type", style: const TextStyle(fontSize: 13)),
-                                      ),
+
                                       DropdownButtonFormField<String>(
                                         icon: const Icon(
                                           Icons.arrow_drop_down,
@@ -295,8 +302,7 @@ class _AddWaterState extends State<AddWater> {
                                                 if (water != null) {
                                                   waterBloc.quantityController.text=water.numberOfBotal=="0"?'':water.numberOfBotal??"";
                                                 }
-
-                                              return AppTextField(
+                                                return AppTextField(
                                                 controller: waterBloc.quantityController,
                                                 title: "Quantity",
                                                 keyboardType: TextInputType.number,
@@ -316,7 +322,6 @@ class _AddWaterState extends State<AddWater> {
                                             title: "Submit",
                                             loading: loading?true:false,
                                             onTap: () {
-
                                               if (formKey.currentState!.validate()) {
                                                 waterBloc.addWaterDaily();
                                               }

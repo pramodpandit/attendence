@@ -3,7 +3,6 @@ class WaterType {
   String? name;
   String? perprice;
   String? status;
-
   WaterType({this.id, this.name, this.perprice, this.status});
 
   WaterType.fromJson(Map<String, dynamic> json) {

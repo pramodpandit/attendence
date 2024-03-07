@@ -230,7 +230,6 @@ class taskBloc extends Bloc{
     try {
 
       SharedPreferences _pref = await SharedPreferences.getInstance();
-
       Map<String, dynamic> data = {
         "user_id": _pref.getString('uid'),
         "task_id":id,

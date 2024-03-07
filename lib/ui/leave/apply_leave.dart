@@ -106,12 +106,14 @@ class _ApplyLeavePageState extends State<ApplyLeavePage> {
                           ),
                           const SizedBox(height: 10),
                           AppTextField(
+                            textCapitalization: TextCapitalization.sentences,
                             controller: bloc.reasonTitle,
                             title: "Reason Title",
                             validate: true,
                           ),
                           const SizedBox(height: 10),
                           AppTextField(
+                            textCapitalization: TextCapitalization.sentences,
                             controller: bloc.reason,
                             title: "Reason Description",
                             validate: true,

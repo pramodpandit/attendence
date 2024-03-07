@@ -121,12 +121,14 @@ class _EditLeavePageState extends State<EditLeavePage> {
                           ),
                           const SizedBox(height: 10),
                           AppTextField(
+                            textCapitalization: TextCapitalization.sentences,
                             controller: bloc.reasonTitleEdit,
                             title: "Reason Title",
                             validate: true,
                           ),
                           const SizedBox(height: 10),
                           AppTextField(
+                            textCapitalization: TextCapitalization.sentences,
                             controller: bloc.reasonEdit,
                             title: "Reason Description",
                             validate: true,

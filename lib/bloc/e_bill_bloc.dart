@@ -167,4 +167,41 @@ class EBillBloc extends Bloc {
 
   }
 
+
+  ValueNotifier<DateTime?> month = ValueNotifier(DateTime.now());
+  ValueNotifier<DateTime?> year = ValueNotifier(DateTime.now());
+  updateMonth(DateTime value) => month.value = value;
+  updateYear(DateTime value) => year.value = value;
+  ValueNotifier<List?> ebillList = ValueNotifier([]);
+  ScrollController scrollController = ScrollController();
+
+
+  fetchBillList()async{
+    String months = DateFormat('MM').format(month.value!);
+    String years = DateFormat('yyyy').format(year.value!);
+    isLoadingvalue.value = true;
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    try {
+      Map<String, dynamic> data = {
+        "user_id": pref.getString('uid'),
+        "month": months,
+        "year": years,
+      };
+      ApiResponse2 res = await _repo.Add2('electricity-List-list',data);
+      if(res.status ==true) {
+        ebillList.value = res.data;
+
+      } else {
+        showMessage(MessageType.error(res.message.toString()));
+      }
+    } catch(e,s) {
+      print("the error is : $e");
+      debugPrint('$e');
+      debugPrintStack(stackTrace: s);
+      showMessage(const MessageType.error("Some error occurred! Please try again!"));
+    }finally{
+      isLoadingvalue.value = false;
+    }
+  }
+
 }

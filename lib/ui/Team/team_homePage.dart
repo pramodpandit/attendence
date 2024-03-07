@@ -100,36 +100,7 @@ class _TeamHomePageState extends State<TeamHomePage> {
                     ),
                   ),
                   5.height,
-                  ValueListenableBuilder(
-                    valueListenable: bloc.reportto,
-                    builder: (context, member, child) {
-                      if(member ==null){
-                        return AppDropdown(
-                          items:[],
-                          onChanged: (v) {bloc.Updatereportto=v;
-                          print(v);
-                          },
-                          value: null,
-                          hintText: "Choose Member",
-                        );
-                      }
-                      if(member.isEmpty){
-                        return SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.7,
-                            child: Center(child: Text("No data available")));
-                      }
-                      return AppDropdown(
-                        items: member!.map((e) => DropdownMenuItem(value: '${e['id']}', child: Text(e['text']??""))
-                        ).toList(),
-                        onChanged: (v) {bloc.Updatereportto.value = v;
-                        print(v);
-                        },
-                        value: bloc.Updatereportto.value,
-                        hintText: "Choose Member",
-                      );
-                    },
 
-                  ),
                   ValueListenableBuilder(
                     valueListenable: bloc.reportto,
                     builder: (context, member, child) {

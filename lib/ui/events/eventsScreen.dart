@@ -10,6 +10,7 @@ import 'package:office/data/model/holiday_model.dart';
 import 'package:office/data/repository/holiday_repo.dart';
 import 'package:office/ui/events/allEventScreen.dart';
 import 'package:office/ui/widget/app_bar.dart';
+import 'package:office/utils/message_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -33,6 +34,9 @@ class _EventScreenState extends State<EventScreen> {
     holidayBloc = HolidayEventBloc(context.read<HolidayEventRepository>());
     super.initState();
     holidayBloc.eventsList();
+    holidayBloc.msgController?.stream.listen((event) {
+      AppMessageHandler().showSnackBar(context, event);
+    });
   }
 
   @override
@@ -636,7 +640,7 @@ class _EventScreenState extends State<EventScreen> {
                                   physics: const ScrollPhysics(),
                                   itemCount: event.length,
                                   itemBuilder: (_, index) {
-                                    return EventsList(index: index, data: event);
+                                    return EventsList(index: index, data: event,bloc: holidayBloc,);
                                   },
                                 );
                               },
@@ -657,9 +661,10 @@ class _EventScreenState extends State<EventScreen> {
 }
 
 class EventsList extends StatelessWidget {
+  final HolidayEventBloc bloc;
   final int index;
   final List<Events> data;
-  const EventsList({required this.index, required this.data, super.key});
+  const EventsList({required this.index, required this.data, super.key, required this.bloc});
 
   @override
   Widget build(BuildContext context) {
@@ -776,10 +781,12 @@ class EventsList extends StatelessWidget {
                   try {
                     await launchUrl(url);
                   } catch (e) {
-                    ScaffoldMessenger.of(context)
-                        .showSnackBar(SnackBar(
-                        content: Text(
-                            '${data[index].link} does not exist')));
+                    bloc.showMessage(MessageType.error('${data[index].link} does not exist'));
+
+                    // ScaffoldMessenger.of(context)
+                    //     .showSnackBar(SnackBar(
+                    //     content: Text(
+                    //         '${data[index].link} does not exist')));
                   }
                 },
               ),
@@ -794,10 +801,11 @@ class EventsList extends StatelessWidget {
                   try {
                     await launchUrl(url);
                   } catch (e) {
-                    ScaffoldMessenger.of(context)
-                        .showSnackBar(SnackBar(
-                        content: Text(
-                            '${data[index].location} does not exist')));
+                    bloc.showMessage(MessageType.error('This url does not exist'));
+                    // ScaffoldMessenger.of(context)
+                    //     .showSnackBar(SnackBar(
+                    //     content: Text(
+                    //         '${data[index].location} does not exist')));
                   }
                 },
               ),

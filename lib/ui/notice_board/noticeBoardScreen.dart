@@ -96,7 +96,12 @@ class _NoticeBoardScreenState extends State<NoticeBoardScreen> {
             );
           }
           if(noticeBoards.isEmpty){
-            return const Center(child: Text('Data Not Exist!'));
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Center(child: Text('Data Not Exist!')),
+              ],
+            );
           }
           return Expanded(
             child: ListView.builder(

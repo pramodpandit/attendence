@@ -16,7 +16,7 @@ class FeedbackBloc extends Bloc {
       feedbackData = [];
       var result = await _repo.feedbackList(allFeedback: allFeedBack);
       if(result.status && result.data != null){
-        feedbackData = result.data!.reversed.toList();
+        feedbackData = result.data!.toList();
       }
     }catch (e,s) {
       debugPrint("$e");
