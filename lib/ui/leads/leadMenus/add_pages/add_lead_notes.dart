@@ -108,6 +108,7 @@ class _AddLeadNotesState extends State<AddLeadNotes> {
                         10.height,
                         TextFormField(
                           style: const TextStyle(color: Colors.black),
+                          textCapitalization: TextCapitalization.sentences,
                           controller: widget.bloc.titleNotes,
                           decoration: InputDecoration(
                             filled: true,
@@ -173,6 +174,7 @@ class _AddLeadNotesState extends State<AddLeadNotes> {
                                   width: 1, color: const Color(0xff777777))),
                           child: TextFormField(
                             style: const TextStyle(color: Colors.black),
+                            textCapitalization: TextCapitalization.sentences,
                             keyboardType: TextInputType.multiline,
                             controller:widget.bloc.descriptionNotes,
                             maxLines: null,
@@ -202,7 +204,7 @@ class _AddLeadNotesState extends State<AddLeadNotes> {
                           height: 20,
                         ),
                         ValueListenableBuilder(
-                          valueListenable: widget.bloc.addLinkLoading,
+                          valueListenable: widget.bloc.isLoadingAddNotes,
                           builder: (BuildContext context, bool loading,
                               Widget? child) {
                             return Row(

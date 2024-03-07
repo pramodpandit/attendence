@@ -19,10 +19,9 @@ class taskBloc extends Bloc{
   ValueNotifier<bool> isUserDetailLoad = ValueNotifier(false);
   List<TaskData> feedbackData = [];
   List<TaskData> ongoing = [];
-
-
   ValueNotifier<String> taskStatus = ValueNotifier("doing");
   ValueNotifier<List?> allFetchedTaskData = ValueNotifier(null);
+
   fetchTaskData(String type) async{
     try{
       isUserDetailLoad.value = true;
@@ -230,7 +229,6 @@ class taskBloc extends Bloc{
     try {
 
       SharedPreferences _pref = await SharedPreferences.getInstance();
-
       Map<String, dynamic> data = {
         "user_id": _pref.getString('uid'),
         "task_id":id,
@@ -348,12 +346,16 @@ class taskBloc extends Bloc{
         "hours_logged":HourLogged.text,
         "memo":memo.text
       };
-      addtimesheetLoading.value = true;
-      var result = await _repo.Add('tasks/add_timesheet',data,false);
-      if(result.status == true){
-        timesheetStream.sink.add('timesheetStream');
+      if(updateemployelist.value ==null){
+        showMessage(MessageType.info('Please select employee'));
       }else{
-        showMessage(MessageType.error("Something went wrong"));
+        addtimesheetLoading.value = true;
+        var result = await _repo.Add('tasks/add_timesheet',data,false);
+        if(result.status == true){
+          timesheetStream.sink.add('timesheetStream');
+        }else{
+          showMessage(MessageType.error("Something went wrong"));
+        }
       }
     } catch (e, s) {
       debugPrint("$e");

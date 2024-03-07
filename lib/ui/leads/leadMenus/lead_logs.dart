@@ -56,7 +56,7 @@ class _LeadLogsState extends State<LeadLogs> {
             }
             return   Padding(
               padding: const EdgeInsets.only(
-                  left: 25, right: 25, top: 10, bottom: 10),
+                  left: 15, right: 15, top: 10, bottom: 10),
               child: ListView.builder(
                   physics: const NeverScrollableScrollPhysics(),
                   padding: EdgeInsets.only(top: 10),

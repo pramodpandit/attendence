@@ -4,12 +4,15 @@ import 'dart:ui';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:office/bloc/profile_bloc.dart';
 import 'package:office/data/model/document.dart';
 import 'package:office/data/repository/profile_repo.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+
+import '../../../utils/message_handler.dart';
 
 class DocumentScreen extends StatefulWidget {
   const DocumentScreen({Key? key}) : super(key: key);
@@ -31,6 +34,9 @@ class _DocumentScreenState extends State<DocumentScreen> {
       setState(() {
         progress = message;
       });
+    });
+    bloc.msgController?.stream.listen((event) {
+      AppMessageHandler().showSnackBar(context, event);
     });
     FlutterDownloader.registerCallback(downloadCallback);
     super.initState();
@@ -110,82 +116,119 @@ class _DocumentScreenState extends State<DocumentScreen> {
                                                 fontFamily: "Poppins"),
                                           ),
                                           const Spacer(),
-                                          GestureDetector(
-                                            onTap: () async {
-                                              final androidInfo = await DeviceInfoPlugin().androidInfo;
-                                              print("object");
-                                              String url =
-                                                  "https://freeze.talocare.co.in/public/${document[index].file}";
-                                              if (androidInfo.version.sdkInt <= 32) {
-                                                var status = await
-                                                  Permission.storage.request();
-                                                if (status.isGranted) {
-                                                  var firstPath =
-                                                      "/storage/emulated/0/Documents/images/";
-                                                  var path =
-                                                  await Directory(firstPath)
-                                                      .create(
-                                                      recursive: true);
-                                                  // final baseStorage=await getExternalStorageDirectory();
-                                                  await FlutterDownloader.enqueue(
-                                                    url: url,
-                                                    savedDir: path.path,
-                                                    saveInPublicStorage: true,
-                                                    fileName:
-                                                    "${document[index].name}",
+                                          ValueListenableBuilder(
+                                            valueListenable: bloc.isLoadingDownload,
+                                            builder: (context, downloadLoading, child) {
+                                              return document[index].file==null || document[index].file == ''?Offstage():InkWell(
+                                                onTap: () async{
+                                                  bloc.isLoadingDownload.value = index;
+                                                  FileDownloader.downloadFile(url: 'https://freeze.talocare.co.in/public/${document[index].file}',name: document[index].file.toString().split('/').last,onDownloadCompleted: (path) {
+                                                    bloc.showMessage(MessageType.success('File Downloaded'));
+                                                    bloc.isLoadingDownload.value = -1;
+                                                  },
                                                   );
-                                                }
-                                              } else {
-                                                var status = await Permission.photos.request();
-                                                if (status.isGranted) {
-                                                  var firstPath =
-                                                      "/storage/emulated/0/Documents/images/";
-                                                  var path =
-                                                  await Directory(firstPath)
-                                                      .create(
-                                                      recursive: true);
-                                                  // final baseStorage=await getExternalStorageDirectory();
-                                                  await FlutterDownloader.enqueue(
-                                                    url: url,
-                                                    savedDir: path.path,
-                                                    saveInPublicStorage: true,
-                                                    fileName:
-                                                    "${document[index].name}",
-                                                  );
-                                                }
-                                              }
-                                              // await FlutterDownloader.enqueue(
-                                              //   url: url,
-                                              //   fileName: "${document[index].name}",
-                                              //   allowCellular: true,
-                                              //   headers: {"auth": "test_for_sql_encoding"},
-                                              //   savedDir:path.path,
-                                              //   saveInPublicStorage: true,
-                                              //   showNotification: true, // show download progress in status bar (for Android)
-                                              //   openFileFromNotification: true, // click on notification to open downloaded file (for Android)
-                                              //
-                                              // );
+                                                },
+                                                child: downloadLoading == index?
+                                                SizedBox(width: 20,height:20,child: CircularProgressIndicator()):
+                                                Container(
+                                                  padding: const EdgeInsets.all(6),
+                                                  decoration: BoxDecoration(
+                                                      borderRadius: BorderRadius.circular(100),
+                                                      color: Colors.white,
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                            spreadRadius: 0,
+                                                            blurRadius: 3,
+                                                            color: Colors.black.withOpacity(0.2)
+                                                        )
+                                                      ]
+                                                  ),
+                                                  child: const Icon(
+                                                    Icons.download,
+                                                    color: Colors.black,
+                                                    size: 20,
+                                                  ),
+                                                ),
+                                              );
+
                                             },
-                                            child: Container(
-                                              padding: const EdgeInsets.all(6),
-                                              decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.circular(100),
-                                                  color: Colors.white,
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                        spreadRadius: 0,
-                                                        blurRadius: 3,
-                                                        color: Colors.black.withOpacity(0.2)
-                                                    )
-                                                  ]
-                                              ),
-                                              child: const Icon(
-                                                Icons.download,
-                                                color: Colors.black,
-                                                size: 20,
-                                              ),
-                                            ),
                                           ),
+                                          // GestureDetector(
+                                          //   onTap: () async {
+                                          //     final androidInfo = await DeviceInfoPlugin().androidInfo;
+                                          //     print("object");
+                                          //     String url =
+                                          //         "https://freeze.talocare.co.in/public/${document[index].file}";
+                                          //     if (androidInfo.version.sdkInt <= 32) {
+                                          //       var status = await
+                                          //         Permission.storage.request();
+                                          //       if (status.isGranted) {
+                                          //         var firstPath =
+                                          //             "/storage/emulated/0/Documents/images/";
+                                          //         var path =
+                                          //         await Directory(firstPath)
+                                          //             .create(
+                                          //             recursive: true);
+                                          //         // final baseStorage=await getExternalStorageDirectory();
+                                          //         await FlutterDownloader.enqueue(
+                                          //           url: url,
+                                          //           savedDir: path.path,
+                                          //           saveInPublicStorage: true,
+                                          //           fileName:
+                                          //           "${document[index].name}",
+                                          //         );
+                                          //       }
+                                          //     } else {
+                                          //       var status = await Permission.photos.request();
+                                          //       if (status.isGranted) {
+                                          //         var firstPath =
+                                          //             "/storage/emulated/0/Documents/images/";
+                                          //         var path =
+                                          //         await Directory(firstPath)
+                                          //             .create(
+                                          //             recursive: true);
+                                          //         // final baseStorage=await getExternalStorageDirectory();
+                                          //         await FlutterDownloader.enqueue(
+                                          //           url: url,
+                                          //           savedDir: path.path,
+                                          //           saveInPublicStorage: true,
+                                          //           fileName:
+                                          //           "${document[index].name}",
+                                          //         );
+                                          //       }
+                                          //     }
+                                          //     // await FlutterDownloader.enqueue(
+                                          //     //   url: url,
+                                          //     //   fileName: "${document[index].name}",
+                                          //     //   allowCellular: true,
+                                          //     //   headers: {"auth": "test_for_sql_encoding"},
+                                          //     //   savedDir:path.path,
+                                          //     //   saveInPublicStorage: true,
+                                          //     //   showNotification: true, // show download progress in status bar (for Android)
+                                          //     //   openFileFromNotification: true, // click on notification to open downloaded file (for Android)
+                                          //     //
+                                          //     // );
+                                          //   },
+                                          //   child: Container(
+                                          //     padding: const EdgeInsets.all(6),
+                                          //     decoration: BoxDecoration(
+                                          //         borderRadius: BorderRadius.circular(100),
+                                          //         color: Colors.white,
+                                          //         boxShadow: [
+                                          //           BoxShadow(
+                                          //               spreadRadius: 0,
+                                          //               blurRadius: 3,
+                                          //               color: Colors.black.withOpacity(0.2)
+                                          //           )
+                                          //         ]
+                                          //     ),
+                                          //     child: const Icon(
+                                          //       Icons.download,
+                                          //       color: Colors.black,
+                                          //       size: 20,
+                                          //     ),
+                                          //   ),
+                                          // ),
                                         ],
                                       ),
                                       if(document[index].other!=null)Text(

@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+
+import '../../bloc/e_bill_bloc.dart';
+import '../../data/model/e_bill_model.dart';
+import '../../data/repository/e_bill_repo.dart';
 
 class BillList extends StatefulWidget {
   const BillList({Key? key}) : super(key: key);
@@ -11,11 +16,16 @@ class BillList extends StatefulWidget {
 }
 
 class _BillListState extends State<BillList> {
-  ValueNotifier<DateTime?> month = ValueNotifier(null);
-  ValueNotifier<DateTime?> year = ValueNotifier(null);
-  updateMonth(DateTime value) => month.value = value;
-  updateYear(DateTime value) => year.value = value;
-  ScrollController scrollController = ScrollController();
+  late EBillBloc bloc;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    bloc =EBillBloc(context.read<EBillRepository>());
+    bloc.fetchEBill();
+    bloc.fetchBillList();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -111,7 +121,7 @@ class _BillListState extends State<BillList> {
                                   ),
                                 ),
                                 ValueListenableBuilder(
-                                  valueListenable: month,
+                                  valueListenable: bloc.month,
                                   builder: (context, DateTime? monthDate, _) {
                                     return InkWell(
                                       onTap: () async {
@@ -165,11 +175,12 @@ class _BillListState extends State<BillList> {
 
                                         if (selectedMonth != null) {
                                           DateTime selectedDate = DateTime(
-                                            year.value?.year ??
+                                            bloc.year.value?.year ??
                                                 DateTime.now().year,
                                             selectedMonth,
                                           );
-                                          await updateMonth(selectedDate);
+                                          await bloc.updateMonth(selectedDate);
+                                          await bloc.fetchBillList();
                                           print("$selectedDate");
                                         }
                                       },
@@ -225,7 +236,7 @@ class _BillListState extends State<BillList> {
                                   ),
                                 ),
                                 ValueListenableBuilder(
-                                    valueListenable: year,
+                                    valueListenable: bloc.year,
                                     builder: (context, DateTime? date, _) {
                                       return InkWell(
                                         // onTap: () async {
@@ -285,11 +296,11 @@ class _BillListState extends State<BillList> {
                                               );
                                             },
                                           );
-
                                           if (selectedYear != null) {
                                             DateTime selectedDate =
                                             DateTime(selectedYear);
-                                            await updateYear(selectedDate);
+                                            await bloc.updateYear(selectedDate);
+                                            await bloc.fetchBillList();
                                             print("$selectedDate");
                                           }
                                         },
@@ -328,52 +339,123 @@ class _BillListState extends State<BillList> {
                           ],
                         ),
                         const SizedBox(height: 20,),
-                        Scrollbar(
-                            thumbVisibility: true,
-                            thickness: 4,
-                            controller: scrollController,
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              controller: scrollController,
-                              child: Table(
-                                border: TableBorder.all(),
-                                defaultColumnWidth: FixedColumnWidth(80),
-                                /*columnWidths: const {
-                                  0: FixedColumnWidth(100.0),
-                                  1: FixedColumnWidth(80),
-                                  2: FixedColumnWidth(80),
-                                  3: FixedColumnWidth(80),
-                                  // 4: FixedColumnWidth(80),
-                                  // 5: FixedColumnWidth(80),
-                                  // 6: FixedColumnWidth(80),
-                                },*/
-                                children: [
-                                  TableRow(
-                                      decoration: BoxDecoration(
-                                        border: Border.all(color: Colors.black),
-                                      ),
-                                      children:const [
-                                        Padding(
-                                          padding: EdgeInsets.all(5.0),
-                                          child: Text("Date",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.w600),),
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.all(5.0),
-                                          child: Text("Test Data",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.w600),),
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.all(5.0),
-                                          child: Text("demopdemo",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.w600),),
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.all(5.0),
-                                          child: Text("dadeed",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.w600),),
-                                        ),
-                                      ]
-                                  )
-                                ],
-                              ),
-                            )
+                        ValueListenableBuilder(
+                            valueListenable: bloc.eBill,
+                             builder: (context, List<EBill>eBill,__) {
+
+                               if (eBill.isEmpty) {
+                                 return const Center(
+                                   child: Column(
+                                     children: [
+                                       SizedBox(height: 50),
+                                       Text(
+                                         "No data Found",
+                                         style: TextStyle(color: Colors.black),
+                                       ),
+                                     ],
+                                   ),
+                                 );
+                               }
+                               return ValueListenableBuilder(
+                                 valueListenable: bloc.ebillList,
+                                 builder: (context, ebilllistdata, child) {
+                                   if(ebilllistdata ==null){
+                                     return Center(child: CircularProgressIndicator(),);
+                                   }
+                                   if (ebilllistdata!.isEmpty) {
+                                     return CircularProgressIndicator();
+                                   }
+                                   return
+
+                                     Scrollbar(
+                                       thumbVisibility: true,
+                                       thickness: 4,
+                                       controller: bloc.scrollController,
+                                       child: SingleChildScrollView(
+                                         scrollDirection: Axis.horizontal,
+                                         controller: bloc.scrollController,
+                                         child: Table(
+                                           border: TableBorder.all(),
+                                           defaultColumnWidth: const FixedColumnWidth(
+                                               100),
+                                           children: [
+                                             TableRow(
+                                                 decoration: BoxDecoration(
+                                                   border: Border.all(
+                                                       color: Colors.black),
+                                                 ),
+                                                 children: [
+                                                   const Padding(
+                                                     padding: EdgeInsets.all(5.0),
+                                                     child: Text("Date",
+                                                       style: TextStyle(
+                                                           color: Colors.blue,
+                                                           fontWeight: FontWeight
+                                                               .w600),),
+                                                   ),
+                                                   for (var type in eBill)
+                                                     Padding(
+                                                       padding: const EdgeInsets
+                                                           .all(5.0),
+                                                       child: Text(
+                                                         "${type.name}",
+                                                         style: const TextStyle(
+                                                             color: Colors.blue,
+                                                             fontWeight: FontWeight
+                                                                 .w600),
+                                                       ),
+                                                     ),
+                                                 ]
+                                             ),
+
+                                             ...ebilllistdata.map((item) {
+                                               return TableRow(
+                                                   decoration: BoxDecoration(
+                                                       border: Border.all(
+                                                           color: Colors.black)
+                                                   ),
+                                                   children: [
+                                                     Padding(
+                                                       padding: EdgeInsets.all(5.0),
+                                                       child: Text(
+                                                         DateFormat("dd-MM-yyyy")
+                                                             .format(DateTime.parse(
+                                                             item['f_date']!)),
+                                                         style: const TextStyle(
+                                                             color: Color(
+                                                                 0xff20263c),
+                                                             fontWeight: FontWeight
+                                                                 .w600),),
+                                                     ),
+                                                     for (var type in eBill)
+                                                       Padding(
+                                                         padding: EdgeInsets.all(
+                                                             5.0),
+                                                         child: Text(
+                                                           // Check if water ID and type ID are the same, then show quantity
+                                                           (item['e_type'] ==
+                                                               "${type.id}")
+                                                               ? item['t_reading']?? ""
+                                                               : "",
+                                                           style: const TextStyle(
+                                                               color: Color(
+                                                                   0xff20263c),
+                                                               fontWeight: FontWeight
+                                                                   .w600),
+                                                         ),
+                                                       ),
+                                                   ]
+                                               );
+                                             }).toList()
+                                           ],
+                                         ),
+                                       )
+                                   );
+                                 },
+
+
+                               );
+                             }
                         )
                       ],
                     ),

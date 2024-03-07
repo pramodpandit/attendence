@@ -39,6 +39,8 @@ class ProfileBloc extends Bloc {
     "Assets"
   ];
   ValueNotifier<int> selectedMenuIndex = ValueNotifier(0);
+  ValueNotifier<int> isLoadingDownload = ValueNotifier(-1);
+
   List<Widget> profileMenusWidgets = [
     const BasicInfoScreen(),
     const OfficialDetails(),

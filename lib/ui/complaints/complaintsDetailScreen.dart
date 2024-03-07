@@ -102,16 +102,15 @@ class _ComplaintRequestsDetailsState extends State<ComplaintRequestsDetails> {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(15.0),
-                    margin:
-                        const EdgeInsets.symmetric(vertical: 10.0, horizontal: 5.0),
+                    margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 5.0),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12.0),
                       boxShadow: [
                         BoxShadow(
                             color: Colors.grey.withOpacity(0.3),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10))
+                            blurRadius: 5,
+                            offset: const Offset(0, 0))
                       ],
                     ),
                     child: Column(

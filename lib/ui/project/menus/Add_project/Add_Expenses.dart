@@ -141,6 +141,7 @@ class _Add_ExpensesState extends State<Add_Expenses> {
                                     width: 1, color: const Color(0xff777777))),
                             child: TextFormField(
                               style: const TextStyle(color: Colors.black),
+                              textCapitalization: TextCapitalization.sentences,
                               keyboardType: TextInputType.multiline,
                               controller: bloc.itemName,
                               decoration: const InputDecoration(
@@ -222,7 +223,7 @@ class _Add_ExpensesState extends State<Add_Expenses> {
                                     width: 1, color: const Color(0xff777777))),
                             child: TextFormField(
                               style: const TextStyle(color: Colors.black),
-                              keyboardType: TextInputType.multiline,
+                              keyboardType: TextInputType.number,
                               controller: bloc.price,
                               decoration: const InputDecoration(
                                 border: InputBorder.none,

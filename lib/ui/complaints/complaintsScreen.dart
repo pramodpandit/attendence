@@ -119,6 +119,7 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
                           TextFormField(
                             style: const TextStyle(color: Colors.black),
                             controller: bloc.tittleController,
+                            textCapitalization: TextCapitalization.sentences,
                             decoration: InputDecoration(
                               filled: true,
                               fillColor: const Color(0xffffffff),
@@ -176,6 +177,7 @@ class _ComplaintScreenState extends State<ComplaintScreen> {
                           ),
                           TextFormField(
                             style: const TextStyle(color: Colors.black),
+                            textCapitalization: TextCapitalization.sentences,
                             controller: bloc.descriptionController,
                             keyboardType: TextInputType.multiline,
                             maxLines: 5,

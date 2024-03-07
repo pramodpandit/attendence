@@ -61,7 +61,6 @@ class _LeadDetailsState extends State<LeadDetails> {
       LeadTechnology(data : widget.data['id']),
       LeadBranches(data : widget.data['id']),
     ];
-
   }
   @override
   Widget build(BuildContext context) {

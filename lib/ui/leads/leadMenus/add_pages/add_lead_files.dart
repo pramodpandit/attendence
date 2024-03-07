@@ -102,7 +102,6 @@ class _AddLeadFilesState extends State<AddLeadFiles> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-
                         const SizedBox(
                           height: 10,
                         ),
@@ -243,12 +242,16 @@ class _AddLeadFilesState extends State<AddLeadFiles> {
                                     ? CircularProgressIndicator()
                                     : CustomButton2(
                                     onPressed: () {
-                                      if (formKey.currentState!.validate()) {
+                                      if (formKey.currentState!.validate() && widget.bloc.image !=null) {
                                         widget.bloc.addNewLeadFiles(widget.leadId,light?"on":"off").then((value){
-                                          Navigator.pop(context);
-                                          widget.bloc.specificLeadData.value = null;
-                                          widget.bloc.getSpecificLeadData(widget.leadId.toString(),"lead_file_details");
-                                        });;
+                                          if(value ==true){
+                                            Navigator.pop(context);
+                                            widget.bloc.specificLeadData.value = null;
+                                            widget.bloc.getSpecificLeadData(widget.leadId.toString(),"lead_file_details");
+                                          }
+                                        });
+                                      }else{
+                                        widget.bloc.showMessage(MessageType.info('Please select file'));
                                       }
                                     },
                                     tittle: 'Add Files'),

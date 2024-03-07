@@ -5,6 +5,7 @@ import 'package:nb_utils/nb_utils.dart';
 import 'package:office/bloc/leads_bloc.dart';
 import 'package:office/ui/widget/app_dropdown.dart';
 import 'package:office/ui/widget/custom_button.dart';
+import 'package:office/utils/message_handler.dart';
 import 'package:provider/provider.dart';
 import '../../../../bloc/project_bloc.dart';
 
@@ -28,6 +29,8 @@ class _AddLeadLinksState extends State<AddLeadLinks> {
   void initState() {
     super.initState();
     widget.bloc.getAllLinkTypes();
+    widget.bloc.link.text = '';
+    widget.bloc.other.text = '';
   }
 
   @override
@@ -247,12 +250,14 @@ class _AddLeadLinksState extends State<AddLeadLinks> {
                                     ? CircularProgressIndicator()
                                     : CustomButton2(
                                     onPressed: () {
-                                      if (formKey.currentState!.validate()) {
+                                      if (formKey.currentState!.validate() ) {
                                         widget.bloc.addLeadLink(widget.leadId.toString()).then((value){
-                                          Navigator.pop(context);
-                                          widget.bloc.specificLeadData.value = null;
-                                          widget.bloc.getSpecificLeadData(widget.leadId.toString(),"lead_links");
-                                        });
+                                          if(value ==true){
+                                            Navigator.pop(context);
+                                            widget.bloc.specificLeadData.value = null;
+                                            widget.bloc.getSpecificLeadData(widget.leadId.toString(),"lead_links");
+                                          }
+                                         });
                                       }
                                     },
                                     tittle: 'Add Links'),

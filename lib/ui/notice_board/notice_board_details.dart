@@ -18,7 +18,6 @@ class _NoticeBoardDetailsState extends State<NoticeBoardDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,27 +81,29 @@ class _NoticeBoardDetailsState extends State<NoticeBoardDetails> {
                   const SizedBox(
                     height: 20,
                   ),
-                  Text(
-                    widget.data.title ?? "",
-                    textAlign: TextAlign.left,
-                    style: const TextStyle(
-                      color: Colors.black87,
-                      fontWeight: FontWeight.w700,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        widget.data.title ?? "",
+                        textAlign: TextAlign.left,
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 15
+                        ),
+                      ),
+                      Text(
+                        DateFormat.yMMMMd()
+                            .format(DateTime.parse("${widget.data.updateAt}")),
+                        textAlign: TextAlign.start,
+                        style: const TextStyle(color: Colors.black54, fontSize: 8),
+                      ),
+                    ],
                   ),
                   const SizedBox(
                     height: 5,
                   ),
-                  Text(
-                    DateFormat.yMMMMd()
-                        .format(DateTime.parse("${widget.data.updateAt}")),
-                    textAlign: TextAlign.start,
-                    style: const TextStyle(color: Colors.black54, fontSize: 8),
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
-
                   Html(
                     data: widget.data.description ?? "",
                     // data: "${noticeBoards[index].description}",

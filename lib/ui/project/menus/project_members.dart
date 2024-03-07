@@ -65,14 +65,16 @@ class _ProjectMembersState extends State<ProjectMembers> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       RefreshIndicator(
-                        displacement: 250,
-                        backgroundColor: Colors.yellow,
-                        color: Colors.red,
+                        displacement: 100,
+                        backgroundColor: Colors.white,
+                        color:Colors.red,
                         strokeWidth: 3,
-                        triggerMode: RefreshIndicatorTriggerMode.onEdge,
-                        onRefresh: ()async {
-                          await Future.delayed(Duration(seconds: 5));
-                          },
+                        triggerMode:
+                        RefreshIndicatorTriggerMode.onEdge,
+                        onRefresh: () async {
+                          await Future.delayed(
+                              Duration(milliseconds: 1200));
+                        },
                         child: ListView.builder(
                           itemCount: projectMember.length,
                           padding: const EdgeInsets.only(top: 10),
@@ -90,7 +92,7 @@ class _ProjectMembersState extends State<ProjectMembers> {
                                 child: Row(
                                   children: [
                                     CircleAvatar(
-                                      backgroundImage:data['employee_img']==null?null:NetworkImage('https://freeze.talocare.co.in/public/${data['employee_img']}'),
+                                      backgroundImage:data['employee_img']==null?null:NetworkImage('https://freeze.talocare.co.in/public/${data['employee_img']}',),
                                       child: data['employee_img']==null?Icon(Icons.person):Offstage(),
                                     ),
                                     SizedBox(width: 10),
@@ -168,10 +170,10 @@ class _ProjectMembersState extends State<ProjectMembers> {
                                     style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.blue,
                                         shape: BeveledRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5)))),
-                                    onPressed: (){
+                                      onPressed: (){
+                                      bloc.fetchProjectsDetails(widget.data['id']);
                                       bloc.addMember(widget.data['id']);
                                       bloc.selectedEmpId = null;
-                                      bloc.fetchProjectsDetails(widget.data['id']);
                                       Navigator.pop(context);
                                       }, child: isLoading?CircularProgressIndicator():Text('Add',style: TextStyle(color: Colors.white),));
                               },
@@ -216,9 +218,7 @@ class _ProjectMembersState extends State<ProjectMembers> {
                           )
                         ],
                       ),
-                    ));
-              },
-
+                    ));},
             ),
           ),
           SizedBox(height: 30,)

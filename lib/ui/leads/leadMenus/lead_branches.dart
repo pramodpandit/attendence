@@ -9,13 +9,6 @@ import 'package:office/bloc/leads_bloc.dart';
 import 'package:office/data/repository/lead_repository.dart';
 import 'package:office/utils/message_handler.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
-import '../../../bloc/profile_bloc.dart';
-import '../../../bloc/project_bloc.dart';
-import '../../../data/model/user.dart';
-import '../../../data/repository/profile_repo.dart';
-import '../../../data/repository/project_repo.dart';
-import '../../profile/menus/basic_info.dart';
 import 'add_pages/add_lead_branch.dart';
 
 class LeadBranches extends StatefulWidget {
@@ -41,121 +34,114 @@ class _LeadBranchesState extends State<LeadBranches> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            ValueListenableBuilder(
-              valueListenable: bloc.specificLeadData,
-              builder: (context, specificLeadData, child) {
-                if(specificLeadData ==null){
-                  return SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.3,
-                      child: Center(child: CircularProgressIndicator()));
-                }
-                if(specificLeadData.isEmpty){
-                  return SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.3,
-                      child: Center(child: Text("No data available")));
-                }
-                return Container(
-                  height: MediaQuery.of(context).size.height,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15,vertical:0),
-                    child: ListView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount:specificLeadData.length,
-                        padding: EdgeInsets.only(top: 10),
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) {
-                          var data = specificLeadData[index];
-                          return GestureDetector(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 15),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10),
-                                margin: const EdgeInsets.only(bottom: 20),
-                                decoration: BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                        color: Colors.grey.withOpacity(0.2),
-                                        blurRadius: 3,
-                                        spreadRadius: 2)
-                                  ],
-                                  color: Colors.white,
-                                  borderRadius: const BorderRadius.all(Radius.circular(10)),
-                                ),
-                                child:  Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const SizedBox(height: 5,),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          "${data['company_name']}",
-                                          textAlign: TextAlign.start,
-                                          style: TextStyle(
-                                              color: Colors.black54,
-                                              fontSize: 8
-                                          ),
-                                        ),
-                                        Flexible(
-                                          child: Text(
-                                            "${DateFormat.yMMMd().format(DateTime.parse(data['created_at']))}",
-                                            style: const TextStyle(
-                                                color: Colors.black54,
-                                                fontSize: 10
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    // const Text(
-                                    //   "Web Development",
-                                    //   textAlign: TextAlign.left,
-                                    //   style: TextStyle(
-                                    //     fontWeight: FontWeight.w700,
-                                    //   ),
-                                    // ),
-
-                                    const SizedBox(height: 5,),
-                                    Html(
-                                      data: data['company_address']??'',
-                                      // data:"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-                                      // data:notes[index].description ?? "",
-                                      style: {
-                                        "body": Style(
-                                            color: Colors.black,
-                                            fontWeight:
-                                            FontWeight.w500,
-                                            fontFamily: "Poppins",
-                                            display: Display.inline,
-                                            fontSize: FontSize(11),
-                                            textAlign: TextAlign.start
-                                        ),
-                                        "p": Style(
-                                            color: Colors.black,
-                                            fontWeight:
-                                            FontWeight.w500,
-                                            // padding: EdgeInsets.zero,
-                                            fontFamily: "Poppins",
-                                            display: Display.inline,
-                                            fontSize: FontSize(11),
-                                            textAlign: TextAlign.start
-                                        ),
-                                      },
-                                    ),
-                                    const SizedBox(height: 15,)
-                                  ],
-                                ),
-                              ),
+        child: ValueListenableBuilder(
+          valueListenable: bloc.specificLeadData,
+          builder: (context, specificLeadData, child) {
+            if(specificLeadData ==null){
+              return SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.3,
+                  child: Center(child: CircularProgressIndicator()));
+            }
+            if(specificLeadData.isEmpty){
+              return SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.3,
+                  child: Center(child: Text("No data available")));
+            }
+            return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5,vertical:0),
+                child: ListView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount:specificLeadData.length,
+                    padding: EdgeInsets.only(top: 10),
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      var data = specificLeadData[index];
+                      return GestureDetector(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            margin: const EdgeInsets.only(bottom: 20),
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Colors.grey.withOpacity(0.2),
+                                    blurRadius: 3,
+                                    spreadRadius: 2)
+                              ],
+                              color: Colors.white,
+                              borderRadius: const BorderRadius.all(Radius.circular(10)),
                             ),
-                          );
-                        }),
-                  ) ,
-                );
-              },),
-          ],
-        ),
+                            child:  Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 5,),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "${data['company_name']}",
+                                      textAlign: TextAlign.start,
+                                      style: TextStyle(
+                                          color: Colors.black54,
+                                          fontSize: 8
+                                      ),
+                                    ),
+                                    Flexible(
+                                      child: Text(
+                                        "${DateFormat.yMMMd().format(DateTime.parse(data['created_at']))}",
+                                        style: const TextStyle(
+                                            color: Colors.black54,
+                                            fontSize: 10
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                // const Text(
+                                //   "Web Development",
+                                //   textAlign: TextAlign.left,
+                                //   style: TextStyle(
+                                //     fontWeight: FontWeight.w700,
+                                //   ),
+                                // ),
+
+                                const SizedBox(height: 5,),
+                                Html(
+                                  data: data['company_address']??'',
+                                  // data:"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+                                  // data:notes[index].description ?? "",
+                                  style: {
+                                    "body": Style(
+                                        color: Colors.black,
+                                        fontWeight:
+                                        FontWeight.w500,
+                                        fontFamily: "Poppins",
+                                        display: Display.inline,
+                                        fontSize: FontSize(11),
+                                        textAlign: TextAlign.start
+                                    ),
+                                    "p": Style(
+                                        color: Colors.black,
+                                        fontWeight:
+                                        FontWeight.w500,
+                                        // padding: EdgeInsets.zero,
+                                        fontFamily: "Poppins",
+                                        display: Display.inline,
+                                        fontSize: FontSize(11),
+                                        textAlign: TextAlign.start
+                                    ),
+                                  },
+                                ),
+                                const SizedBox(height: 15,)
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+              ) ;
+          },),
       ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,

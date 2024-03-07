@@ -58,7 +58,7 @@ class _AddLeadBranchState extends State<AddLeadBranch> {
                   height: 56,
                 ),
                 Text(
-                  "Add Notes",
+                  "Add Branch",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: Colors.white,
@@ -100,22 +100,24 @@ class _AddLeadBranchState extends State<AddLeadBranch> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const SizedBox(
-                            height: 10,
-                          ),
+
                     
-                          const Text(
-                            "Branch Name",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              // color: ,
-                              fontSize: 13,
-                    
-                            ),
+                          Row(
+                            children: [
+                              const Text(
+                                "Branch Name",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  // color: ,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              Text("*", style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)
+                            ],
                           ),
-                          10.height,
                           TextFormField(
                             style: const TextStyle(color: Colors.black),
+                            textCapitalization: TextCapitalization.sentences,
                             controller: widget.bloc.cname,
                             decoration: InputDecoration(
                               filled: true,
@@ -161,20 +163,23 @@ class _AddLeadBranchState extends State<AddLeadBranch> {
                             },
                             onTap: () {},
                           ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          const Text(
-                            "Phone Number",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              // color: ,
-                              fontSize: 13,
-                    
-                            ),
-                          ),
                           10.height,
+                          Row(
+                            children: [
+                              const Text(
+                                "Phone Number",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  // color: ,
+                                  fontSize: 13,
+
+                                ),
+                              ),
+                              Text("*", style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)
+                            ],
+                          ),
                           TextFormField(
+                            textCapitalization: TextCapitalization.sentences,
                             style: const TextStyle(color: Colors.black),
                             controller: widget.bloc.c_phone,
                             maxLength: 10,
@@ -225,19 +230,19 @@ class _AddLeadBranchState extends State<AddLeadBranch> {
                             },
                             onTap: () {},
                           ),
-                          const SizedBox(
-                            height: 10,
+                          Row(
+                            children: [
+                              const Text(
+                                "Email",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  // color: ,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              Text("*", style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)
+                            ],
                           ),
-                          const Text(
-                            "Email",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              // color: ,
-                              fontSize: 13,
-                    
-                            ),
-                          ),
-                          10.height,
                           TextFormField(
                             style: const TextStyle(color: Colors.black),
                             keyboardType: TextInputType.emailAddress,
@@ -290,9 +295,7 @@ class _AddLeadBranchState extends State<AddLeadBranch> {
                               email = _validateEmail(vale);
                             },
                           ),
-                          const SizedBox(
-                            height: 10,
-                          ),
+                         10.height,
                     
                           const Text(
                             "Company Address",
@@ -339,16 +342,22 @@ class _AddLeadBranchState extends State<AddLeadBranch> {
                           const SizedBox(
                             height: 20,
                           ),
-                          const Text(
-                            "Coordinate Person Name",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              // color: ,
-                              fontSize: 13,
-                    
-                            ),
+                          Row(
+                            children: [
+                              const Text(
+                                "Coordinate Person Name",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  // color: ,
+                                  fontSize: 13,
+
+                                ),
+                              ),
+                              Text("*", style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)
+
+                            ],
                           ),
-                          10.height,
+
                           TextFormField(
                             style: const TextStyle(color: Colors.black),
                             controller: widget.bloc.cp_name,
@@ -399,16 +408,22 @@ class _AddLeadBranchState extends State<AddLeadBranch> {
                           const SizedBox(
                             height: 10,
                           ),
-                          const Text(
-                            "Coordinate Person Number",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              // color: ,
-                              fontSize: 13,
-                    
-                            ),
+                          Row(
+                            children: [
+                              const Text(
+                                "Coordinate Person Number",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  // color: ,
+                                  fontSize: 13,
+
+                                ),
+                              ),
+                              Text("*", style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)
+
+                            ],
                           ),
-                          10.height,
+
                           TextFormField(
                             style: const TextStyle(color: Colors.black),
                             keyboardType: TextInputType.number,
@@ -463,16 +478,21 @@ class _AddLeadBranchState extends State<AddLeadBranch> {
                           const SizedBox(
                             height: 10,
                           ),
-                          const Text(
-                            "Coordinate Person Email",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              // color: ,
-                              fontSize: 13,
-                    
-                            ),
+                          Row(
+                            children: [
+                              const Text(
+                                "Coordinate Person Email",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  // color: ,
+                                  fontSize: 13,
+
+                                ),
+                              ),
+                              Text("*", style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)
+
+                            ],
                           ),
-                          10.height,
                           TextFormField(
                             style: const TextStyle(color: Colors.black),
                             controller: widget.bloc.cp_email,
@@ -572,7 +592,7 @@ class _AddLeadBranchState extends State<AddLeadBranch> {
                             height: 10,
                           ),
                           ValueListenableBuilder(
-                            valueListenable: widget.bloc.addLinkLoading,
+                            valueListenable: widget.bloc.isLoadingAddBranch,
                             builder: (BuildContext context, bool loading,
                                 Widget? child) {
                               return Row(
