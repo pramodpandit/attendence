@@ -81,7 +81,7 @@ class _ChatScreenState extends State<ChatScreen> {
       AppMessageHandler().showSnackBar(context, event);
     });
     super.initState();
-    chattingStream = profileBloc.getRecentChats().asBroadcastStream();
+    chattingStream = profileBloc.getOneToOneChat(widget.user['user_id'].toString()).asBroadcastStream();
   }
 
   Future<void> getLocation() async {
@@ -225,8 +225,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: CircularProgressIndicator(),
                 );
               }else{
-                List mainList = snapshot.data!.where((element) => element['id'].toString() == widget.user['id'].toString()).toList();
-                List chatData = mainList.isEmpty? []: (mainList[0]['last_chat'] as List).reversed.toList();
                 return Column(
                   children: [
                     Container(
@@ -254,13 +252,8 @@ class _ChatScreenState extends State<ChatScreen> {
                           CircleAvatar(
                             radius: 20,
                             child: ClipOval(
-                              child: mainList.isEmpty? widget.user['image'] != null?Image.network(
+                              child: widget.user['image'] != null?Image.network(
                                 "https://freeze.talocare.co.in/public/${widget.user['image']}",
-                                height: 50,
-                                width: 50,
-                                fit: BoxFit.cover,
-                              ):const Icon(Icons.person): mainList[0]['image'] != null?Image.network(
-                                "https://freeze.talocare.co.in/public/${mainList[0]['image']}",
                                 height: 50,
                                 width: 50,
                                 fit: BoxFit.cover,
@@ -277,10 +270,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    mainList.isEmpty?
-                                    "${widget.user['first_name']??''} ${widget.user['middle_name']??''} ${widget.user['last_name']??''}"
-                                    : "${mainList[0]['first_name']??''} ${mainList[0]['middle_name']??''} ${mainList[0]['last_name']??''}",
+                                  Text("${widget.user['first_name']??''} ${widget.user['middle_name']??''} ${widget.user['last_name']??''}",
                                     maxLines: 1,
                                     style: const TextStyle(fontWeight: FontWeight.w500,overflow: TextOverflow.ellipsis),
                                   ),
@@ -350,24 +340,24 @@ class _ChatScreenState extends State<ChatScreen> {
                       height: 10,
                     ),
                     Expanded(
-                      child: chatData.isEmpty ? Offstage():
+                      child: snapshot.data!.isEmpty ? Offstage():
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         child: ListView.builder(
                           reverse: true,
-                          itemCount: chatData.length,
+                          itemCount: snapshot.data!.length,
                           itemBuilder: (context, index) {
                             return Container(
                               margin: const EdgeInsets.only(bottom: 10),
                               child: Column(
                                 children: [
                                   Align(
-                                    alignment: chatData[index]['from_user'].toString() == widget.prefs.getString("uid") ?Alignment.centerRight:Alignment.centerLeft,
+                                    alignment: snapshot.data![index]['from_user'].toString() == widget.prefs.getString("uid") ?Alignment.centerRight:Alignment.centerLeft,
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 15, vertical: 10),
                                       decoration: BoxDecoration(
-                                        borderRadius: chatData[index]['from_user'].toString() == widget.prefs.getString("uid")
+                                        borderRadius: snapshot.data![index]['from_user'].toString() == widget.prefs.getString("uid")
                                             ? const BorderRadius.only(
                                           topLeft: Radius.circular(10),
                                           topRight: Radius.circular(10),
@@ -378,14 +368,14 @@ class _ChatScreenState extends State<ChatScreen> {
                                           topRight: Radius.circular(10),
                                           bottomRight: Radius.circular(10),
                                         ),
-                                        color: chatData[index]['from_user'].toString() == widget.prefs.getString("uid")
+                                        color: snapshot.data![index]['from_user'].toString() == widget.prefs.getString("uid")
                                             ? Colors.blue
                                             : Colors.grey.withOpacity(0.3),
                                       ),
                                       child: Text(
-                                        chatData[index]['message'].toString(),
+                                        snapshot.data![index]['message'].toString(),
                                         style: TextStyle(
-                                          color: chatData[index]['from_user'].toString() == widget.prefs.getString("uid")
+                                          color: snapshot.data![index]['from_user'].toString() == widget.prefs.getString("uid")
                                               ? Colors.white
                                               : Colors.black,
                                         ),
@@ -393,18 +383,18 @@ class _ChatScreenState extends State<ChatScreen> {
                                     ),
                                   ),
                                   Padding(
-                                    padding: chatData[index]['from_user'].toString() == widget.prefs.getString("uid")
+                                    padding: snapshot.data![index]['from_user'].toString() == widget.prefs.getString("uid")
                                         ? const EdgeInsets.only(right: 5)
                                         : const EdgeInsets.only(left: 5),
                                     child: Row(
-                                      mainAxisAlignment: chatData[index]['from_user'].toString() == widget.prefs.getString("uid")
+                                      mainAxisAlignment: snapshot.data![index]['from_user'].toString() == widget.prefs.getString("uid")
                                           ? MainAxisAlignment.end
                                           : MainAxisAlignment.start,
                                       children: [
-                                        if (chatData[index]['from_user'].toString() == widget.prefs.getString("uid"))
+                                        if (snapshot.data![index]['from_user'].toString() == widget.prefs.getString("uid"))
                                           Icon(PhosphorIcons.checks_bold,
                                               size: 14,
-                                              color: chatData[index]['from_user'].toString() == widget.prefs.getString("uid")
+                                              color: snapshot.data![index]['from_user'].toString() == widget.prefs.getString("uid")
                                                   ? Colors.blue.shade700
                                                   : Colors.grey.withOpacity(0.8)),
                                         const SizedBox(
@@ -522,7 +512,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                     }
                                   return InkWell(
                                     onTap: () {
-                                      profileBloc.sendMessage(widget.user['id'].toString(),"text");
+                                      profileBloc.sendMessage(widget.user['user_id'].toString(),"text");
                                     },
                                     child: const Icon(PhosphorIcons.paper_plane_tilt),
                                   );

@@ -240,6 +240,13 @@ class ProfileRepository {
     });
     return ApiResponse2.fromJson(response,response['data']);
   }
+  Future<ApiResponse2> fetchOneToOneChat(String senderId)async{
+    var response=await _api.postRequest("chats/fetch_chats", {
+      "user_id": prefs.getString("uid"),
+      "sender_id" : senderId,
+    });
+    return ApiResponse2.fromJson(response,response['data']);
+  }
 
   Future sendMessageApi(Map<String,dynamic> data)async{
     var response=await _api.postRequest("chats/one_to_one_chat", data);

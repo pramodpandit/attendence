@@ -119,12 +119,12 @@ class ProfileBloc extends Bloc {
   }
   ValueNotifier<String?> allUser = ValueNotifier(null);
   fetchAllUserDetail() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     try{
       isAllUserDetailLoad.value = true;
       var result = await _repo.allUserDetails();
-      print("the date is : ${result.data}");
       if(result.status){
-        allUserDetail.value = result.data;
+        allUserDetail.value = (result.data as List).where((element) => element['user_id'].toString() != prefs.getString("uid")).toList();
       }
     }catch (e, s) {
       allUserDetail.value = [];
@@ -310,7 +310,20 @@ class ProfileBloc extends Bloc {
         print(e);
         print(s);
       }
-      await Future.delayed(Duration(seconds: 5));
+      await Future.delayed(Duration(seconds: 8));
+    }
+  }
+
+  Stream<List> getOneToOneChat(String senderId) async*{
+    while(true){
+      try{
+        var result = await _repo.fetchOneToOneChat(senderId);
+        yield result.data as List;
+      }catch (e, s) {
+        print(e);
+        print(s);
+      }
+      await Future.delayed(Duration(seconds: 2));
     }
   }
 
