@@ -52,6 +52,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     bloc = ProfileBloc(context.read<ProfileRepository>());
     super.initState();
     bloc.fetchUserDetail();
+    bloc.getExpanseAllowData();
   }
 
   @override
@@ -312,14 +313,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   builder: (context) => const HolidayScreen()));
                             },
                           ),
-                          if (bloc.hasAccess(department,9,'1'))BoxContainer(
-                            heading: "Expense",
-                            image: "images/budget.png",
-                            onTap: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => const ExpenseList()));
-                            },
-                          ),
+                          // if (bloc.hasAccess(department,9,'1'))
+                          ValueListenableBuilder(
+                            valueListenable: bloc.expenseAllow,
+                            builder: (context, expenseAllow, child) {
+                              if(expenseAllow == ""){
+                                return Offstage();
+                              }
+                            return BoxContainer(
+                              heading: "Expense",
+                              image: "images/budget.png",
+                              onTap: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => ExpenseList(expanseAllow: expenseAllow,userType: user.userType.toString(),)));
+                              },
+                            );
+                          },),
                           if (bloc.hasAccess(department, 10,'1'))BoxContainer(
                             heading: "Events",
                             image: "images/event.png",

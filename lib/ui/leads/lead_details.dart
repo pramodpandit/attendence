@@ -134,39 +134,51 @@ class _LeadDetailsState extends State<LeadDetails> {
                         children: [
                           const SizedBox(height: 5,),
                           const SizedBox(height: 10,),
-                          DetailsContainer(
-                            title:"${widget.data['createdby_fname'] ?? ''} ${widget.data['createdby_lname'] ?? ''}",
-                            //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
-                            heading: 'Created By', isHtml: false,
-                          ),
-                          Dash(
-                            dashColor: Colors.grey.withOpacity(0.3),
-                            dashGap: 3,
-                            length: 270.w,
-                          ),
-                          const SizedBox(height: 10,),
-                          DetailsContainer(
-                            title:"${DateFormat.yMMMd().format(DateTime.parse(widget.data['created_date']))}",
-                            //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
-                            heading: 'Created At', isHtml: false,
-                          ),
-                          Dash(
-                            dashColor: Colors.grey.withOpacity(0.3),
-                            dashGap: 3,
-                            length: 270.w,
-                          ),
-                          const SizedBox(height: 10,),
-                          DetailsContainer(
-                            title:"${widget.data['clientsurname'] ?? ''} ${widget.data['clientfirstname'] ?? ''} ${widget.data['clientlastname'] ?? ''}",
-                            //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",
-                            heading: 'Client Name', isHtml: false,
-                          ),
-                          Dash(
-                            dashColor: Colors.grey.withOpacity(0.3),
-                            dashGap: 3,
-                            length: 270.w,
-                          ),
-                          const SizedBox(height: 10,),
+                          if(widget.data['createdby_fname'] != null)
+                            Column(
+                              children: [
+                                DetailsContainer(
+                                  title:"${widget.data['createdby_fname'] ?? ''} ${widget.data['createdby_lname'] ?? ''}",
+                                  heading: 'Created By', isHtml: false,
+                                ),
+                                Dash(
+                                  dashColor: Colors.grey.withOpacity(0.3),
+                                  dashGap: 3,
+                                  length: 270.w,
+                                ),
+                                const SizedBox(height: 10,),
+                              ],
+                            ),
+                          if(widget.data['created_date'] != null)
+                            Column(
+                              children: [
+                                DetailsContainer(
+                                  title:"${DateFormat.yMMMd().format(DateTime.parse(widget.data['created_date']))}",
+                                  heading: 'Created At', isHtml: false,
+                                ),
+                                Dash(
+                                  dashColor: Colors.grey.withOpacity(0.3),
+                                  dashGap: 3,
+                                  length: 270.w,
+                                ),
+                                const SizedBox(height: 10,),
+                              ],
+                            ),
+                          if(widget.data['clientfirstname'] != null)
+                            Column(
+                              children: [
+                                DetailsContainer(
+                                  title:"${widget.data['clientsurname'] ?? ''} ${widget.data['clientfirstname'] ?? ''} ${widget.data['clientlastname'] ?? ''}",
+                                  heading: 'Client Name', isHtml: false,
+                                ),
+                                Dash(
+                                  dashColor: Colors.grey.withOpacity(0.3),
+                                  dashGap: 3,
+                                  length: 270.w,
+                                ),
+                                const SizedBox(height: 10,),
+                              ],
+                            ),
                           DetailsContainer(
                             title:"${widget.data['status']}",
                             //"${details["first_name"]!=null?details["first_name"]:""} ${details["middle_name"]!=null?details["middle_name"]:""} ${details["last_name"]!=null?details["last_name"]:""}",

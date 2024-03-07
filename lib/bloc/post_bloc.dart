@@ -93,6 +93,7 @@ class PostBloc extends Bloc {
   }
 
   ValueNotifier<bool?> liked = ValueNotifier(null);
+  ValueNotifier<List?> postLikedAllUserList = ValueNotifier(null);
   getLikedPostUserDetails(String postId)async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Map<String,dynamic> data = {
@@ -101,8 +102,8 @@ class PostBloc extends Bloc {
     try{
       var result = await _repo.fetchLikedPostUserDetails(data);
       List finalResult = result.data;
+      postLikedAllUserList.value = finalResult;
       liked.value = finalResult.where((element) => element['user_id'].toString()==prefs.getString("uid").toString()).toList().isNotEmpty;
-      print("the result ${liked.value}");
     }catch(e){
       print(e);
     }

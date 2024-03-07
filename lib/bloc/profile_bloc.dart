@@ -17,6 +17,7 @@ import 'package:office/ui/profile/menus/guardian_details.dart';
 import 'package:office/ui/profile/menus/links.dart';
 import 'package:office/ui/profile/menus/official_details.dart';
 import 'package:office/ui/profile/menus/warning.dart';
+import 'package:office/utils/message_handler.dart';
 import '../data/model/Assets_Detail_modal.dart';
 import '../data/model/Assets_model.dart';
 import '../data/model/user.dart';
@@ -298,15 +299,51 @@ class ProfileBloc extends Bloc {
     }
   }
 
-  ValueNotifier<List?> allLastChats = ValueNotifier(null);
-  getRecentChats() async{
-    try{
-      var result = await _repo.fetchRecentChats();
-      if(result.status && result.data != null){
-        allLastChats.value = result.data;
-      }else{
-        allLastChats.value = [];
+  Stream<List> getRecentChats() async*{
+    while(true){
+      try{
+        var result = await _repo.fetchRecentChats();
+        yield result.data as List;
+      }catch (e, s) {
+        print(e);
+        print(s);
       }
+      await Future.delayed(Duration(seconds: 5));
+    }
+  }
+
+  TextEditingController sendMessageController = TextEditingController();
+  ValueNotifier<bool> isSending = ValueNotifier(false);
+
+  sendMessage(String toUser,String messageType)async{
+    isSending.value = true;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Map<String,dynamic> data = {
+      "from_user" : prefs.getString("uid"),
+      "to_user" : toUser,
+      "message_type" : messageType,
+      "message" : sendMessageController.text
+    };
+    try{
+      var result = await _repo.sendMessageApi(data);
+      if(result['status']){
+        sendMessageController.clear();
+        showMessage(MessageType.success(result['message']));
+      }else{
+        showMessage(MessageType.error(result['message']));
+      }
+    }catch(e){
+      print(e);
+    }finally{
+      isSending.value = false;
+    }
+  }
+
+  ValueNotifier<dynamic> expenseAllow = ValueNotifier("");
+  getExpanseAllowData() async{
+    try{
+      var result = await _repo.fetchExpanseAllowData();
+      expenseAllow.value = result;
     }catch (e, s) {
       print(e);
       print(s);

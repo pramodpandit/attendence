@@ -26,21 +26,24 @@ class _ChatListScreenState extends State<ChatListScreen> {
   // List<String> tabTittle = ["Chats", "Groups"];
   ValueNotifier<int> tabIndex = ValueNotifier(0);
   ValueNotifier<bool> isSearchClicked = ValueNotifier(false);
+  late Stream<List> chatStream;
 
   @override
   void initState() {
     super.initState();
+    sharedPref();
     bloc = ProfileBloc(context.read<ProfileRepository>());
     bloc.fetchUserDetail();
-    bloc.getRecentChats();
+    // bloc.getRecentChats();
+    chatStream = bloc.getRecentChats().asBroadcastStream();
     bloc.fetchAllUserDetail();
   }
 
-  // bool containsId(String id){
-  //   for(var i=0;i<bloc.allUserDetail.value!.length;i++){
-  //
-  //   }
-  // }
+
+  late SharedPreferences prefs;
+  void sharedPref()async{
+    prefs = await SharedPreferences.getInstance();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -219,20 +222,35 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                       await Future.delayed(
                                           Duration(milliseconds: 1200));
                                     },
-                                    child: ValueListenableBuilder(
-                                      valueListenable: bloc.allLastChats,
-                                      builder: (context, allLastChats, child) {
-                                        if(allLastChats != null){
+                                    // child: ValueListenableBuilder(
+                                    //   valueListenable: bloc.allLastChats,
+                                    //   builder: (context, allLastChats, child) {
+                                    //     if(allLastChats == null){
+                                    //       return Center(
+                                    //         child: CircularProgressIndicator(),
+                                    //       );
+                                    //     }
+                                    //   return ListView.builder(
+                                    //     itemCount: allLastChats.length,
+                                    //     shrinkWrap: true,
+                                    //     itemBuilder: (context, index) {
+                                    //       return SingleChat(userData: allLastChats[index],bloc: bloc,prefs: prefs,);
+                                    //     },
+                                    //   );
+                                    // },),
+                                    child: StreamBuilder(
+                                      stream: chatStream,
+                                      builder: (context, snapshot) {
+                                        if(snapshot.data == null){
                                           return Center(child: CircularProgressIndicator());
                                         }
-                                        // List recentChats = bloc.allUserDetail.value.where((element) => allLastChats.contains(element) element['id'])
-                                      return ListView.builder(
-                                        itemCount: 15,
-                                        shrinkWrap: true,
-                                        itemBuilder: (context, index) {
-                                          return const SingleChat();
-                                        },
-                                      );
+                                        return ListView.builder(
+                                          itemCount: snapshot.data!.length,
+                                          shrinkWrap: true,
+                                          itemBuilder: (context, index) {
+                                            return SingleChat(userData: snapshot.data![index],bloc: bloc,prefs: prefs,);
+                                          },
+                                        );
                                     },),
                                   ),
                                   Positioned(
@@ -241,9 +259,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                     child: FloatingActionButton.extended(
                                         onPressed: () {
                                           Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      ContactsScreen()));
+                                            MaterialPageRoute(
+                                              builder: (context) => ContactsScreen()));
                                         },
                                         backgroundColor: const Color(0xFF253772),
                                         label: AnimatedSwitcher(
@@ -283,7 +300,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                       itemCount: 15,
                                       shrinkWrap: true,
                                       itemBuilder: (context, index) {
-                                        return const GroupChat();
+                                        return GroupChat(bloc: bloc,prefs: prefs,);
                                       },
                                     ),
                                 ),
@@ -385,7 +402,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
 }
 
 class SingleChat extends StatefulWidget {
-  const SingleChat({super.key});
+  final Map<String,dynamic> userData;
+  final ProfileBloc bloc;
+  final SharedPreferences prefs;
+  const SingleChat({super.key,required this.userData, required this.bloc, required this.prefs});
   @override
   State<SingleChat> createState() => _SingleChatState();
 }
@@ -396,15 +416,15 @@ class _SingleChatState extends State<SingleChat> {
     return ListTile(
       onTap: () {
           Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => ChatScreen({"first_name": "Pramod"})));
+              .push(MaterialPageRoute(builder: (context) => ChatScreen(user: widget.userData,bloc: widget.bloc,prefs: widget.prefs,)));
       },
       contentPadding: EdgeInsets.symmetric(horizontal: 5),
       title: Text(
-            "Jacob",
+            "${widget.userData['first_name'] ?? ''} ${widget.userData['middle_name'] ?? ''} ${widget.userData['last_name'] ?? ''}",
             style: TextStyle(fontWeight: FontWeight.w500),
           ),
       subtitle: Text(
-          "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi",
+          widget.userData['last_chat'][widget.userData['last_chat'].length-1]['message'] ?? '',
           softWrap: true,
           style: TextStyle(
               fontWeight: FontWeight.w400,
@@ -413,14 +433,36 @@ class _SingleChatState extends State<SingleChat> {
               color: Colors.grey.shade400),
         ),
       leading: CircleAvatar(
-            child: Icon(Icons.person),
+            child: ClipOval(
+                child: widget.userData['image'] == null?Icon(Icons.person):
+                Image.network(
+                  "https://freeze.talocare.co.in/public/${widget.userData['image']}",
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if(loadingProgress == null){
+                      return child;
+                    }
+                    return SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes!=null?
+                        loadingProgress.cumulativeBytesLoaded/
+                            loadingProgress.expectedTotalBytes!
+                            : null,
+                        strokeWidth: 2,
+                      ),
+                    );
+                  },
+                )),
           ),
     );
   }
 }
 
 class GroupChat extends StatefulWidget {
-  const GroupChat({super.key});
+  final ProfileBloc bloc;
+  final SharedPreferences prefs;
+  const GroupChat({super.key, required this.bloc, required this.prefs});
   @override
   State<GroupChat> createState() => _GroupChatState();
 }
@@ -431,7 +473,7 @@ class _GroupChatState extends State<GroupChat> {
     return ListTile(
       onTap: () {
         Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => ChatScreen({"first_name": "Pramod"})));
+            .push(MaterialPageRoute(builder: (context) => ChatScreen(user: {"first_name" : "pramod"},bloc: widget.bloc,prefs: widget.prefs)));
       },
       contentPadding: EdgeInsets.symmetric(horizontal: 5),
       title: const Text(

@@ -96,152 +96,158 @@ class _TaskScreenState extends State<TaskScreen> {
             ],
           ),
           Expanded(
-            child: Container(
-              width: 1.sw,
-              height: 0.8.sh,
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: ValueListenableBuilder(
-                valueListenable: bloc.allFetchedTaskData,
-                builder: (context, allFetchedTaskData, child) {
-                  if(allFetchedTaskData == null){
-                    return SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.3,
-                      child: Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
-                  }
-                  if(allFetchedTaskData.isEmpty){
-                    return Container(
-                      height: MediaQuery.of(context).size.height * 0.7,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text('No Task Available!',style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold),),
-                        ],
-                      ),
-                    );
-                  }
-                return ListView.builder(
-                    itemCount: allFetchedTaskData.length,
-                    shrinkWrap: true,
-                    physics: const ScrollPhysics(),
-                    itemBuilder: (context,index){
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(MaterialPageRoute(builder: (context)=>TaskDetails(data:allFetchedTaskData[index],)));
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 25),
-                            child: Container(
-                              margin: const EdgeInsets.only(bottom: 20),
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  boxShadow: [
-                                    BoxShadow(
-                                        color: Colors.grey.withOpacity(0.2),
-                                        blurRadius: 3,
-                                        spreadRadius: 2)
-                                  ],
-                                  borderRadius: const BorderRadius.only(topRight: Radius.circular(10.0),bottomRight:Radius.circular(10.0),)
-                              ),
-                              child: IntrinsicHeight(
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: 3,
-                                      decoration: const BoxDecoration(
-                                          color:Color(0xFF009FE3),
-                                          borderRadius: BorderRadius.only(topLeft: Radius.circular(10.0),bottomLeft:Radius.circular(10.0))
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Container(
+            child: RefreshIndicator(
+              onRefresh: () async {
+                bloc.allFetchedTaskData.value = null;
+                bloc.fetchTaskData("doing");
+              },
+              child: Container(
+                width: 1.sw,
+                height: 0.8.sh,
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: ValueListenableBuilder(
+                  valueListenable: bloc.allFetchedTaskData,
+                  builder: (context, allFetchedTaskData, child) {
+                    if(allFetchedTaskData == null){
+                      return SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.3,
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+                    if(allFetchedTaskData.isEmpty){
+                      return Container(
+                        height: MediaQuery.of(context).size.height * 0.7,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text('No Task Available!',style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold),),
+                          ],
+                        ),
+                      );
+                    }
+                  return ListView.builder(
+                      itemCount: allFetchedTaskData.length,
+                      shrinkWrap: true,
+                      physics: const ScrollPhysics(),
+                      itemBuilder: (context,index){
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(builder: (context)=>TaskDetails(data:allFetchedTaskData[index],)));
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 25),
+                              child: Container(
+                                margin: const EdgeInsets.only(bottom: 20),
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color: Colors.grey.withOpacity(0.2),
+                                          blurRadius: 3,
+                                          spreadRadius: 2)
+                                    ],
+                                    borderRadius: const BorderRadius.only(topRight: Radius.circular(10.0),bottomRight:Radius.circular(10.0),)
+                                ),
+                                child: IntrinsicHeight(
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 3,
                                         decoration: const BoxDecoration(
-                                          color: Colors.transparent,
+                                            color:Color(0xFF009FE3),
+                                            borderRadius: BorderRadius.only(topLeft: Radius.circular(10.0),bottomLeft:Radius.circular(10.0))
                                         ),
-                                        padding: EdgeInsets.symmetric(horizontal: 10),
-                                        child:  Column(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            SizedBox(height: 10,),
-                                            Expanded(
-                                              child: Text(
-                                                "${allFetchedTaskData[index]['title']}",
-                                                // "The prevalence of trauma related disorders in children and adolescents affected by forest fires.",
-                                                style: TextStyle(
-                                                    fontFamily: "Poppins",
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w600,
-                                                    color: Colors.black
-                                                ),),
-                                            ),
-                                            Text(
-                                              "11:00 Am - 12:00 Pm",
-                                              // "The prevalence of trauma related disorders in children and adolescents affected by forest fires.",
-                                              style: TextStyle(
-                                                  fontSize: 8,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Colors.black54
-                                              ),),
-                                            SizedBox(height: 10,),
-                                            Container(
-                                              // color: Colors.black,
-                                              // padding: const EdgeInsets.only(
-                                              //     left: 20,
-                                              //     right: 20,
-                                              //     top: 30,
-                                              //     bottom: 10),
-                                              child: Html(
-                                                // data:"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-                                                data:
-                                                "${allFetchedTaskData[index]['description']}",
-                                                style: {
-                                                  "body": Style(
-                                                      color: Colors.black,
-                                                      fontWeight:
-                                                      FontWeight.w600,
-
-                                                      display: Display.inline,
-                                                      fontSize: FontSize(10),
-                                                      textAlign:
-                                                      TextAlign.start),
-                                                  "p": Style(
-                                                      color: Colors.black,
-
-                                                      display: Display.inline,
-                                                      fontSize: FontSize(10),
-                                                      textAlign:
-                                                      TextAlign.start),
-                                                },
-                                              ),
-                                            ),
-                                            SizedBox(height: 10,),
-                                            Row(mainAxisAlignment: MainAxisAlignment.end,
-                                              children: [
-                                                Text("${allFetchedTaskData[index]['status']}",
+                                      ),
+                                      Expanded(
+                                        child: Container(
+                                          decoration: const BoxDecoration(
+                                            color: Colors.transparent,
+                                          ),
+                                          padding: EdgeInsets.symmetric(horizontal: 10),
+                                          child:  Column(
+                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              SizedBox(height: 10,),
+                                              Expanded(
+                                                child: Text(
+                                                  "${allFetchedTaskData[index]['title']}",
+                                                  // "The prevalence of trauma related disorders in children and adolescents affected by forest fires.",
                                                   style: TextStyle(
                                                       fontFamily: "Poppins",
-                                                      fontSize: 11,
+                                                      fontSize: 12,
                                                       fontWeight: FontWeight.w600,
-                                                      color: Colors.blue
+                                                      color: Colors.black
                                                   ),),
-                                              ],),
-                                            SizedBox(height: 10,),
-                                          ],
+                                              ),
+                                              Text(
+                                                "11:00 Am - 12:00 Pm",
+                                                // "The prevalence of trauma related disorders in children and adolescents affected by forest fires.",
+                                                style: TextStyle(
+                                                    fontSize: 8,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Colors.black54
+                                                ),),
+                                              SizedBox(height: 10,),
+                                              Container(
+                                                // color: Colors.black,
+                                                // padding: const EdgeInsets.only(
+                                                //     left: 20,
+                                                //     right: 20,
+                                                //     top: 30,
+                                                //     bottom: 10),
+                                                child: Html(
+                                                  // data:"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+                                                  data:
+                                                  "${allFetchedTaskData[index]['description']}",
+                                                  style: {
+                                                    "body": Style(
+                                                        color: Colors.black,
+                                                        fontWeight:
+                                                        FontWeight.w600,
+
+                                                        display: Display.inline,
+                                                        fontSize: FontSize(10),
+                                                        textAlign:
+                                                        TextAlign.start),
+                                                    "p": Style(
+                                                        color: Colors.black,
+
+                                                        display: Display.inline,
+                                                        fontSize: FontSize(10),
+                                                        textAlign:
+                                                        TextAlign.start),
+                                                  },
+                                                ),
+                                              ),
+                                              SizedBox(height: 10,),
+                                              Row(mainAxisAlignment: MainAxisAlignment.end,
+                                                children: [
+                                                  Text("${allFetchedTaskData[index]['status']}",
+                                                    style: TextStyle(
+                                                        fontFamily: "Poppins",
+                                                        fontSize: 11,
+                                                        fontWeight: FontWeight.w600,
+                                                        color: Colors.blue
+                                                    ),),
+                                                ],),
+                                              SizedBox(height: 10,),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    )
-                                  ],
+                                      )
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        );
-                    });
-              },)
+                          );
+                      });
+                },)
+              ),
             ),
           )
 
@@ -255,7 +261,7 @@ class _TaskScreenState extends State<TaskScreen> {
             width: 50,
             child: FloatingActionButton.extended(
                 shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5.0))
+                    borderRadius: BorderRadius.all(Radius.circular(300.0))
                 ),
                 onPressed: () async{
                   showModalBottomSheet(

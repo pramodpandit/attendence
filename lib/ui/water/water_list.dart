@@ -447,8 +447,7 @@ class _WaterListState extends State<WaterList> {
                                                         Padding(
                                                           padding: EdgeInsets.all(5.0),
                                                           child: Text(
-                                                            DateFormat("dd-MM-yyyy").format(DateTime.parse(item.fDate
-                                                            !)),
+                                                            DateFormat("dd-MM-yyyy").format(DateTime.parse(item.fDate!)),
                                                             style: const TextStyle(color: Color(0xff20263c),fontWeight: FontWeight.w600),),
                                                         ),
                                                         for (var type in waterType)

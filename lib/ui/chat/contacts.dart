@@ -24,6 +24,7 @@ class ContactsScreen extends StatefulWidget {
 
 class _ContactsScreenState extends State<ContactsScreen> {
   late ProfileBloc profileBloc;
+  late Stream<List> chatStream;
 
   TextEditingController searchController = TextEditingController();
   String search=" No User Found ";
@@ -37,9 +38,17 @@ class _ContactsScreenState extends State<ContactsScreen> {
 
   @override
   void initState() {
+    sharedPref();
     profileBloc=ProfileBloc(context.read<ProfileRepository>());
     super.initState();
     profileBloc.fetchAllUserDetail();
+    // profileBloc.getRecentChats();
+    chatStream = profileBloc.getRecentChats().asBroadcastStream();
+  }
+
+  late SharedPreferences prefs;
+  void sharedPref()async{
+    prefs = await SharedPreferences.getInstance();
   }
 
   void sendNotifications(){
@@ -107,244 +116,263 @@ class _ContactsScreenState extends State<ContactsScreen> {
                         ],
                       );
                     }
-                  return ValueListenableBuilder(
-                    valueListenable: profileBloc.allUserDetail,
-                    builder: (context, allUserDetail,__){
-                     // print('htd$data');
-                      if(allUserDetail == null){
-                        return Column(
-                          children: [
-                            SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.3,
-                            ),
-                            const Center(child: CircularProgressIndicator()),
-                          ],
-                        );
-                      }
-                      if(allUserDetail.isEmpty){
-                        return Column(
-                          children: [
-                            SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.3,
-                            ),
-                            const Center(child: Text("No data found!")),
-                          ],
-                        );
-                      }
-                      return Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Column(
+                  return StreamBuilder(
+                    stream: chatStream,
+                    builder: (context, snapshot) {
+                    return ValueListenableBuilder(
+                        valueListenable: profileBloc.allUserDetail,
+                        builder: (context, allUserDetail,__){
+                          // print('htd$data');
+                          if(allUserDetail == null){
+                            return Column(
                               children: [
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 0),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(100),
-                                color: Colors.grey.withOpacity(0.2),
-                                // boxShadow: [
-                                //   BoxShadow(
-                                //     spreadRadius: 1,
-                                //     blurRadius: 3,
-                                //     color: Colors.black.withOpacity(0.2),
-                                //   )
-                                // ]
-                              ),
-                              child: Row(
-                                children: [
-                                  const Icon(Icons.search),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  Expanded(
-                                    child: TextFormField(
-                                      controller: searchController,
-                                      decoration: const InputDecoration(
-                                          border: InputBorder.none, hintText: "Search"),
-                                      onChanged: (String? value) {
-                                        setState(() {
-                                          searchedUser =
-                                              profileBloc.allUserDetail.value!
-                                                  .where((element) =>
-                                                  "${element['first_name'] == null ? '':
-                                                      element['first_name']
-                                                      .toString()
-                                                      .toLowerCase()
-                                                  } ${element['middle_name'] == null ? '':
-                                                      element['middle_name']
-                                                      .toString()
-                                                      .toLowerCase()
-                                                  } ${element['last_name'] == null ? '':
-                                                      element['last_name']
-                                                      .toString()
-                                                      .toLowerCase()}".contains(
-                                                      value!.toLowerCase()))
-                                                  .toList();
-                                        });
-                                      },
+                                SizedBox(
+                                  height: MediaQuery.of(context).size.height * 0.3,
+                                ),
+                                const Center(child: CircularProgressIndicator()),
+                              ],
+                            );
+                          }
+                          if(allUserDetail.isEmpty){
+                            return Column(
+                              children: [
+                                SizedBox(
+                                  height: MediaQuery.of(context).size.height * 0.3,
+                                ),
+                                const Center(child: Text("No data found!")),
+                              ],
+                            );
+                          }
+                          return Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                              child: Column(
+                                  children: [
+                                    const SizedBox(
+                                      height: 10,
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                            child: ListView.builder(
-                              padding: const EdgeInsets.only(top: 15,bottom: 10),
-                                shrinkWrap: true,
-                                physics: const ScrollPhysics(),
-                                itemCount: searchController.text.isEmpty
-                                    ? allUserDetail.length
-                                    : searchedUser.length,
-                                itemBuilder: (context, index) {
-                                // int i=0;
-                                  if(searchController.text.isNotEmpty){
-                                    return GestureDetector(
-                                      onTap: () {
-                                        Navigator.of(context).push(
-                                            MaterialPageRoute(builder: (context) => ChatScreen(searchedUser[index])));
-                                      },
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 5,vertical: 5),
-                                        decoration: const BoxDecoration(
-                                          color: Colors.white,
-                                        ),
-                                        child: Column(
-                                          children: [
-                                            SizedBox(height: 3.h,),
-                                            Row(
-                                              crossAxisAlignment: CrossAxisAlignment.center,
-                                              children: [
-                                                CircleAvatar(
-                                                  radius: 23,
-                                                  child: ClipOval(
-                                                    child: searchedUser[index]['image'] != null?Image.network(
-                                                      "https://freeze.talocare.co.in/public/${searchedUser[index]['image']}",
-                                                      loadingBuilder: (context, child, loadingProgress) {
-                                                        if(loadingProgress == null){
-                                                          return child;
-                                                        }
-                                                        return SizedBox(
-                                                          height: 20,
-                                                          width: 20,
-                                                          child: CircularProgressIndicator(
-                                                            value: loadingProgress.expectedTotalBytes!=null?
-                                                            loadingProgress.cumulativeBytesLoaded/
-                                                                loadingProgress.expectedTotalBytes!
-                                                                : null,
-                                                            strokeWidth: 2,
-                                                          ),
-                                                        );
-                                                      },
-                                                      height: 60,
-                                                      width: 60,
-                                                      fit: BoxFit.cover,
-                                                    ):const Icon(PhosphorIcons.user_bold),
-                                                  ),
-                                                ),
-                                                SizedBox(width: 7.h,),
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Text(
-                                                        "${searchedUser[index]['first_name']??""} ${searchedUser[index]['middle_name']??""} ${searchedUser[index]['last_name']??""}",
-                                                        style: const TextStyle(fontWeight: FontWeight.w500,fontSize: 15,),
-                                                      ),
-                                                      // Text(
-                                                      //   searchedUser[index].departmentname ?? "",
-                                                      //   style: TextStyle(
-                                                      //       fontSize: 13,
-                                                      //       color: Colors.black.withOpacity(0.8)),
-                                                      // ),
-                                                    ],
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                            const Divider(),
-
-                                          ],
-                                        ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 0),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(100),
+                                        color: Colors.grey.withOpacity(0.2),
+                                        // boxShadow: [
+                                        //   BoxShadow(
+                                        //     spreadRadius: 1,
+                                        //     blurRadius: 3,
+                                        //     color: Colors.black.withOpacity(0.2),
+                                        //   )
+                                        // ]
                                       ),
-                                    );
-                                  }
-                                  return GestureDetector(
-                                    onTap: () {
-                                      Navigator.of(context).push(
-                                          MaterialPageRoute(builder: (context) => ChatScreen(allUserDetail[index])));
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 5,vertical: 5),
-                                      decoration: const BoxDecoration(
-                                        color: Colors.white,
-                                      ),
-                                      child: Column(
+                                      child: Row(
                                         children: [
-                                          SizedBox(height: 3.h,),
-                                          Row(
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            children: [
-                                              CircleAvatar(
-                                                radius: 23,
-                                                child: ClipOval(
-                                                  child: allUserDetail[index]['image'] != null?Image.network(
-                                                    "https://freeze.talocare.co.in/public/${allUserDetail[index]['image']}",
-                                                    loadingBuilder: (context, child, loadingProgress) {
-                                                      if(loadingProgress == null){
-                                                        return child;
-                                                      }
-                                                      return SizedBox(
-                                                        height: 20,
-                                                        width: 20,
-                                                        child: CircularProgressIndicator(
-                                                          value: loadingProgress.expectedTotalBytes!=null?
-                                                                loadingProgress.cumulativeBytesLoaded/
-                                                                loadingProgress.expectedTotalBytes!
-                                                              : null,
-                                                          strokeWidth: 2,
-                                                        ),
-                                                      );
-                                                    },
-                                                    height: 60,
-                                                    width: 60,
-                                                    fit: BoxFit.cover,
-                                                  ):const Icon(PhosphorIcons.user_bold),
-                                                ),
-                                              ),
-                                              SizedBox(width: 7.h,),
-                                              Expanded(
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      "${allUserDetail[index]['first_name']??""} ${allUserDetail[index]['middle_name']??""} ${allUserDetail[index]['last_name']??""}",
-                                                      style: const TextStyle(fontWeight: FontWeight.w500,fontSize: 15,),
-                                                    ),
-                                                    // Text(
-                                                    //   allUserDetail[index]['departmentname'] ?? "",
-                                                    //   style: TextStyle(
-                                                    //       fontSize: 13,
-                                                    //       color: Colors.black.withOpacity(0.8)),
-                                                    // ),
-                                                  ],
-                                                ),
-                                              )
-                                            ],
+                                          const Icon(Icons.search),
+                                          const SizedBox(
+                                            width: 10,
                                           ),
-                                          const Divider(),
+                                          Expanded(
+                                            child: TextFormField(
+                                              controller: searchController,
+                                              decoration: const InputDecoration(
+                                                  border: InputBorder.none, hintText: "Search"),
+                                              onChanged: (String? value) {
+                                                setState(() {
+                                                  searchedUser =
+                                                      profileBloc.allUserDetail.value!
+                                                          .where((element) =>
+                                                          "${element['first_name'] == null ? '':
+                                                          element['first_name']
+                                                              .toString()
+                                                              .toLowerCase()
+                                                          } ${element['middle_name'] == null ? '':
+                                                          element['middle_name']
+                                                              .toString()
+                                                              .toLowerCase()
+                                                          } ${element['last_name'] == null ? '':
+                                                          element['last_name']
+                                                              .toString()
+                                                              .toLowerCase()}".contains(
+                                                              value!.toLowerCase()))
+                                                          .toList();
+                                                });
+                                              },
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ),
-                                  );
-                                }),
+                                    Expanded(
+                                      child: ListView.builder(
+                                          padding: const EdgeInsets.only(top: 15,bottom: 10),
+                                          shrinkWrap: true,
+                                          physics: const ScrollPhysics(),
+                                          itemCount: searchController.text.isEmpty
+                                              ? allUserDetail.length
+                                              : searchedUser.length,
+                                          itemBuilder: (context, index) {
+                                            // int i=0;
+                                            if(searchController.text.isNotEmpty){
+                                              return GestureDetector(
+                                                onTap: () {
+
+                                                  List currentData = snapshot.data!.where((element) => element['id'].toString() == searchedUser[index]['user_id'].toString()).toList();
+                                                  if(currentData.isNotEmpty){
+                                                    Navigator.of(context).push(
+                                                        MaterialPageRoute(builder: (context) => ChatScreen(user: currentData[0],bloc: profileBloc,prefs: prefs,)));
+                                                  }else{
+                                                    Navigator.of(context).push(
+                                                        MaterialPageRoute(builder: (context) => ChatScreen(user: searchedUser[index],bloc: profileBloc,prefs: prefs,)));
+                                                  }
+                                                  // Navigator.of(context).push(
+                                                  //     MaterialPageRoute(builder: (context) => ChatScreen(searchedUser[index],bloc: profileBloc,prefs: prefs,)));
+                                                },
+                                                child: Container(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 5,vertical: 5),
+                                                  decoration: const BoxDecoration(
+                                                    color: Colors.white,
+                                                  ),
+                                                  child: Column(
+                                                    children: [
+                                                      SizedBox(height: 3.h,),
+                                                      Row(
+                                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                                        children: [
+                                                          CircleAvatar(
+                                                            radius: 23,
+                                                            child: ClipOval(
+                                                              child: searchedUser[index]['image'] != null?Image.network(
+                                                                "https://freeze.talocare.co.in/public/${searchedUser[index]['image']}",
+                                                                loadingBuilder: (context, child, loadingProgress) {
+                                                                  if(loadingProgress == null){
+                                                                    return child;
+                                                                  }
+                                                                  return SizedBox(
+                                                                    height: 20,
+                                                                    width: 20,
+                                                                    child: CircularProgressIndicator(
+                                                                      value: loadingProgress.expectedTotalBytes!=null?
+                                                                      loadingProgress.cumulativeBytesLoaded/
+                                                                          loadingProgress.expectedTotalBytes!
+                                                                          : null,
+                                                                      strokeWidth: 2,
+                                                                    ),
+                                                                  );
+                                                                },
+                                                                height: 60,
+                                                                width: 60,
+                                                                fit: BoxFit.cover,
+                                                              ):const Icon(PhosphorIcons.user_bold),
+                                                            ),
+                                                          ),
+                                                          SizedBox(width: 7.h,),
+                                                          Expanded(
+                                                            child: Column(
+                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                              children: [
+                                                                Text(
+                                                                  "${searchedUser[index]['first_name']??""} ${searchedUser[index]['middle_name']??""} ${searchedUser[index]['last_name']??""}",
+                                                                  style: const TextStyle(fontWeight: FontWeight.w500,fontSize: 15,),
+                                                                ),
+                                                                // Text(
+                                                                //   searchedUser[index].departmentname ?? "",
+                                                                //   style: TextStyle(
+                                                                //       fontSize: 13,
+                                                                //       color: Colors.black.withOpacity(0.8)),
+                                                                // ),
+                                                              ],
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                      const Divider(),
+
+                                                    ],
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                            return GestureDetector(
+                                              onTap: () {
+                                                List currentData = snapshot.data!.where((element) => element['id'].toString() == allUserDetail[index]['user_id'].toString()).toList();
+                                                if(currentData.isNotEmpty){
+                                                  Navigator.of(context).push(
+                                                      MaterialPageRoute(builder: (context) => ChatScreen(user: currentData[0],bloc: profileBloc,prefs: prefs,)));
+                                                }else{
+                                                  Navigator.of(context).push(
+                                                      MaterialPageRoute(builder: (context) => ChatScreen(user: allUserDetail[index],bloc: profileBloc,prefs: prefs,)));
+                                                }
+                                              },
+                                              child: Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 5,vertical: 5),
+                                                decoration: const BoxDecoration(
+                                                  color: Colors.white,
+                                                ),
+                                                child: Column(
+                                                  children: [
+                                                    SizedBox(height: 3.h,),
+                                                    Row(
+                                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                                      children: [
+                                                        CircleAvatar(
+                                                          radius: 23,
+                                                          child: ClipOval(
+                                                            child: allUserDetail[index]['image'] != null?Image.network(
+                                                              "https://freeze.talocare.co.in/public/${allUserDetail[index]['image']}",
+                                                              loadingBuilder: (context, child, loadingProgress) {
+                                                                if(loadingProgress == null){
+                                                                  return child;
+                                                                }
+                                                                return SizedBox(
+                                                                  height: 20,
+                                                                  width: 20,
+                                                                  child: CircularProgressIndicator(
+                                                                    value: loadingProgress.expectedTotalBytes!=null?
+                                                                    loadingProgress.cumulativeBytesLoaded/
+                                                                        loadingProgress.expectedTotalBytes!
+                                                                        : null,
+                                                                    strokeWidth: 2,
+                                                                  ),
+                                                                );
+                                                              },
+                                                              height: 60,
+                                                              width: 60,
+                                                              fit: BoxFit.cover,
+                                                            ):const Icon(PhosphorIcons.user_bold),
+                                                          ),
+                                                        ),
+                                                        SizedBox(width: 7.h,),
+                                                        Expanded(
+                                                          child: Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: [
+                                                              Text(
+                                                                "${allUserDetail[index]['first_name']??""} ${allUserDetail[index]['middle_name']??""} ${allUserDetail[index]['last_name']??""}",
+                                                                style: const TextStyle(fontWeight: FontWeight.w500,fontSize: 15,),
+                                                              ),
+                                                              // Text(
+                                                              //   allUserDetail[index]['departmentname'] ?? "",
+                                                              //   style: TextStyle(
+                                                              //       fontSize: 13,
+                                                              //       color: Colors.black.withOpacity(0.8)),
+                                                              // ),
+                                                            ],
+                                                          ),
+                                                        )
+                                                      ],
+                                                    ),
+                                                    const Divider(),
+                                                  ],
+                                                ),
+                                              ),
+                                            );
+                                          }),
+                                    ),
+                                  ]),
                             ),
-                          ]),
-                        ),
-                      );
-                    }
-                  );
+                          );
+                        }
+                    );
+                  },);
                 }
               ),
             ],
