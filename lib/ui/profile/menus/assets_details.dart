@@ -89,7 +89,7 @@ class _assetsDetailState extends State<assetsDetail> {
                           child: Text(
                             "${widget.data.itemName}",
                             textAlign: TextAlign.left,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontWeight: FontWeight.w700,
                             ),
                           ),
@@ -99,7 +99,7 @@ class _assetsDetailState extends State<assetsDetail> {
                     Text(
                       widget.data.itemGroupName.toString(),
                       textAlign: TextAlign.left,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.w700,
                         color:Colors.black,
                       ),
@@ -131,7 +131,7 @@ class _assetsDetailState extends State<assetsDetail> {
                                     scrollDirection: Axis.horizontal,
                                     child: DataTable(
                                       columnSpacing: 10.0,
-                                      columns: [
+                                      columns: const [
                                         DataColumn(label: Text('Date',style: TextStyle(fontWeight: FontWeight.w700),)),
                                         DataColumn(label: Text('Description',style: TextStyle(fontWeight: FontWeight.w700))),
                                         DataColumn(label: Text('Status',style: TextStyle(fontWeight: FontWeight.w700))),

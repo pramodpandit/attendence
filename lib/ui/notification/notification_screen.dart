@@ -94,7 +94,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                     RichText(text: const TextSpan(
                                         children: [
                                           TextSpan(
-                                              text: 'Jacob ',
+                                              text: 'Jacob',
                                               style: TextStyle(
                                                   fontWeight: FontWeight.w500, color: Colors.blue,fontSize: 14)),
                                           TextSpan(

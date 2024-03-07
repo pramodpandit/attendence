@@ -177,11 +177,11 @@ class _WaterListState extends State<WaterList> {
                                             Column(
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
-                                                Padding(
-                                                  padding: const EdgeInsets.only(left: 5),
+                                                const Padding(
+                                                  padding: EdgeInsets.only(left: 5),
                                                   child: Text(
                                                     "Select Month",
-                                                    style: const TextStyle(
+                                                    style: TextStyle(
                                                       fontSize: 9,
                                                       fontWeight: FontWeight.w600,
                                                     ),
@@ -292,11 +292,11 @@ class _WaterListState extends State<WaterList> {
                                             Column(
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
-                                                Padding(
-                                                  padding: const EdgeInsets.only(left: 5),
+                                                const Padding(
+                                                  padding: EdgeInsets.only(left: 5),
                                                   child: Text(
                                                     "Select Year",
-                                                    style: const TextStyle(
+                                                    style: TextStyle(
                                                       fontSize: 9,
                                                       fontWeight: FontWeight.w600,
                                                     ),
@@ -351,11 +351,7 @@ class _WaterListState extends State<WaterList> {
                                                                   ),
                                                                   TextButton(
                                                                     onPressed: () {
-                                                                      Navigator.pop(
-                                                                          context,
-                                                                          date?.year ??
-                                                                              DateTime.now()
-                                                                                  .year);
+                                                                      Navigator.pop(context, date?.year ?? DateTime.now().year);
                                                                     },
                                                                     child: Text('Select'),
                                                                   ),
@@ -374,8 +370,7 @@ class _WaterListState extends State<WaterList> {
 
                                                         child: Container(
                                                           height: 50,
-                                                          padding: const EdgeInsets.symmetric(
-                                                              horizontal: 20),
+                                                          padding: const EdgeInsets.symmetric(horizontal: 20),
                                                           decoration: BoxDecoration(
                                                             color: Colors.grey[200],
                                                             borderRadius:
@@ -458,8 +453,6 @@ class _WaterListState extends State<WaterList> {
                                                               style: const TextStyle(color: Color(0xff20263c),fontWeight: FontWeight.w600),
                                                             ),
                                                           ),
-
-
                                                       ]
                                                     );
                                                   }).toList()
@@ -486,5 +479,4 @@ class _WaterListState extends State<WaterList> {
       ),
     );
   }
-
 }
