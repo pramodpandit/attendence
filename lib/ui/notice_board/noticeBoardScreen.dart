@@ -120,7 +120,6 @@ class _NoticeBoardScreenState extends State<NoticeBoardScreen> {
                                 value: bloc,
                                 child:  NoticeBoardDetails(data: data),
                               ),
-
                         )
                     );
                   },
@@ -188,7 +187,6 @@ class _NoticeBoardScreenState extends State<NoticeBoardScreen> {
                           data: (noticeBoards[index].description != null && noticeBoards[index].description!.length > 250)
                               ? "${noticeBoards[index].description!.substring(0, 100)}..."
                               : noticeBoards[index].description ?? "",
-
                           style: {
                             "body": Style(
                               color: Colors.black54,
@@ -220,8 +218,8 @@ class _NoticeBoardScreenState extends State<NoticeBoardScreen> {
           );
         },
       );
-              },
-            ),
+      },
+          ),
         ],
       )
     );
