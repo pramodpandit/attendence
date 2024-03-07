@@ -5,7 +5,8 @@ import 'package:office/ui/community/communityProfile.dart';
 
 class LikeSheet extends StatefulWidget {
   final BuildContext ctx;
-  const LikeSheet({super.key, required this.ctx});
+  final List users;
+  const LikeSheet({super.key, required this.ctx, required this.users});
 
   @override
   State<LikeSheet> createState() => _LikeSheetState();
@@ -54,7 +55,7 @@ class _LikeSheetState extends State<LikeSheet> {
                             ),
                             const SizedBox(width: 10),
                             Text(
-                              "Likes (1.1K)",
+                              "Likes (${widget.users.length})",
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16.sp,
@@ -74,7 +75,7 @@ class _LikeSheetState extends State<LikeSheet> {
                               (context, i) {
                                 return Container(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 5),
+                                      horizontal: 5, vertical: 5),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10),
                                     color: Colors.white,
@@ -90,14 +91,33 @@ class _LikeSheetState extends State<LikeSheet> {
                                                       CommunityProfile()));
                                         },
                                         child: CircleAvatar(
-                                          child: Icon(Icons.person),
+                                          radius: 23,
+                                          child: ClipOval(
+                                              child: widget.users[i]['user_details']['image'] == null
+                                                  ? Icon(Icons.person)
+                                                  : Image.network(
+                                                  "https://freeze.talocare.co.in/public/${widget.users[i]['user_details']['image']}",
+                                                loadingBuilder: (context, child, loadingProgress) {
+                                                    if(loadingProgress == null){
+                                                      return child;
+                                                    }
+                                                  return CircularProgressIndicator(
+                                                    value: loadingProgress.expectedTotalBytes!=null?
+                                                          loadingProgress.cumulativeBytesLoaded/
+                                                        loadingProgress.expectedTotalBytes!:
+                                                        null,
+                                                    strokeWidth: 2,
+                                                  );
+                                                },
+                                              ),
+                                          ),
                                         ),
                                       ),
                                       SizedBox(
                                         width: 10,
                                       ),
                                       Text(
-                                        "User name",
+                                        widget.users[i]['user_details']['name'],
                                         style: TextStyle(
                                             fontWeight: FontWeight.w500),
                                       ),
@@ -128,7 +148,7 @@ class _LikeSheetState extends State<LikeSheet> {
                                   ),
                                 );
                               },
-                              childCount: 3,
+                              childCount: widget.users.length,
                             ),
                           )),
                       SliverToBoxAdapter(child: SizedBox(height: 60.h)),

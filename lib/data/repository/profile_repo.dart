@@ -236,9 +236,21 @@ class ProfileRepository {
 
   Future<ApiResponse2> fetchRecentChats()async{
     var response=await _api.postRequest("chats/fetch_friends", {
-      "user_id":prefs.getString('uid'),
+      "user_id": prefs.getString("uid"),
     });
-    return ApiResponse2.fromJson(response,response['data']['last_chat']);
+    return ApiResponse2.fromJson(response,response['data']);
+  }
+
+  Future sendMessageApi(Map<String,dynamic> data)async{
+    var response=await _api.postRequest("chats/one_to_one_chat", data);
+    return response;
+  }
+
+  Future fetchExpanseAllowData()async{
+    var response = await _api.postRequest("employee/detailst", {
+      "user_id": prefs.getString('uid'),
+    });
+    return response['data']['expance_allow'];
   }
 
 }

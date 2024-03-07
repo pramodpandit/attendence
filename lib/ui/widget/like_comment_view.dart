@@ -61,19 +61,21 @@ class _LikeShareCommentState extends State<LikeShareComment> {
             5.width,
             GestureDetector(
               onTap: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(20),
+                if(widget.bloc.postLikedAllUserList.value != null){
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(20),
+                      ),
                     ),
-                  ),
-                  clipBehavior: Clip.antiAliasWithSaveLayer,
-                  builder: (BuildContext context) {
-                    return LikeSheet(ctx: context);
-                  },
-                );
+                    clipBehavior: Clip.antiAliasWithSaveLayer,
+                    builder: (BuildContext context) {
+                      return LikeSheet(ctx: context,users: widget.bloc.postLikedAllUserList.value!);
+                    },
+                  );
+                }
               },
               child: ValueListenableBuilder(
                 valueListenable: totalLike,

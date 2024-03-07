@@ -19,12 +19,19 @@ class ExpenseBloc extends Bloc {
   ValueNotifier<List?> allExpenseTypeData = ValueNotifier(null);
   ValueNotifier<List?> allExpenseData = ValueNotifier(null);
 
-  Future<String> getActiveExpenseTypeData()async{
+  Future<String> getActiveExpenseTypeData(Map<String,dynamic> allowData,String userType)async{
     try{
       var response = await _repo.fetchActiveExpenseTypeData();
-      allExpenseTypeData.value = response['data'];
-      expenseType.value = response['data'][0]['id'].toString();
-      return response['data'][0]['id'].toString();
+      List data = response['data'];
+      if(userType == "Superadmin" || userType == "Admin"){
+        allExpenseTypeData.value = data;
+        expenseType.value = allExpenseTypeData.value![0]['id'].toString();
+        return allExpenseTypeData.value![0]['id'].toString();
+      }else{
+        allExpenseTypeData.value = data.where((element) => allowData.values.toList().where((ele) => ele['id'].toString() == element['id'].toString() && ele['expance_allow'] == "yes").toList().isNotEmpty).toList();
+        expenseType.value = allExpenseTypeData.value![0]['id'].toString();
+        return allExpenseTypeData.value![0]['id'].toString();
+      }
     }catch(e){
       throw e;
     }

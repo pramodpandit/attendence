@@ -37,88 +37,73 @@ class _ProjectMembersState extends State<ProjectMembers> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 20,
-            ),
-            ValueListenableBuilder(
-              valueListenable: bloc.projectmember,
-              builder: (context, projectMember, child) {
-                if(projectMember ==null){
-                  return SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.7,
-                      child: Center(child: CircularProgressIndicator()));
-                }
-                if(projectMember.isEmpty){
-                  return SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.7,
-                      child: Center(child: Text("No data available")));
-                }
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15,vertical:0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      RefreshIndicator(
-                        displacement: 100,
-                        backgroundColor: Colors.white,
-                        color:Colors.red,
-                        strokeWidth: 3,
-                        triggerMode:
-                        RefreshIndicatorTriggerMode.onEdge,
-                        onRefresh: () async {
-                          await Future.delayed(
-                              Duration(milliseconds: 1200));
-                        },
-                        child: ListView.builder(
-                          itemCount: projectMember.length,
-                          padding: const EdgeInsets.only(top: 10),
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemBuilder: (context, index) {
-                            var data  = projectMember[index];
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => UserProfile(userid: data['user_id'],)));
-                              },
-                              child: Container(
-                                margin: const EdgeInsets.only(bottom: 20),
-                                child: Row(
-                                  children: [
-                                    CircleAvatar(
-                                      backgroundImage:data['employee_img']==null?null:NetworkImage('https://freeze.talocare.co.in/public/${data['employee_img']}',),
-                                      child: data['employee_img']==null?Icon(Icons.person):Offstage(),
-                                    ),
-                                    SizedBox(width: 10),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "${data['first_name']??''} ${data['l_name']==null?data['m_name']??'':data['l_name']??''}",
-                                            style: TextStyle(fontWeight: FontWeight.bold,fontSize: 15),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
+      body: RefreshIndicator(
+        onRefresh: () async {
+          bloc.fetchProjectsDetails(widget.data['id']);
+          bloc.fetchAddMemberLit(int.parse(widget.data['business_address']));
+          },
+        child: SingleChildScrollView(
+          child:  ValueListenableBuilder(
+            valueListenable: bloc.projectmember,
+            builder: (context, projectMember, child) {
+              if(projectMember ==null){
+                return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.7,
+                    child: Center(child: CircularProgressIndicator()));
+              }
+              if(projectMember.isEmpty){
+                return SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.7,
+                    child: Center(child: Text("No data available")));
+              }
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15,vertical:0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ListView.builder(
+                      itemCount: projectMember.length,
+                      padding: const EdgeInsets.only(top: 10),
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        var data  = projectMember[index];
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => UserProfile(userid: data['user_id'],)));
                           },
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },),
-          ],
+                          child: Container(
+                            margin: const EdgeInsets.only(bottom: 20),
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  backgroundImage:data['employee_img']==null?null:NetworkImage('https://freeze.talocare.co.in/public/${data['employee_img']}',),
+                                  child: data['employee_img']==null?Icon(Icons.person):Offstage(),
+                                ),
+                                SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "${data['first_name']??''} ${data['l_name']==null?data['m_name']??'':data['l_name']??''}",
+                                        style: TextStyle(fontWeight: FontWeight.bold,fontSize: 15),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              );
+            },),
         ),
       ),
       floatingActionButton: Column(

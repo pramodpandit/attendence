@@ -13,6 +13,7 @@ import 'package:nb_utils/nb_utils.dart';
 import 'package:office/data/model/user.dart';
 import 'package:office/ui/community/communityProfile.dart';
 import 'package:office/ui/widget/more_sheet.dart';
+import 'package:office/utils/message_handler.dart';
 import 'package:provider/provider.dart';
 
 import '../../bloc/profile_bloc.dart';
@@ -20,15 +21,15 @@ import '../../data/repository/profile_repo.dart';
 
 class ChatScreen extends StatefulWidget {
   final Map<String,dynamic> user;
-  const ChatScreen(this.user,{Key? key}) : super(key: key);
+  final ProfileBloc bloc;
+  final SharedPreferences prefs;
+  const ChatScreen({Key? key,required this.user, required this.bloc, required this.prefs}) : super(key: key);
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  ScrollController scrollController = ScrollController();
-  TextEditingController sendmessage = TextEditingController();
   File? galleryFile;
   PlayerController playerController = PlayerController();
   // var waveFormData;
@@ -36,7 +37,6 @@ class _ChatScreenState extends State<ChatScreen> {
   final Completer<GoogleMapController> _completer = Completer();
   Position? position;
   late ProfileBloc profileBloc;
-  List<String> messageType = ["r", "s", "s", "r", "s", "s", "r", "s"];
 
   Future<void> _openImagePicker(ImageSource source) async {
     Navigator.of(context).pop();
@@ -73,13 +73,15 @@ class _ChatScreenState extends State<ChatScreen> {
     // audioPlayer.play(DeviceFileSource(audioFile.path));
   }
 
+  late Stream<List> chattingStream;
   @override
   void initState() {
     profileBloc=ProfileBloc(context.read<ProfileRepository>());
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      scrollController.jumpTo(scrollController.position.maxScrollExtent);
+    profileBloc.msgController?.stream.listen((event) {
+      AppMessageHandler().showSnackBar(context, event);
     });
+    super.initState();
+    chattingStream = profileBloc.getRecentChats().asBroadcastStream();
   }
 
   Future<void> getLocation() async {
@@ -204,291 +206,342 @@ class _ChatScreenState extends State<ChatScreen> {
         statusBarIconBrightness: Brightness.dark,
       ),
       child: Scaffold(
-        body: Column(
-          children: [
-             Container(
-              height:35,
-               color: Colors.grey.withOpacity(0.2),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.grey.withOpacity(0.2),
-                borderRadius: BorderRadius.only(bottomRight: Radius.circular(25),bottomLeft: Radius.circular(25))
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Icon(
-                      Icons.arrow_back,
+        body: StreamBuilder(
+          stream: chattingStream,
+          builder: (context, snapshot) {
+            if(snapshot.connectionState == ConnectionState.waiting){
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            if(snapshot.hasError){
+              return Center(
+                child: Text("Some error occured"),
+              );
+            }
+            if(snapshot.hasData){
+              if(snapshot.data == null){
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              }else{
+                List mainList = snapshot.data!.where((element) => element['id'].toString() == widget.user['id'].toString()).toList();
+                List chatData = mainList.isEmpty? []: (mainList[0]['last_chat'] as List).reversed.toList();
+                return Column(
+                  children: [
+                    Container(
+                      height:35,
+                      color: Colors.grey.withOpacity(0.2),
                     ),
-                  ),
-                  const SizedBox(width: 5),
-                   CircleAvatar(
-                     radius: 20,
-                     child: ClipOval(
-                      child: widget.user['image'] != null?Image.network(
-                        "https://freeze.talocare.co.in/public/${widget.user['image']}",
-                        height: 50,
-                        width: 50,
-                        fit: BoxFit.cover,
-                      ):const Icon(PhosphorIcons.user_bold),
-                  ),
-                   ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => CommunityProfile()));
-                      },
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                           Text(
-                             "${widget.user['first_name']??""} ${widget.user['middle_name']??""} ${widget.user['last_name']??""}",
-                            maxLines: 1,
-                            style: const TextStyle(fontWeight: FontWeight.w500,overflow: TextOverflow.ellipsis),
-                          ),
-                          Text(
-                            "online",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                overflow: TextOverflow.ellipsis,
-                                fontSize: 12,
-                                color: Colors.blue.shade400),
-                          ),
-                        ],
+                    Container(
+                      decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.2),
+                          borderRadius: BorderRadius.only(bottomRight: Radius.circular(25),bottomLeft: Radius.circular(25))
                       ),
-                    ),
-                  ),
-                  // Spacer(),
-                  SizedBox(
-                    width: 15,
-                  ),
-                  GestureDetector(
-                      onTap: () {},
-                      child: Icon(
-                        Icons.videocam,
-                        color: Colors.blue,
-                      )),
-                  SizedBox(
-                    width: 15,
-                  ),
-                  GestureDetector(
-                      onTap: () {},
-                      child: Icon(
-                        Icons.call,
-                        color: Colors.blue,
-                        size: 20,
-                      )),
-                  SizedBox(
-                    width: 15,
-                  ),
-                  GestureDetector(
-                      onTap: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: false,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.vertical(
-                              top: Radius.circular(20),
+                      padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Icon(
+                              Icons.arrow_back,
                             ),
                           ),
-                          clipBehavior: Clip.antiAliasWithSaveLayer,
-                          builder: (BuildContext context) {
-                            return MoreSheet(
-                                ctx: context,
-                                items: ["Report", "Block"],
-                              icons: [Icon(Icons.report), Icon(Icons.block)],
-                                deleteOnTap: () {
-
-                                },
-                            );
-                          },
-                        );
-                      },
-                      child: Icon(Icons.more_vert)),
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: ListView.builder(
-                  controller: scrollController,
-                  itemCount: 8,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 10),
-                      child: Column(
-                        children: [
-                          Container(
-                            margin: messageType[index] == "r"
-                                ? const EdgeInsets.only(right: 80)
-                                : const EdgeInsets.only(left: 80),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 15, vertical: 10),
-                            decoration: BoxDecoration(
-                              borderRadius: messageType[index] == "r"
-                                  ? const BorderRadius.only(
-                                      topLeft: Radius.circular(10),
-                                      topRight: Radius.circular(10),
-                                      bottomRight: Radius.circular(10),
-                                    )
-                                  : const BorderRadius.only(
-                                      topLeft: Radius.circular(10),
-                                      topRight: Radius.circular(10),
-                                      bottomLeft: Radius.circular(10),
-                                    ),
-                              color: messageType[index] == "r"
-                                  ? Colors.grey.withOpacity(0.3)
-                                  : Colors.blue,
+                          const SizedBox(width: 5),
+                          CircleAvatar(
+                            radius: 20,
+                            child: ClipOval(
+                              child: mainList.isEmpty? widget.user['image'] != null?Image.network(
+                                "https://freeze.talocare.co.in/public/${widget.user['image']}",
+                                height: 50,
+                                width: 50,
+                                fit: BoxFit.cover,
+                              ):const Icon(Icons.person): mainList[0]['image'] != null?Image.network(
+                                "https://freeze.talocare.co.in/public/${mainList[0]['image']}",
+                                height: 50,
+                                width: 50,
+                                fit: BoxFit.cover,
+                              ):const Icon(Icons.person),
                             ),
-                            child: Text(
-                              "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi",
-                              style: TextStyle(
-                                color: messageType[index] == "r"
-                                    ? Colors.black
-                                    : Colors.white,
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => CommunityProfile()));
+                              },
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    mainList.isEmpty?
+                                    "${widget.user['first_name']??''} ${widget.user['middle_name']??''} ${widget.user['last_name']??''}"
+                                    : "${mainList[0]['first_name']??''} ${mainList[0]['middle_name']??''} ${mainList[0]['last_name']??''}",
+                                    maxLines: 1,
+                                    style: const TextStyle(fontWeight: FontWeight.w500,overflow: TextOverflow.ellipsis),
+                                  ),
+                                  Text(
+                                    "online",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        overflow: TextOverflow.ellipsis,
+                                        fontSize: 12,
+                                        color: Colors.blue.shade400),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
-                          Padding(
-                            padding: messageType[index] == "r"
-                                ? const EdgeInsets.only(left: 10)
-                                : const EdgeInsets.only(right: 10),
-                            child: Row(
-                              mainAxisAlignment: messageType[index] == "r"
-                                  ? MainAxisAlignment.start
-                                  : MainAxisAlignment.end,
+                          // Spacer(),
+                          SizedBox(
+                            width: 15,
+                          ),
+                          GestureDetector(
+                              onTap: () {},
+                              child: Icon(
+                                Icons.videocam,
+                                color: Colors.blue,
+                              )),
+                          SizedBox(
+                            width: 15,
+                          ),
+                          GestureDetector(
+                              onTap: () {},
+                              child: Icon(
+                                Icons.call,
+                                color: Colors.blue,
+                                size: 20,
+                              )),
+                          SizedBox(
+                            width: 15,
+                          ),
+                          GestureDetector(
+                              onTap: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: false,
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(20),
+                                    ),
+                                  ),
+                                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                                  builder: (BuildContext context) {
+                                    return MoreSheet(
+                                      ctx: context,
+                                      items: ["Report", "Block"],
+                                      icons: [Icon(Icons.report), Icon(Icons.block)],
+                                      deleteOnTap: () {
+
+                                      },
+                                    );
+                                  },
+                                );
+                              },
+                              child: Icon(Icons.more_vert)),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Expanded(
+                      child: chatData.isEmpty ? Offstage():
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: ListView.builder(
+                          reverse: true,
+                          itemCount: chatData.length,
+                          itemBuilder: (context, index) {
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 10),
+                              child: Column(
+                                children: [
+                                  Align(
+                                    alignment: chatData[index]['from_user'].toString() == widget.prefs.getString("uid") ?Alignment.centerRight:Alignment.centerLeft,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 15, vertical: 10),
+                                      decoration: BoxDecoration(
+                                        borderRadius: chatData[index]['from_user'].toString() == widget.prefs.getString("uid")
+                                            ? const BorderRadius.only(
+                                          topLeft: Radius.circular(10),
+                                          topRight: Radius.circular(10),
+                                          bottomLeft: Radius.circular(10),
+                                        )
+                                            : const BorderRadius.only(
+                                          topLeft: Radius.circular(10),
+                                          topRight: Radius.circular(10),
+                                          bottomRight: Radius.circular(10),
+                                        ),
+                                        color: chatData[index]['from_user'].toString() == widget.prefs.getString("uid")
+                                            ? Colors.blue
+                                            : Colors.grey.withOpacity(0.3),
+                                      ),
+                                      child: Text(
+                                        chatData[index]['message'].toString(),
+                                        style: TextStyle(
+                                          color: chatData[index]['from_user'].toString() == widget.prefs.getString("uid")
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: chatData[index]['from_user'].toString() == widget.prefs.getString("uid")
+                                        ? const EdgeInsets.only(right: 5)
+                                        : const EdgeInsets.only(left: 5),
+                                    child: Row(
+                                      mainAxisAlignment: chatData[index]['from_user'].toString() == widget.prefs.getString("uid")
+                                          ? MainAxisAlignment.end
+                                          : MainAxisAlignment.start,
+                                      children: [
+                                        if (chatData[index]['from_user'].toString() == widget.prefs.getString("uid"))
+                                          Icon(PhosphorIcons.checks_bold,
+                                              size: 14,
+                                              color: chatData[index]['from_user'].toString() == widget.prefs.getString("uid")
+                                                  ? Colors.blue.shade700
+                                                  : Colors.grey.withOpacity(0.8)),
+                                        const SizedBox(
+                                          width: 5,
+                                        ),
+                                        Text(
+                                          "1:30 AM",
+                                          style: TextStyle(
+                                              fontSize: 10,
+                                              color: Colors.grey.withOpacity(0.8)),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(20),
+                                topRight: Radius.circular(20)),
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                spreadRadius: 1,
+                                blurRadius: 3,
+                                color: Colors.black.withOpacity(0.2),
+                              )
+                            ]),
+                        padding: const EdgeInsets.only(
+                            bottom: 10, top: 10, left: 10, right: 10),
+                        child: Column(
+                          children: [
+                            imageView,
+                            Row(
                               children: [
-                                if (messageType[index] == "r")
-                                  Icon(PhosphorIcons.checks_bold,
-                                      size: 14,
-                                      color: messageType[index] == "r"
-                                          ? Colors.blue.shade700
-                                          : Colors.grey.withOpacity(0.8)),
-                                const SizedBox(
-                                  width: 5,
+                                Expanded(
+                                  child: TextFormField(
+                                    controller: profileBloc.sendMessageController,
+                                    keyboardType: TextInputType.multiline,
+                                    maxLines: 3,
+                                    minLines: 1,
+                                    decoration: const InputDecoration(
+                                      border: InputBorder.none,
+                                      hintText: "Send Message...",
+                                    ),
+                                  ),
                                 ),
-                                Text(
-                                  "1:30 AM",
-                                  style: TextStyle(
-                                      fontSize: 10,
-                                      color: Colors.grey.withOpacity(0.8)),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                InkWell(
+                                    onTap: (){
+                                      showModalBottomSheet(context: context, builder: (context) {
+                                        return Container(
+                                          color: Colors.white,
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              ListTile(
+                                                onTap : () {
+                                                  _openImagePicker(ImageSource.camera);
+                                                },
+                                                title: Text("Camera"),
+                                                leading: Icon(PhosphorIcons.camera),
+                                              ),
+                                              ListTile(
+                                                onTap : () {
+                                                  _openImagePicker(ImageSource.gallery);
+                                                },
+                                                title: Text("Gallery"),
+                                                leading: Icon(Icons.browse_gallery),
+                                              ),
+                                              ListTile(
+                                                onTap : () {
+                                                  openFilePicker();
+                                                },
+                                                title: Text("Audio"),
+                                                leading: Icon(PhosphorIcons.file_audio),
+                                              ),
+                                              ListTile(
+                                                onTap : () {
+                                                  getLocation();
+                                                },
+                                                title: Text("Location"),
+                                                leading: Icon(Icons.location_on),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },);
+                                    },
+                                    child: const Icon(Icons.attach_file)),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                ValueListenableBuilder(
+                                  valueListenable: profileBloc.isSending,
+                                  builder: (context, isSending, child) {
+                                    if(isSending){
+                                      return Center(
+                                        child: SizedBox(
+                                            height: 20,
+                                            width: 20,
+                                            child: CircularProgressIndicator(strokeWidth: 2),
+                                        ),
+                                      );
+                                    }
+                                  return InkWell(
+                                    onTap: () {
+                                      profileBloc.sendMessage(widget.user['id'].toString(),"text");
+                                    },
+                                    child: const Icon(PhosphorIcons.paper_plane_tilt),
+                                  );
+                                },),
+                                const SizedBox(
+                                  width: 10,
                                 ),
                               ],
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    );
-                  },
-                ),
-              ),
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20)),
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        spreadRadius: 1,
-                        blurRadius: 3,
-                        color: Colors.black.withOpacity(0.2),
-                      )
-                    ]),
-                padding: const EdgeInsets.only(
-                    bottom: 10, top: 10, left: 10, right: 10),
-                child: Column(
-                  children: [
-                    imageView,
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-                            controller: sendmessage,
-                            keyboardType: TextInputType.multiline,
-                            maxLines: 3,
-                            minLines: 1,
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              hintText: "Send Message...",
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        InkWell(
-                            onTap: (){
-                              showModalBottomSheet(context: context, builder: (context) {
-                                return Container(
-                                  color: Colors.white,
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      ListTile(
-                                        onTap : () {
-                                          _openImagePicker(ImageSource.camera);
-                                        },
-                                        title: Text("Camera"),
-                                        leading: Icon(PhosphorIcons.camera),
-                                      ),
-                                      ListTile(
-                                        onTap : () {
-                                          _openImagePicker(ImageSource.gallery);
-                                        },
-                                        title: Text("Gallery"),
-                                        leading: Icon(Icons.browse_gallery),
-                                      ),
-                                      ListTile(
-                                        onTap : () {
-                                          openFilePicker();
-                                        },
-                                        title: Text("Audio"),
-                                        leading: Icon(PhosphorIcons.file_audio),
-                                      ),
-                                      ListTile(
-                                        onTap : () {
-                                          getLocation();
-                                        },
-                                        title: Text("Location"),
-                                        leading: Icon(Icons.location_on),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },);
-                            },
-                            child: const Icon(Icons.attach_file)),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        const Icon(PhosphorIcons.paper_plane_tilt),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                      ],
                     ),
                   ],
-                ),
-              ),
-            ),
-          ],
-        ),
+                );
+              }
+            }
+              return Offstage();
+        },),
       ),
     );
   }

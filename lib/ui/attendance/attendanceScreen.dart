@@ -657,8 +657,8 @@ class AttendanceList extends StatelessWidget {
               //   ),
               // ),
                Container(
-                 height: 40,
-                width: 40,
+                height: 30,
+                width: 30,
                 padding: EdgeInsets.all(5),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
