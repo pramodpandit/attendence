@@ -52,7 +52,7 @@ class WaterRepository {
     return ApiResponse3.fromJson(response);
   }
 
-  Future<List<Water>> fetchWaterList(String? month,String? year) async {
+  Future<ApiResponse2> fetchWaterList(String? month,String? year) async {
     var response = await _api.postRequest("fetch_waterlist",{
       "user_id": prefs.getString('uid'),
       "month": month,
@@ -61,7 +61,7 @@ class WaterRepository {
     if (response == null) {
       throw ApiException.fromString("response null");
     }
-    return List.from(response['data'].map((e) => Water.fromJson(e)));
+    return ApiResponse2.fromJson(response,response["data"]);
   }
   Future<ApiResponse2> Add(String url,Map<String,dynamic> data,) async {
     try{

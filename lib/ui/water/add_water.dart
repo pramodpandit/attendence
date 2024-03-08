@@ -300,7 +300,7 @@ class _AddWaterState extends State<AddWater> {
                                               valueListenable: waterBloc.water,
                                               builder: (context, Water? water,__) {
                                                 if (water != null) {
-                                                  waterBloc.quantityController.text=water.numberOfBotal=="0"?'':water.numberOfBotal??"";
+                                                //  waterBloc.quantityController.text=water.data=="0"?'':water.numberOfBotal??"";
                                                 }
                                                 return AppTextField(
                                                 controller: waterBloc.quantityController,

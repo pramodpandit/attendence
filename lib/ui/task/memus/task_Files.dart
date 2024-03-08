@@ -4,9 +4,7 @@ import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import '../../../bloc/project_bloc.dart';
 import '../../../bloc/task_bloc.dart';
-import '../../../data/repository/project_repo.dart';
 import '../../../data/repository/task_repo.dart';
 import '../../../utils/message_handler.dart';
 import 'add_pages/task_add_files.dart';
@@ -14,7 +12,6 @@ import 'add_pages/task_add_files.dart';
 class TaskFile extends StatefulWidget {
   final int id;
   const TaskFile({Key? key,required this.id}) : super(key: key);
-
   @override
   State<TaskFile> createState() => _TaskFileState();
 }
@@ -54,7 +51,7 @@ class _TaskFileState extends State<TaskFile> {
                 }
                 return  Padding(
                   padding: const EdgeInsets.only(
-                      left: 25, right: 25, top: 10, bottom: 10),
+                      left: 15, right: 15, top: 10, bottom: 10),
                   child: ListView.builder(
                       padding: EdgeInsets.only(top: 10),
                       physics: const NeverScrollableScrollPhysics(),

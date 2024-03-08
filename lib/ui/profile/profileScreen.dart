@@ -297,14 +297,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   builder: (context) => const NoticeBoardScreen()));
                             },
                           ),
-                          if (bloc.hasAccess(department, 7,'1'))BoxContainer(
-                            heading: "Payroll Salary",
-                            image: "images/board.png",
-                            onTap: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => const sallary()));
-                            },
-                          ),
+                          // if (bloc.hasAccess(department, 7,'1'))BoxContainer(
+                          //   heading: "Payroll Salary",
+                          //   image: "images/board.png",
+                          //   onTap: () {
+                          //     Navigator.of(context).push(MaterialPageRoute(
+                          //         builder: (context) => const sallary()));
+                          //   },
+                          // ),
                           if (bloc.hasAccess(department, 8,'1'))BoxContainer(
                             heading: "Holidays",
                             image: "images/holiday.png",
