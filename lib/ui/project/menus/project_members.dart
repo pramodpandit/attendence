@@ -39,6 +39,7 @@ class _ProjectMembersState extends State<ProjectMembers> {
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: () async {
+          bloc.projectmember.value =null;
           bloc.fetchProjectsDetails(widget.data['id']);
           bloc.fetchAddMemberLit(int.parse(widget.data['business_address']));
           },

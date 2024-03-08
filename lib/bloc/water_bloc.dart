@@ -87,12 +87,16 @@ class WaterBloc extends Bloc {
   }
 
   ValueNotifier<DateTime?> month = ValueNotifier(DateTime.now());
+
   ValueNotifier<DateTime?> year = ValueNotifier(DateTime.now());
   updateMonth(DateTime value) => month.value = value;
+  dateloop(DateTime value) => month.value = value;
+
   updateYear(DateTime value) => year.value = value;
   ScrollController scrollController = ScrollController();
   ValueNotifier<bool> isWaterListLoad = ValueNotifier(false);
-  ValueNotifier<List<Water>> waterList = ValueNotifier([]);
+  ValueNotifier<List?> waterList = ValueNotifier([]);
+  ValueNotifier<List?> waterListvaluedata = ValueNotifier([]);
   fetchWaterList() async{
     try{
       isWaterListLoad.value = true;
@@ -100,7 +104,8 @@ class WaterBloc extends Bloc {
       String years = DateFormat('yyyy').format(year.value!);
       var res = await _repo.fetchWaterList(months, years);
       if(res!=null){
-        waterList.value = res;
+        waterList.value = res.data;
+        waterListvaluedata.value = res.data['list'];
         // waterList.value.addAll(res);
       }
     }catch (e, s) {

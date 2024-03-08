@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:provider/provider.dart';
 import '../../bloc/water_bloc.dart';
 import '../../data/model/water_model.dart';
@@ -150,9 +151,8 @@ class _WaterListState extends State<WaterList> {
                             }
                             return ValueListenableBuilder(
                               valueListenable: waterBloc.waterList,
-                              builder: (context,List<Water>waterList,__) {
-                                print("the water list ${waterList[0].toJson()}");
-                                if (waterList.isEmpty) {
+                              builder: (context,waterList,__) {
+                                if (waterList!.isEmpty) {
                                   return  const Center(
                                     child: Column(
                                       children: [
@@ -432,16 +432,16 @@ class _WaterListState extends State<WaterList> {
                                                     ]
                                                   ),
                                                   ...waterList.map((item){
+                                                   // List data = waterBloc.waterListvaluedata.value!.where((element) => element['f_date'].toString() ==item['date']).toList();
                                                     return TableRow(
                                                       decoration: BoxDecoration(
                                                           border: Border.all(color: Colors.black)
                                                       ),
                                                       children:[
-
                                                         Padding(
                                                           padding: EdgeInsets.all(5.0),
                                                           child: Text(
-                                                            DateFormat("dd-MM-yyyy").format(DateTime.parse(item.fDate!)),
+                                                            DateFormat("dd-MM-yyyy").format(DateTime.parse(item['date']!)),
                                                             style: const TextStyle(color: Color(0xff20263c),fontWeight: FontWeight.w600),),
                                                         ),
                                                         for (var type in waterType)
@@ -449,7 +449,10 @@ class _WaterListState extends State<WaterList> {
                                                             padding: EdgeInsets.all(5.0),
                                                             child: Text(
                                                               // Check if water ID and type ID are the same, then show quantity
-                                                              (item.waterType == "${type.id}") ? item.numberOfBotal ?? "" : "",
+                                                              (item['list'] as List).toList().where((el) => el['water_type'].toString() ==type.id.toString()).toList().isNotEmpty?
+                                                              ((item['list'] as List).toList().where((el) =>el['water_type'].toString()==type.id.toString()).toList()[0]['water_type']=="${type.id}")?(item['list'] as List).toList().where((el) =>el['water_type'].toString()==type.id.toString()).toList()[0]['number_of_botal']??'':'':'',
+                                                              // (item['list'] as List).toList().where((ele) => ele['water_type'].toString()==type.id.toString()).toList().isNotEmpty?
+                                                              // ((item['list'] as List).toList().where((ele) => ele['water_type'].toString()==type.id.toString()).toList()[0]['water_type'] == "${type.id}") ? (item['list'] as List).toList().where((ele) => ele['water_type'].toString()==type.id.toString()).toList()[0]['number_of_botal'] ?? "" : "":"",
                                                               style: const TextStyle(color: Color(0xff20263c),fontWeight: FontWeight.w600),
                                                             ),
                                                           ),

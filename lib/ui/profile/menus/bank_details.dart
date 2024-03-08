@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:office/bloc/profile_bloc.dart';
 import 'package:office/data/model/bankDetails_model.dart';
 import 'package:office/data/repository/profile_repo.dart';
+import 'package:office/utils/message_handler.dart';
 import 'package:provider/provider.dart';
 
 class BankDetails extends StatefulWidget {
@@ -21,6 +22,9 @@ class _BankDetailsState extends State<BankDetails> {
     bloc = ProfileBloc(context.read<ProfileRepository>());
     super.initState();
     bloc.fetchBankDocuments();
+    bloc.msgController?.stream.listen((event) {
+      AppMessageHandler().showSnackBar(context, event);
+    });
   }
 
   @override
@@ -122,12 +126,13 @@ class _BankDetailsState extends State<BankDetails> {
                                                                     text:
                                                                         'UPI\n${bankDetail[index].upiId ?? "---"}\n${bankDetail[index].other ?? "---"}'))
                                                             .then((_) {
-                                                          ScaffoldMessenger.of(
-                                                                  context)
-                                                              .showSnackBar(
-                                                                  const SnackBar(
-                                                                      content: Text(
-                                                                          'Copied UPI Details to your clipboard !')));
+                                                              bloc.showMessage(MessageType.info('Copied UPI Details to your clipboard !'));
+                                                          // ScaffoldMessenger.of(
+                                                          //         context)
+                                                          //     .showSnackBar(
+                                                          //         const SnackBar(
+                                                          //             content: Text(
+                                                          //                 'Copied UPI Details to your clipboard !')));
                                                         });
                                                       },
                                                       child: const Icon(
@@ -234,12 +239,13 @@ class _BankDetailsState extends State<BankDetails> {
                                                                     text:
                                                                         'Bank Details\nBank Name\n${bankDetail[index].bankName ?? "---"}\nAccount Holder Name\n${bankDetail[index].bankHolderName ?? "---"}\nAccount No\n${bankDetail[index].accountNo ?? "---"}\nIFSC No\n${bankDetail[index].ifscCode ?? "---"}\n${bankDetail[index].other ?? "---"}'))
                                                             .then((_) {
-                                                          ScaffoldMessenger.of(
-                                                                  context)
-                                                              .showSnackBar(
-                                                                  const SnackBar(
-                                                                      content: Text(
-                                                                          'Copied Bank Details to your clipboard !')));
+                                                              bloc.showMessage(MessageType.info('Copied Bank Details to your clipboard !'));
+                                                          // ScaffoldMessenger.of(
+                                                          //         context)
+                                                          //     .showSnackBar(
+                                                          //         const SnackBar(
+                                                          //             content: Text(
+                                                          //                 'Copied Bank Details to your clipboard !')));
                                                         });
                                                       },
                                                       child: const Icon(

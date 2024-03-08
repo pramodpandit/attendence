@@ -1,4 +1,30 @@
 class Water {
+  String? date;
+  List<Data>? data;
+
+  Water({this.date, this.data});
+
+  Water.fromJson(Map<String, dynamic> json) {
+    date = json['date'];
+    if (json['data'] != null) {
+      data = <Data>[];
+      json['data'].forEach((v) {
+        data!.add(new Data.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['date'] = this.date;
+    if (this.data != null) {
+      data['data'] = this.data!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class Data {
   int? id;
   String? empId;
   String? fDate;
@@ -9,7 +35,7 @@ class Water {
   String? createdAt;
   String? updatedAt;
 
-  Water(
+  Data(
       {this.id,
         this.empId,
         this.fDate,
@@ -20,7 +46,7 @@ class Water {
         this.createdAt,
         this.updatedAt});
 
-  Water.fromJson(Map<String, dynamic> json) {
+  Data.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     empId = json['emp_id'];
     fDate = json['f_date'];
