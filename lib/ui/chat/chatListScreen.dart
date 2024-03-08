@@ -39,7 +39,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
     bloc.fetchAllUserDetail();
   }
 
-
   late SharedPreferences prefs;
   void sharedPref()async{
     prefs = await SharedPreferences.getInstance();

@@ -11,7 +11,7 @@ class CommunityRepositary{
   final ApiService _api;
 
   CommunityRepositary(this.prefs, this._api);
-  Future<ApiResponse2<List<Data>>> getLeaveRecords()async{
+  Future<ApiResponse2<List<Data>>> getPostRecords()async{
     var response=await _api.getRequest("getpost",data: {
       "user_id":prefs.getString('uid'),
     });

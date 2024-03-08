@@ -348,10 +348,7 @@ class _BillListState extends State<BillList> {
                                    child: Column(
                                      children: [
                                        SizedBox(height: 50),
-                                       Text(
-                                         "No data Found",
-                                         style: TextStyle(color: Colors.black),
-                                       ),
+                                       CircularProgressIndicator()
                                      ],
                                    ),
                                  );
@@ -362,12 +359,10 @@ class _BillListState extends State<BillList> {
                                    if(ebilllistdata ==null){
                                      return Center(child: CircularProgressIndicator(),);
                                    }
-                                   if (ebilllistdata!.isEmpty) {
+                                   if (ebilllistdata.isEmpty) {
                                      return CircularProgressIndicator();
                                    }
-                                   return
-
-                                     Scrollbar(
+                                   return Scrollbar(
                                        thumbVisibility: true,
                                        thickness: 4,
                                        controller: bloc.scrollController,
@@ -409,6 +404,52 @@ class _BillListState extends State<BillList> {
                                              ),
 
                                              ...ebilllistdata.map((item) {
+                                               List extractData = ebilllistdata.where((element) => element['f_date']==item['f_date']).toList();
+                                               if(extractData.length>1){
+                                                 if(extractData[0]['id'] == item['id']){
+                                                   return TableRow(
+                                                       children: [
+                                                         Padding(
+                                                           padding: EdgeInsets.all(5.0),
+                                                           child: Text(
+                                                             DateFormat("dd-MM-yyyy")
+                                                                 .format(DateTime.parse(
+                                                                 extractData[0]['f_date']!)),
+                                                             style: const TextStyle(
+                                                                 color: Color(
+                                                                     0xff20263c),
+                                                                 fontWeight: FontWeight
+                                                                     .w600),),
+                                                         ),
+                                                         for (var type in eBill)
+                                                           Padding(
+                                                             padding: EdgeInsets.all(
+                                                                 5.0),
+                                                             child: Text(
+                                                               extractData.where((ele) => ele['e_type'].toString() == type.id.toString()).toList().isNotEmpty?
+                                                               (extractData.where((ele) => ele['e_type'].toString() == type.id.toString()).toList()[0]['e_type'] ==
+                                                                   "${type.id}")
+                                                                   ? extractData.where((ele) => ele['e_type'].toString() == type.id.toString()).toList()[0]['t_reading']?? ""
+                                                                   : "":"",
+                                                               style: const TextStyle(
+                                                                   color: Color(
+                                                                       0xff20263c),
+                                                                   fontWeight: FontWeight
+                                                                       .w600),
+                                                             ),
+                                                           ),
+                                                       ]
+                                                   );
+                                                 }else{
+                                                   return TableRow(
+                                                       children: [
+                                                         Offstage(),
+                                                         for (var type in eBill)
+                                                           Offstage(),
+                                                       ]
+                                                   );
+                                                 }
+                                               }
                                                return TableRow(
                                                    decoration: BoxDecoration(
                                                        border: Border.all(

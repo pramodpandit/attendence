@@ -45,11 +45,7 @@ class _LikeShareCommentState extends State<LikeShareComment> {
                 valueListenable: widget.bloc.liked,
                 builder: (context, alreadyLiked, child) {
                   if(alreadyLiked== null){
-                    return SizedBox(
-                      height : 10,
-                      width: 10,
-                      child: CircularProgressIndicator(strokeWidth: 1),
-                    );
+                    return Icon(Icons.favorite_border,size: 18);
                   }
                   return Icon(
                     alreadyLiked ? Icons.favorite : Icons.favorite_border,

@@ -112,6 +112,7 @@ class _AddPostState extends State<AddPost> {
                           controller: bloc.postTextController,
                           minLines: 1,
                           maxLines: 8,
+                          textCapitalization: TextCapitalization.sentences,
                           decoration: InputDecoration(
                               border: InputBorder.none,
                               hintText: "What do you want to talk about?"),

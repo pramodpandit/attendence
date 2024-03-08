@@ -90,26 +90,28 @@ class _LikeSheetState extends State<LikeSheet> {
                                                   builder: (context) =>
                                                       CommunityProfile()));
                                         },
-                                        child: CircleAvatar(
-                                          radius: 23,
-                                          child: ClipOval(
-                                              child: widget.users[i]['user_details']['image'] == null
-                                                  ? Icon(Icons.person)
-                                                  : Image.network(
-                                                  "https://freeze.talocare.co.in/public/${widget.users[i]['user_details']['image']}",
-                                                loadingBuilder: (context, child, loadingProgress) {
-                                                    if(loadingProgress == null){
-                                                      return child;
-                                                    }
-                                                  return CircularProgressIndicator(
-                                                    value: loadingProgress.expectedTotalBytes!=null?
-                                                          loadingProgress.cumulativeBytesLoaded/
-                                                        loadingProgress.expectedTotalBytes!:
-                                                        null,
-                                                    strokeWidth: 2,
-                                                  );
-                                                },
-                                              ),
+                                        child: ClipOval(
+                                          child: CircleAvatar(
+                                            radius: 23,
+                                            child: widget.users[i]['user_details']['image'] == null
+                                                ? Icon(Icons.person)
+                                                : Image.network(
+                                                "https://freeze.talocare.co.in/public/${widget.users[i]['user_details']['image']}",
+                                              loadingBuilder: (context, child, loadingProgress) {
+                                                  if(loadingProgress == null){
+                                                    return child;
+                                                  }
+                                                return CircularProgressIndicator(
+                                                  value: loadingProgress.expectedTotalBytes!=null?
+                                                        loadingProgress.cumulativeBytesLoaded/
+                                                      loadingProgress.expectedTotalBytes!:
+                                                      null,
+                                                  strokeWidth: 2,
+                                                );
+                                              },
+                                              width: double.infinity,
+                                              fit: BoxFit.cover,
+                                            ),
                                           ),
                                         ),
                                       ),

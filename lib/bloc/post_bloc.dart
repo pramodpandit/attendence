@@ -65,7 +65,7 @@ class PostBloc extends Bloc {
   fetchPostData() async{
     try{
       isUserDetailLoad.value = true;
-      var result = await repo.getLeaveRecords();
+      var result = await repo.getPostRecords();
       if(result.status && result.data != null){
         feedbackData = result.data!.reversed.toList();
       }
