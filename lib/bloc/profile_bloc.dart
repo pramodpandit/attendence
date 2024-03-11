@@ -378,12 +378,12 @@ class ProfileBloc extends Bloc {
     try{
       var result = await _repo.sendNotificationApi(data);
       if(result['success'].toString() == "1"){
-        showMessage(MessageType.success("done"));
+        // showMessage(MessageType.success("done"));
       }else{
-        showMessage(MessageType.error("some error ${result['results'][0]}"));
+        // showMessage(MessageType.error("some error ${result['results'][0]}"));
       }
     }catch(e){
-      showMessage(MessageType.error(e.toString()));
+      // showMessage(MessageType.error(e.toString()));
       print(e);
     }
   }
