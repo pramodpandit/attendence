@@ -109,14 +109,13 @@ class _AssetsState extends State<Assets> {
                                     padding: const EdgeInsets.symmetric(horizontal: 10),
                                     margin: const EdgeInsets.only(bottom: 20),
                                     decoration: BoxDecoration(
-                                      color:data.returnable =='0'?Colors.grey:Colors.white,
+                                      color:data.returnable =='0'?Colors.grey.shade300:Colors.white,
                                       boxShadow: [
                                         BoxShadow(
                                             color:    Colors.grey.withOpacity(0.3),
                                             blurRadius: 3,
                                             spreadRadius: 1)
                                       ],
-
                                       borderRadius: const BorderRadius.all(Radius.circular(10)),
                                     ),
                                     child:  Column(
@@ -163,7 +162,7 @@ class _AssetsState extends State<Assets> {
                                                 '${data.totalStock.toString()}',
                                                 textAlign: TextAlign.start,
                                                 style: TextStyle(
-                                                    color: data.returnable=='0'?Colors.grey:Colors.black, fontSize: 14,fontWeight: FontWeight.w400),
+                                                    color: data.returnable=='0'?Colors.white:Colors.black, fontSize: 14,fontWeight: FontWeight.w400),
                                               ),
                                             ),
                                              10.width,
