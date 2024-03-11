@@ -171,9 +171,9 @@ class _NotesListState extends State<NotesList> {
                                     ),
                                   ),
                                    Text(
-                                       notes[index].updatedAt!=null?DateFormat.yMMMMd().format(
+                                       notes[index].createdAt!=null?DateFormat.yMMMMd().format(
                                            DateTime.parse(notes[index]
-                                               .updatedAt
+                                               .createdAt
                                                .toString() ??
                                                "")):"",
                                     textAlign: TextAlign.start,

@@ -8,13 +8,10 @@ import 'package:office/bloc/holiday_bloc.dart';
 import 'package:office/data/model/events_model.dart';
 import 'package:office/data/model/holiday_model.dart';
 import 'package:office/data/repository/holiday_repo.dart';
-import 'package:office/ui/events/allEventScreen.dart';
-import 'package:office/ui/widget/app_bar.dart';
 import 'package:office/utils/message_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 class EventScreen extends StatefulWidget {
   const EventScreen({super.key});
@@ -106,40 +103,40 @@ class _EventScreenState extends State<EventScreen> {
           // ),
           Column(
             children: [
-              const SizedBox(height: 100,),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  InkWell(
-                    onTap: (){
-                      setState(() {
-                        condition = '2';
-                      });
-                    },
-                    child: Container(
-                        height: 40,
-                        width: 40,
-                        child: Image.asset('images/img.png',fit: BoxFit.cover,)),
-                  ),
-                  InkWell(
-                    onTap: (){
-                      setState(() {
-                        condition = '1';
-                      });
-                    },
-                    child: Container(
-                        height: 22,
-                        width: 22,
-                        child: Image.asset('images/img_1.png',height: 30,width: 30,)),
-                  ),
-                  SizedBox(width: 20,)
-                ],
-              ),
+              const SizedBox(height: 120,),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.end,
+              //   children: [
+              //     InkWell(
+              //       onTap: (){
+              //         setState(() {
+              //           condition = '2';
+              //         });
+              //       },
+              //       child: Container(
+              //           height: 40,
+              //           width: 40,
+              //           child: Image.asset('images/img.png',fit: BoxFit.cover,)),
+              //     ),
+              //     InkWell(
+              //       onTap: (){
+              //         setState(() {
+              //           condition = '1';
+              //         });
+              //       },
+              //       child: Container(
+              //           height: 22,
+              //           width: 22,
+              //           child: Image.asset('images/img_1.png',height: 30,width: 30,)),
+              //     ),
+              //     SizedBox(width: 20,)
+              //   ],
+              // ),
 
               Expanded(
                 child: Column(
                   children: [
-                    condition=='1'?
+                    // condition=='1'?
                 Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -375,7 +372,7 @@ class _EventScreenState extends State<EventScreen> {
                       ],
                     ),
                   ],
-                )
+                ),
                     // Padding(
                     //   padding: const EdgeInsets.all(8.0),
                     //   child: Row(
@@ -491,119 +488,119 @@ class _EventScreenState extends State<EventScreen> {
                     //   ),
                     // )
 
-                        :condition =='2'?
-                    ValueListenableBuilder(
-                      valueListenable: holidayBloc.calendar,
-                      builder: (context, calendarFormatValue, child) {
-                        return ValueListenableBuilder(
-                          valueListenable: holidayBloc.holidayData,
-                          builder:
-                              (BuildContext context, List<Holiday> value, Widget? child) {
-                            Map<DateTime, List<dynamic>> eventsList = {};
-                            final events = LinkedHashMap(
-                              equals: isSameDay,
-                              // hashCode: getHashCode,
-                            )..addAll(eventsList);
-                            List _getEventsForDay(DateTime day) {
-                              return events[day] ?? [];
-                            }
-                            return TableCalendar(
-                              eventLoader: (day) {
-                                return _getEventsForDay(day);
-                              },
-                              firstDay: DateTime.utc(DateTime.now().year, 01, 01),
-                              lastDay: DateTime.utc(DateTime.now().year, 12, 31),
-                              focusedDay: holidayBloc.focusDay,
-                              currentDay: DateTime.now(),
-                              headerStyle: const HeaderStyle(
-                                formatButtonVisible: false,
-                              ),
-                              calendarStyle: const CalendarStyle(
-                                weekendTextStyle: TextStyle(color: Colors.red),
-                              ),
-                              daysOfWeekStyle: const DaysOfWeekStyle(
-                                weekendStyle: TextStyle(color: Colors.red),
-                              ),
-                              startingDayOfWeek: StartingDayOfWeek.monday,
-                              calendarFormat: calendarFormatValue,
-                              onPageChanged: (focusedDay) {
-                                if (focusedDay.month != month) {
-                                  print(holidayBloc.focusDay);
-                                  month = focusedDay.month;
-                                  holidayBloc.focusDay = focusedDay;
-                                  holidayBloc.eventsList();
-                                }
-                              },
-                              onFormatChanged: (format) {
-                                if (value != format) {
-                                  holidayBloc.calendar.value = format;
-                                }
-                              },
-                              availableCalendarFormats: const {
-                                CalendarFormat.month: 'Month',
-                                CalendarFormat.week: 'Weeks'
-                              },
-                            );
-                          },
-                        );
-                      },
-                    ):
-                    ValueListenableBuilder(
-                      valueListenable: holidayBloc.calendar,
-                      builder: (context, calendarFormatValue, child) {
-                        return ValueListenableBuilder(
-                          valueListenable: holidayBloc.holidayData,
-                          builder:
-                              (BuildContext context, List<Holiday> value, Widget? child) {
-                            Map<DateTime, List<dynamic>> eventsList = {};
-                            final events = LinkedHashMap(
-                              equals: isSameDay,
-                              // hashCode: getHashCode,
-                            )..addAll(eventsList);
-                            List _getEventsForDay(DateTime day) {
-                              return events[day] ?? [];
-                            }
-                            return TableCalendar(
-                              eventLoader: (day) {
-                                return _getEventsForDay(day);
-                              },
-                              firstDay: DateTime.utc(DateTime.now().year, 01, 01),
-                              lastDay: DateTime.utc(DateTime.now().year, 12, 31),
-                              focusedDay: holidayBloc.focusDay,
-                              currentDay: DateTime.now(),
-                              headerStyle: const HeaderStyle(
-                                formatButtonVisible: false,
-                              ),
-                              calendarStyle: const CalendarStyle(
-                                weekendTextStyle: TextStyle(color: Colors.red),
-                              ),
-                              daysOfWeekStyle: const DaysOfWeekStyle(
-                                weekendStyle: TextStyle(color: Colors.red),
-                              ),
-                              startingDayOfWeek: StartingDayOfWeek.monday,
-                              calendarFormat: calendarFormatValue,
-                              onPageChanged: (focusedDay) {
-                                if (focusedDay.month != month) {
-                                  print(holidayBloc.focusDay);
-                                  month = focusedDay.month;
-                                  holidayBloc.focusDay = focusedDay;
-                                  holidayBloc.eventsList();
-                                }
-                              },
-                              onFormatChanged: (format) {
-                                if (value != format) {
-                                  holidayBloc.calendar.value = format;
-                                }
-                              },
-                              availableCalendarFormats: const {
-                                CalendarFormat.month: 'Month',
-                                CalendarFormat.week: 'Weeks'
-                              },
-                            );
-                          },
-                        );
-                      },
-                    ),
+                    //     :condition =='2'?
+                    // ValueListenableBuilder(
+                    //   valueListenable: holidayBloc.calendar,
+                    //   builder: (context, calendarFormatValue, child) {
+                    //     return ValueListenableBuilder(
+                    //       valueListenable: holidayBloc.holidayData,
+                    //       builder:
+                    //           (BuildContext context, List<Holiday> value, Widget? child) {
+                    //         Map<DateTime, List<dynamic>> eventsList = {};
+                    //         final events = LinkedHashMap(
+                    //           equals: isSameDay,
+                    //           // hashCode: getHashCode,
+                    //         )..addAll(eventsList);
+                    //         List _getEventsForDay(DateTime day) {
+                    //           return events[day] ?? [];
+                    //         }
+                    //         return TableCalendar(
+                    //           eventLoader: (day) {
+                    //             return _getEventsForDay(day);
+                    //           },
+                    //           firstDay: DateTime.utc(DateTime.now().year, 01, 01),
+                    //           lastDay: DateTime.utc(DateTime.now().year, 12, 31),
+                    //           focusedDay: holidayBloc.focusDay,
+                    //           currentDay: DateTime.now(),
+                    //           headerStyle: const HeaderStyle(
+                    //             formatButtonVisible: false,
+                    //           ),
+                    //           calendarStyle: const CalendarStyle(
+                    //             weekendTextStyle: TextStyle(color: Colors.red),
+                    //           ),
+                    //           daysOfWeekStyle: const DaysOfWeekStyle(
+                    //             weekendStyle: TextStyle(color: Colors.red),
+                    //           ),
+                    //           startingDayOfWeek: StartingDayOfWeek.monday,
+                    //           calendarFormat: calendarFormatValue,
+                    //           onPageChanged: (focusedDay) {
+                    //             if (focusedDay.month != month) {
+                    //               print(holidayBloc.focusDay);
+                    //               month = focusedDay.month;
+                    //               holidayBloc.focusDay = focusedDay;
+                    //               holidayBloc.eventsList();
+                    //             }
+                    //           },
+                    //           onFormatChanged: (format) {
+                    //             if (value != format) {
+                    //               holidayBloc.calendar.value = format;
+                    //             }
+                    //           },
+                    //           availableCalendarFormats: const {
+                    //             CalendarFormat.month: 'Month',
+                    //             CalendarFormat.week: 'Weeks'
+                    //           },
+                    //         );
+                    //       },
+                    //     );
+                    //   },
+                    // ):
+                    // ValueListenableBuilder(
+                    //   valueListenable: holidayBloc.calendar,
+                    //   builder: (context, calendarFormatValue, child) {
+                    //     return ValueListenableBuilder(
+                    //       valueListenable: holidayBloc.holidayData,
+                    //       builder:
+                    //           (BuildContext context, List<Holiday> value, Widget? child) {
+                    //         Map<DateTime, List<dynamic>> eventsList = {};
+                    //         final events = LinkedHashMap(
+                    //           equals: isSameDay,
+                    //           // hashCode: getHashCode,
+                    //         )..addAll(eventsList);
+                    //         List _getEventsForDay(DateTime day) {
+                    //           return events[day] ?? [];
+                    //         }
+                    //         return TableCalendar(
+                    //           eventLoader: (day) {
+                    //             return _getEventsForDay(day);
+                    //           },
+                    //           firstDay: DateTime.utc(DateTime.now().year, 01, 01),
+                    //           lastDay: DateTime.utc(DateTime.now().year, 12, 31),
+                    //           focusedDay: holidayBloc.focusDay,
+                    //           currentDay: DateTime.now(),
+                    //           headerStyle: const HeaderStyle(
+                    //             formatButtonVisible: false,
+                    //           ),
+                    //           calendarStyle: const CalendarStyle(
+                    //             weekendTextStyle: TextStyle(color: Colors.red),
+                    //           ),
+                    //           daysOfWeekStyle: const DaysOfWeekStyle(
+                    //             weekendStyle: TextStyle(color: Colors.red),
+                    //           ),
+                    //           startingDayOfWeek: StartingDayOfWeek.monday,
+                    //           calendarFormat: calendarFormatValue,
+                    //           onPageChanged: (focusedDay) {
+                    //             if (focusedDay.month != month) {
+                    //               print(holidayBloc.focusDay);
+                    //               month = focusedDay.month;
+                    //               holidayBloc.focusDay = focusedDay;
+                    //               holidayBloc.eventsList();
+                    //             }
+                    //           },
+                    //           onFormatChanged: (format) {
+                    //             if (value != format) {
+                    //               holidayBloc.calendar.value = format;
+                    //             }
+                    //           },
+                    //           availableCalendarFormats: const {
+                    //             CalendarFormat.month: 'Month',
+                    //             CalendarFormat.week: 'Weeks'
+                    //           },
+                    //         );
+                    //       },
+                    //     );
+                    //   },
+                    // ),
                     SizedBox(
                       height: 20,
                     ),
