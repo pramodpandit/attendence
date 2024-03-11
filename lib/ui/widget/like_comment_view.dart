@@ -18,23 +18,29 @@ class LikeShareComment extends StatefulWidget {
 class _LikeShareCommentState extends State<LikeShareComment> {
  var valueLike = 0;
  late SharedPreferences pref;
+ ValueNotifier<bool> liked = ValueNotifier(false);
+ ValueNotifier<List?> postLikedAllUserList = ValueNotifier(null);
+  ValueNotifier<int?> totalLike = ValueNotifier(0);
+  ValueNotifier<int?> totalcomment = ValueNotifier(0);
 
  @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
-    widget.bloc.getLikedPostUserDetails(widget.data.postId.toString());
     shared();
-      }
+    totalLike.value = widget.data.totalLike;
+    totalcomment.value = widget.data.totalComments;
+    widget.bloc.getLikedPostUserDetails(widget.data.postId.toString()).then((List result){
+      postLikedAllUserList.value = result;
+      liked.value = result.where((element) => element['user_id'].toString()==pref.getString("uid").toString()).toList().isNotEmpty;
+    });
+ }
   shared()async{
    pref = await SharedPreferences.getInstance();
   }
-  
+
   @override
   Widget build(BuildContext context) {
-    ValueNotifier<int?> totalLike = ValueNotifier(widget.data.totalLike);
-    ValueNotifier<int?> totalcomment = ValueNotifier(widget.data.totalComments);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -42,12 +48,17 @@ class _LikeShareCommentState extends State<LikeShareComment> {
           children: [
             GestureDetector(
               onTap: () {
-                widget.bloc.liked.value = !widget.bloc.liked.value!;
-                widget.bloc.likePost(widget.data.postId.toString(),widget.bloc.liked.value! ? "1": "0");
-                totalLike.value = widget.bloc.liked.value!? totalLike.value!+1 :totalLike.value!-1;
+                liked.value = !liked.value;
+                widget.bloc.likePost(widget.data.postId.toString(),liked.value ? "1": "0").then((value){
+                  widget.bloc.getLikedPostUserDetails(widget.data.postId.toString()).then((List result){
+                    postLikedAllUserList.value = result;
+                    liked.value = result.where((element) => element['user_id'].toString()==pref.getString("uid").toString()).toList().isNotEmpty;
+                  });
+                });
+                totalLike.value = liked.value? totalLike.value!+1 :totalLike.value!-1;
               },
               child: ValueListenableBuilder(
-                valueListenable: widget.bloc.liked,
+                valueListenable: liked,
                 builder: (context,bool? alreadyLiked, child) {
                   if(alreadyLiked== null){
                     return Icon(Icons.favorite_border,size: 18);
@@ -62,9 +73,8 @@ class _LikeShareCommentState extends State<LikeShareComment> {
             5.width,
             GestureDetector(
               onTap: () {
-                widget.bloc.postLikedAllUserList.value = null;
-                widget.bloc.getLikedPostUserDetails(widget.data.postId.toString());
-                if(widget.bloc.postLikedAllUserList.value != null){
+                // widget.bloc.getLikedPostUserDetails(widget.data.postId.toString());
+                if(postLikedAllUserList.value != null){
                   showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
@@ -75,7 +85,7 @@ class _LikeShareCommentState extends State<LikeShareComment> {
                     ),
                     clipBehavior: Clip.antiAliasWithSaveLayer,
                     builder: (BuildContext context) {
-                      return LikeSheet(ctx: context,users: widget.bloc.postLikedAllUserList.value!);
+                      return LikeSheet(ctx: context,users: postLikedAllUserList.value!);
                     },
                   );
                 }

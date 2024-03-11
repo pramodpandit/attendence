@@ -71,7 +71,14 @@ class _LikeSheetState extends State<LikeSheet> {
                       SliverPadding(
                           padding: EdgeInsets.symmetric(
                               horizontal: 20.w, vertical: 10.h),
-                          sliver: SliverList(
+                          sliver: widget.users.isEmpty?
+                              SliverList(delegate: SliverChildListDelegate(
+                                [
+                                  SizedBox(height: 150),
+                                  Center(child: Text("No likes yet"))
+                                ]
+                              ))
+                          : SliverList(
                             delegate: SliverChildBuilderDelegate(
                               (context, i) {
                                 return Container(

@@ -77,7 +77,7 @@ class PostBloc extends Bloc {
     }
   }
   
-  likePost(String postId,String like)async{
+  Future likePost(String postId,String like)async{
     SharedPreferences pref = await SharedPreferences.getInstance();
     Map<String,dynamic> data = {
       "post_id" : postId,
@@ -92,9 +92,7 @@ class PostBloc extends Bloc {
     }
   }
 
-  ValueNotifier<bool?> liked = ValueNotifier(null);
-  ValueNotifier<List?> postLikedAllUserList = ValueNotifier(null);
-  getLikedPostUserDetails(String postId)async{
+  Future<List> getLikedPostUserDetails(String postId)async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Map<String,dynamic> data = {
       "post_id" : postId,
@@ -102,10 +100,11 @@ class PostBloc extends Bloc {
     try{
       var result = await _repo.fetchLikedPostUserDetails(data);
       List finalResult = result.data;
-      postLikedAllUserList.value = finalResult;
-      liked.value = finalResult.where((element) => element['user_id'].toString()==prefs.getString("uid").toString()).toList().isNotEmpty;
+      return finalResult;
+      // postLikedAllUserList.value = finalResult;
+      // liked.value = finalResult.where((element) => element['user_id'].toString()==prefs.getString("uid").toString()).toList();
     }catch(e){
-      print(e);
+      throw(e);
     }
   }
 
