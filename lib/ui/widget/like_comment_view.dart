@@ -7,9 +7,8 @@ import 'package:office/ui/widget/like_sheet.dart';
 import '../../data/model/community_list.dart';
 
 class LikeShareComment extends StatefulWidget {
-  final Data data;
+  final Community data;
   final PostBloc bloc;
-
   const LikeShareComment({super.key, required this.data, required this.bloc});
 
   @override
@@ -30,6 +29,7 @@ class _LikeShareCommentState extends State<LikeShareComment> {
   @override
   Widget build(BuildContext context) {
     ValueNotifier<int?> totalLike = ValueNotifier(widget.data.totalLike);
+    ValueNotifier<int?> totalcomment = ValueNotifier(widget.data.totalComments);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -89,20 +89,24 @@ class _LikeShareCommentState extends State<LikeShareComment> {
         ),
         GestureDetector(
           onTap: () {
+            widget.bloc.postCommentAllUserList.value = null;
+            widget.bloc.getCommentPostUserDetails(widget.data.postId.toString());
+
             showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(20),
+                context: context,
+                isScrollControlled: true,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(20),
+                  ),
                 ),
-              ),
-              clipBehavior: Clip.antiAliasWithSaveLayer,
-              builder: (BuildContext context) {
-                return CommentSheet(ctx: context);
-              },
-            );
-          },
+                clipBehavior: Clip.antiAliasWithSaveLayer,
+                builder: (BuildContext context) {
+                  return CommentSheet(ctx: context, bloc: widget.bloc, postid: widget.data.postId!.toInt());
+                },
+              );
+
+            },
           child: Row(
             children: [
               Icon(
@@ -113,10 +117,16 @@ class _LikeShareCommentState extends State<LikeShareComment> {
               const SizedBox(
                 width: 5,
               ),
-               Text(
-                "${widget.data.totalComments}",
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
+               ValueListenableBuilder(
+                 valueListenable: totalcomment,
+                 builder: (context, value, child) {
+                   return  Text(
+                     "${value}",
+                     style: TextStyle(fontWeight: FontWeight.w600),
+                   );
+                 },
+
+               ),
             ],
           ),
         ),

@@ -11,12 +11,12 @@ class CommunityRepositary{
   final ApiService _api;
 
   CommunityRepositary(this.prefs, this._api);
-  Future<ApiResponse2<List<Data>>> getPostRecords()async{
+  Future<ApiResponse2<List<Community>>> getPostRecords()async{
     var response=await _api.getRequest("getpost",data: {
       "user_id":prefs.getString('uid'),
     });
     //print('jek${response['data']['data']}');
-    return ApiResponse2.fromJson(response,List.from((response['data']['data'] ?? []).map((e) => Data.fromJson(e))));
+    return ApiResponse2.fromJson(response,List.from((response['data']['data'] ?? []).map((e) => Community.fromJson(e))));
   }
 
   // Future<List<Getcommunity>> getLeaveRecords() async{

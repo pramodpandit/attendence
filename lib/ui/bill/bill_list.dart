@@ -174,11 +174,7 @@ class _BillListState extends State<BillList> {
                                         );
 
                                         if (selectedMonth != null) {
-                                          DateTime selectedDate = DateTime(
-                                            bloc.year.value?.year ??
-                                                DateTime.now().year,
-                                            selectedMonth,
-                                          );
+                                          DateTime selectedDate = DateTime(bloc.year.value?.year ?? DateTime.now().year, selectedMonth,);
                                           await bloc.updateMonth(selectedDate);
                                           await bloc.fetchBillList();
                                           print("$selectedDate");
@@ -200,15 +196,8 @@ class _BillListState extends State<BillList> {
                                             Text(
                                               monthDate == null
                                                   ? DateFormat('MMMM').format(
-                                                  DateTime(
-                                                      DateTime.now().year,
-                                                      DateTime.now().month,
-                                                      1))
-                                                  : DateFormat('MMMM').format(
-                                                  DateTime(
-                                                      DateTime.now().year,
-                                                      monthDate.month,
-                                                      1)),
+                                                  DateTime(DateTime.now().year, DateTime.now().month, 1))
+                                                  : DateFormat('MMMM').format(DateTime(DateTime.now().year, monthDate.month, 1)),
                                               style: const TextStyle(
                                                 fontSize: 15,
                                                 fontWeight: FontWeight.w500,
@@ -239,12 +228,6 @@ class _BillListState extends State<BillList> {
                                     valueListenable: bloc.year,
                                     builder: (context, DateTime? date, _) {
                                       return InkWell(
-                                        // onTap: () async {
-                                        //   DateTime? dt = await showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime.now().subtract(Duration(days: 15)), lastDate:  DateTime.now().add(Duration(days: 30)),);
-                                        //   if(dt!=null) {
-                                        //     await holidayBloc.updateStartYear(dt);
-                                        //   }
-                                        // },
                                         onTap: () async {
                                           int? selectedYear = await showDialog(
                                             context: context,
@@ -257,22 +240,13 @@ class _BillListState extends State<BillList> {
                                                       DateTime.now().year,
                                                   items: List.generate(30,
                                                           (index) {
-                                                        return DropdownMenuItem<
-                                                            int>(
-                                                          value:
-                                                          DateTime.now().year -
-                                                              15 +
+                                                        return DropdownMenuItem<int>(value: DateTime.now().year -15 +
                                                               index,
-                                                          child: Text(
-                                                              (DateTime.now().year -
-                                                                  15 +
-                                                                  index)
-                                                                  .toString()),
+                                                          child: Text((DateTime.now().year - 15 + index).toString()),
                                                         );
                                                       }),
                                                   onChanged: (int? value) {
-                                                    Navigator.pop(
-                                                        context, value);
+                                                    Navigator.pop(context, value);
                                                   },
                                                 ),
                                                 actions: [
@@ -284,11 +258,7 @@ class _BillListState extends State<BillList> {
                                                   ),
                                                   TextButton(
                                                     onPressed: () {
-                                                      Navigator.pop(
-                                                          context,
-                                                          date?.year ??
-                                                              DateTime.now()
-                                                                  .year);
+                                                      Navigator.pop(context, date?.year ?? DateTime.now().year);
                                                     },
                                                     child: Text('Select'),
                                                   ),
@@ -342,8 +312,7 @@ class _BillListState extends State<BillList> {
                         ValueListenableBuilder(
                             valueListenable: bloc.eBill,
                              builder: (context, List<EBill>eBill,__) {
-
-                               if (eBill.isEmpty) {
+                              if (eBill.isEmpty) {
                                  return const Center(
                                    child: Column(
                                      children: [
@@ -397,15 +366,13 @@ class _BillListState extends State<BillList> {
                                                          style: const TextStyle(
                                                              color: Colors.blue,
                                                              fontWeight: FontWeight
-                                                                 .w600),
-                                                       ),
-                                                     ),
+                                                                 .w600),),),
                                                  ]
                                              ),
 
                                              ...ebilllistdata.map((item) {
                                                List extractData = ebilllistdata.where((element) => element['f_date']==item['f_date']).toList();
-                                               if(extractData.length>1){
+                                               if(extractData.length > 1){
                                                  if(extractData[0]['id'] == item['id']){
                                                    return TableRow(
                                                        children: [
@@ -423,8 +390,7 @@ class _BillListState extends State<BillList> {
                                                          ),
                                                          for (var type in eBill)
                                                            Padding(
-                                                             padding: EdgeInsets.all(
-                                                                 5.0),
+                                                             padding: EdgeInsets.all(5.0),
                                                              child: Text(
                                                                extractData.where((ele) => ele['e_type'].toString() == type.id.toString()).toList().isNotEmpty?
                                                                (extractData.where((ele) => ele['e_type'].toString() == type.id.toString()).toList()[extractData.where((ele) => ele['e_type'].toString() == type.id.toString()).toList().length-1]['e_type'] ==
@@ -459,14 +425,13 @@ class _BillListState extends State<BillList> {
                                                      Padding(
                                                        padding: EdgeInsets.all(5.0),
                                                        child: Text(
-                                                         DateFormat("dd-MM-yyyy")
-                                                             .format(DateTime.parse(
-                                                             item['f_date']!)),
+                                                         DateFormat("dd-MM-yyyy").format(DateTime.parse(item['f_date']!)),
                                                          style: const TextStyle(
                                                              color: Color(
                                                                  0xff20263c),
                                                              fontWeight: FontWeight
-                                                                 .w600),),
+                                                                 .w600),
+                                                       ),
                                                      ),
                                                      for (var type in eBill)
                                                        Padding(
@@ -474,8 +439,7 @@ class _BillListState extends State<BillList> {
                                                              5.0),
                                                          child: Text(
                                                            // Check if water ID and type ID are the same, then show quantity
-                                                           (item['e_type'] ==
-                                                               "${type.id}")
+                                                           (item['e_type'] == "${type.id}")
                                                                ? item['t_reading']?? ""
                                                                : "",
                                                            style: const TextStyle(

@@ -73,7 +73,7 @@ class WaterBloc extends Bloc {
         return;
       }
       var result = await _repo.addWaterTypeDaily(date,waterString.value,quantityController.text,UpdateBranchName.value);
-      if(result.message!=''&& result.message=="WaterBill Added successfully"){
+      if(result.status==true){
         showMessage(const MessageType.success("WaterBill Updated successfully"));
         fetchWaterDaily();
       }

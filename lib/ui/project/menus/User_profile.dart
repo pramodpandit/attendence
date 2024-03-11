@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:office/ui/community/communityHomepage.dart';
 import 'package:provider/provider.dart';
-
 import '../../../bloc/project_bloc.dart';
 import '../../../data/repository/project_repo.dart';
 import '../../profile/menus/basic_info.dart';
