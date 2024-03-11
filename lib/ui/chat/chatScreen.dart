@@ -352,12 +352,12 @@ class _ChatScreenState extends State<ChatScreen> {
                               child: Column(
                                 children: [
                                   Align(
-                                    alignment: snapshot.data![index]['from_user'].toString() == widget.prefs.getString("uid") ?Alignment.centerRight:Alignment.centerLeft,
+                                    alignment: snapshot.data![index]['sender_id'].toString() == widget.prefs.getString("uid") ?Alignment.centerRight:Alignment.centerLeft,
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 15, vertical: 10),
                                       decoration: BoxDecoration(
-                                        borderRadius: snapshot.data![index]['from_user'].toString() == widget.prefs.getString("uid")
+                                        borderRadius: snapshot.data![index]['sender_id'].toString() == widget.prefs.getString("uid")
                                             ? const BorderRadius.only(
                                           topLeft: Radius.circular(10),
                                           topRight: Radius.circular(10),
@@ -368,14 +368,14 @@ class _ChatScreenState extends State<ChatScreen> {
                                           topRight: Radius.circular(10),
                                           bottomRight: Radius.circular(10),
                                         ),
-                                        color: snapshot.data![index]['from_user'].toString() == widget.prefs.getString("uid")
+                                        color: snapshot.data![index]['sender_id'].toString() == widget.prefs.getString("uid")
                                             ? Colors.blue
                                             : Colors.grey.withOpacity(0.3),
                                       ),
                                       child: Text(
                                         snapshot.data![index]['message'].toString(),
                                         style: TextStyle(
-                                          color: snapshot.data![index]['from_user'].toString() == widget.prefs.getString("uid")
+                                          color: snapshot.data![index]['sender_id'].toString() == widget.prefs.getString("uid")
                                               ? Colors.white
                                               : Colors.black,
                                         ),
@@ -383,18 +383,18 @@ class _ChatScreenState extends State<ChatScreen> {
                                     ),
                                   ),
                                   Padding(
-                                    padding: snapshot.data![index]['from_user'].toString() == widget.prefs.getString("uid")
+                                    padding: snapshot.data![index]['sender_id'].toString() == widget.prefs.getString("uid")
                                         ? const EdgeInsets.only(right: 5)
                                         : const EdgeInsets.only(left: 5),
                                     child: Row(
-                                      mainAxisAlignment: snapshot.data![index]['from_user'].toString() == widget.prefs.getString("uid")
+                                      mainAxisAlignment: snapshot.data![index]['sender_id'].toString() == widget.prefs.getString("uid")
                                           ? MainAxisAlignment.end
                                           : MainAxisAlignment.start,
                                       children: [
-                                        if (snapshot.data![index]['from_user'].toString() == widget.prefs.getString("uid"))
+                                        if (snapshot.data![index]['sender_id'].toString() == widget.prefs.getString("uid"))
                                           Icon(PhosphorIcons.checks_bold,
                                               size: 14,
-                                              color: snapshot.data![index]['from_user'].toString() == widget.prefs.getString("uid")
+                                              color: snapshot.data![index]['sender_id'].toString() == widget.prefs.getString("uid")
                                                   ? Colors.blue.shade700
                                                   : Colors.grey.withOpacity(0.8)),
                                         const SizedBox(
@@ -512,7 +512,10 @@ class _ChatScreenState extends State<ChatScreen> {
                                     }
                                   return InkWell(
                                     onTap: () {
-                                      profileBloc.sendMessage(widget.user['user_id'].toString(),"text");
+                                      profileBloc.sendMessage(widget.user['user_id'].toString(),"one_to_one","text");
+                                      if(widget.user['fcm_token'] != null && profileBloc.sendMessageController.text.isNotEmpty){
+                                        profileBloc.sendNotification(widget.user);
+                                      }
                                     },
                                     child: const Icon(PhosphorIcons.paper_plane_tilt),
                                   );

@@ -423,7 +423,7 @@ class _SingleChatState extends State<SingleChat> {
             style: TextStyle(fontWeight: FontWeight.w500),
           ),
       subtitle: Text(
-          widget.userData['last_chat'][widget.userData['last_chat'].length-1]['message'] ?? '',
+        widget.userData['last_chat'].isEmpty ? '':widget.userData['last_chat'][widget.userData['last_chat'].length-1]['message'] ?? '',
           softWrap: true,
           style: TextStyle(
               fontWeight: FontWeight.w400,
@@ -452,6 +452,9 @@ class _SingleChatState extends State<SingleChat> {
                       ),
                     );
                   },
+                  width: double.infinity,
+                  height: double.infinity,
+                  fit: BoxFit.fill,
                 )),
           ),
     );

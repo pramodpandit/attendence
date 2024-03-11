@@ -20,7 +20,7 @@ class AuthRepository {
       // 'fcmToken': fcmToken ?? prefs.getString('device_token'),
     };
     if(fcmToken!=null) {
-      data['fcmToken'] = fcmToken;
+      data['fcm_token'] = fcmToken;
     }
 
     var res = await _api.postRequest('login_user', data);

@@ -427,10 +427,10 @@ class _BillListState extends State<BillList> {
                                                                  5.0),
                                                              child: Text(
                                                                extractData.where((ele) => ele['e_type'].toString() == type.id.toString()).toList().isNotEmpty?
-                                                               (extractData.where((ele) => ele['e_type'].toString() == type.id.toString()).toList()[0]['e_type'] ==
+                                                               (extractData.where((ele) => ele['e_type'].toString() == type.id.toString()).toList()[extractData.where((ele) => ele['e_type'].toString() == type.id.toString()).toList().length-1]['e_type'] ==
                                                                    "${type.id}")
-                                                                   ? extractData.where((ele) => ele['e_type'].toString() == type.id.toString()).toList()[0]['t_reading']?? ""
-                                                                   : "":"",
+                                                                   ? extractData.where((ele) => ele['e_type'].toString() == type.id.toString()).toList()[extractData.where((ele) => ele['e_type'].toString() == type.id.toString()).toList().length-1]['t_reading']?? ""
+                                                                   : "" : "" ,
                                                                style: const TextStyle(
                                                                    color: Color(
                                                                        0xff20263c),

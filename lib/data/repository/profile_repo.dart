@@ -253,6 +253,11 @@ class ProfileRepository {
     return response;
   }
 
+  Future sendNotificationApi(Map<String,dynamic> data)async{
+    var response=await _api.sendNotificationRequest(data);
+    return response;
+  }
+
   Future fetchExpanseAllowData()async{
     var response = await _api.postRequest("employee/detailst", {
       "user_id": prefs.getString('uid'),

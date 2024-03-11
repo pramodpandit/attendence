@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -310,7 +311,7 @@ class ProfileBloc extends Bloc {
         print(e);
         print(s);
       }
-      await Future.delayed(Duration(seconds: 8));
+      await Future.delayed(Duration(seconds: 5));
     }
   }
 
@@ -318,24 +319,25 @@ class ProfileBloc extends Bloc {
     while(true){
       try{
         var result = await _repo.fetchOneToOneChat(senderId);
-        yield result.data as List;
+        yield (result.data as List).reversed.toList();
       }catch (e, s) {
         print(e);
         print(s);
       }
-      await Future.delayed(Duration(seconds: 2));
+      await Future.delayed(Duration(seconds: 5));
     }
   }
 
   TextEditingController sendMessageController = TextEditingController();
   ValueNotifier<bool> isSending = ValueNotifier(false);
 
-  sendMessage(String toUser,String messageType)async{
+  sendMessage(String toUser,String chatType,String messageType)async{
     isSending.value = true;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Map<String,dynamic> data = {
       "from_user" : prefs.getString("uid"),
       "to_user" : toUser,
+      "type" : chatType,
       "message_type" : messageType,
       "message" : sendMessageController.text
     };
@@ -351,6 +353,38 @@ class ProfileBloc extends Bloc {
       print(e);
     }finally{
       isSending.value = false;
+    }
+  }
+
+  sendNotification(Map<String,dynamic> user)async{
+    Map<String,dynamic> data = {
+      "to": user['fcm_token'].toString(),
+      "notification": {
+        "body": sendMessageController.text,
+        "OrganizationId": "2",
+        "content_available": true,
+        "priority": "high",
+        "subtitle": "Subtitle",
+        "title":  "${user['first_name'] ?? ''} ${user['middle_name'] ?? ''} ${user['last_name'] ?? ''}",
+      },
+      "data": {
+        "priority": "high",
+        "content_available": true,
+        // "data" : "jsonEncode(user)",
+        // "screen" : "chatting",
+        "OrganizationId": "2",
+      }
+    };
+    try{
+      var result = await _repo.sendNotificationApi(data);
+      if(result['success'].toString() == "1"){
+        showMessage(MessageType.success("done"));
+      }else{
+        showMessage(MessageType.error("some error ${result['results'][0]}"));
+      }
+    }catch(e){
+      showMessage(MessageType.error(e.toString()));
+      print(e);
     }
   }
 

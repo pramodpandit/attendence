@@ -1,11 +1,14 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:office/bloc/auth_bloc.dart';
 import 'package:office/data/repository/auth_repo.dart';
 import 'package:office/ui/auth/forget_password/forgetPassword.dart';
 import 'package:office/ui/auth/loginWithOtpScreen.dart';
 import 'package:office/ui/home/home_bar.dart';
 import 'package:office/ui/widget/custom_button.dart';
+import 'package:office/utils/constants.dart';
 import 'package:provider/provider.dart';
 import '../../utils/message_handler.dart';
 
@@ -20,6 +23,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   late AuthBloc authBloc;
   final formKey = GlobalKey<FormState>();
+  late SharedPreferences prefs;
 
   @override
   void initState() {
@@ -28,6 +32,17 @@ class _LoginScreenState extends State<LoginScreen> {
     authBloc.msgController?.stream.listen((event) {
       AppMessageHandler().showSnackBar(context, event);
     });
+    getFirebaseToken();
+  }
+
+  getFirebaseToken() async {
+    // use the returned token to send messages to users from your custom server
+    String token = (await FirebaseMessaging.instance.getToken(
+      vapidKey: FirebaseVapidKey.key,
+    ))!;
+    prefs = await SharedPreferences.getInstance();
+    await prefs.setString("fcmToken", token);
+    debugPrint('fcmToken $token');
   }
 
   @override
@@ -243,7 +258,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       tittle: 'LOGIN',
                       onPressed: () async {
                         if (formKey.currentState!.validate()) {
-                          var res = await authBloc.userLogin('');
+                          var res = await authBloc.userLogin(prefs.getString("fcmToken").toString());
                           if (res['status']) {
                             // ignore: use_build_context_synchronously
                             Navigator.pushReplacementNamed(
