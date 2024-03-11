@@ -131,5 +131,4 @@ class ApiService {
       throw ApiException.fromDioError(dioError);
     }
   }
-
 }

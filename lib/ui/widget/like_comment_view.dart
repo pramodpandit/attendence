@@ -23,7 +23,12 @@ class _LikeShareCommentState extends State<LikeShareComment> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
     widget.bloc.getLikedPostUserDetails(widget.data.postId.toString());
+    shared();
+      }
+  shared()async{
+   pref = await SharedPreferences.getInstance();
   }
   
   @override
@@ -43,7 +48,7 @@ class _LikeShareCommentState extends State<LikeShareComment> {
               },
               child: ValueListenableBuilder(
                 valueListenable: widget.bloc.liked,
-                builder: (context, alreadyLiked, child) {
+                builder: (context,bool? alreadyLiked, child) {
                   if(alreadyLiked== null){
                     return Icon(Icons.favorite_border,size: 18);
                   }
@@ -57,6 +62,8 @@ class _LikeShareCommentState extends State<LikeShareComment> {
             5.width,
             GestureDetector(
               onTap: () {
+                widget.bloc.postLikedAllUserList.value = null;
+                widget.bloc.getLikedPostUserDetails(widget.data.postId.toString());
                 if(widget.bloc.postLikedAllUserList.value != null){
                   showModalBottomSheet(
                     context: context,
@@ -91,7 +98,6 @@ class _LikeShareCommentState extends State<LikeShareComment> {
           onTap: () {
             widget.bloc.postCommentAllUserList.value = null;
             widget.bloc.getCommentPostUserDetails(widget.data.postId.toString());
-
             showModalBottomSheet(
                 context: context,
                 isScrollControlled: true,
