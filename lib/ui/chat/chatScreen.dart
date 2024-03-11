@@ -9,6 +9,7 @@ import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:office/data/model/user.dart';
 import 'package:office/ui/community/communityProfile.dart';
@@ -351,6 +352,25 @@ class _ChatScreenState extends State<ChatScreen> {
                               margin: const EdgeInsets.only(bottom: 10),
                               child: Column(
                                 children: [
+                                  index == snapshot.data!.length-1
+                                    ?Container(
+                                      padding: EdgeInsets.all(5),
+                                      decoration : BoxDecoration(
+                                        color : Colors.grey.shade200,
+                                        borderRadius: BorderRadius.circular(5),
+                                      ),
+                                      child: Text("${DateTime.parse(snapshot.data![index]['created_at']).isToday ? 'Today' :DateTime.parse(snapshot.data![index]['created_at']).isYesterday ? 'Yesterday' :DateFormat("dd/MM/yyyy").format(DateTime.parse(snapshot.data![index]['created_at']))}",
+                                      ))
+                                  : DateTime.parse(snapshot.data![index]['created_at']).day > DateTime.parse(snapshot.data![index+1]['created_at']).day
+                                  ? Container(
+                                    padding: EdgeInsets.all(5),
+                                      decoration : BoxDecoration(
+                                        color : Colors.grey.shade200,
+                                        borderRadius: BorderRadius.circular(5),
+                                      ),
+                                      child: Text("${DateTime.parse(snapshot.data![index]['created_at']).isToday ? 'Today' :DateTime.parse(snapshot.data![index]['created_at']).isYesterday ? 'Yesterday' :DateFormat("dd/MM/yyyy").format(DateTime.parse(snapshot.data![index]['created_at']))}",
+                                      ))
+                                      : Offstage(),
                                   Align(
                                     alignment: snapshot.data![index]['sender_id'].toString() == widget.prefs.getString("uid") ?Alignment.centerRight:Alignment.centerLeft,
                                     child: Container(
@@ -401,7 +421,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                           width: 5,
                                         ),
                                         Text(
-                                          "1:30 AM",
+                                          "${DateFormat("hh:mm a").format(DateTime.parse(snapshot.data![index]['created_at']))}",
                                           style: TextStyle(
                                               fontSize: 10,
                                               color: Colors.grey.withOpacity(0.8)),
