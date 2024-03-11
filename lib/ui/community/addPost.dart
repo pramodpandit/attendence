@@ -1,16 +1,12 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:office/bloc/post_bloc.dart';
-import 'package:office/data/repository/post_repo.dart';
 import 'package:office/ui/widget/app_bar.dart';
-import 'package:office/ui/widget/top_snackbar/top_snack_bar.dart';
 import 'package:provider/provider.dart';
-
 import '../../utils/constants.dart';
 import '../../utils/message_handler.dart';
-import 'communityHomepage.dart';
 
 class AddPost extends StatefulWidget {
   const AddPost({Key? key}) : super(key: key);
@@ -59,7 +55,7 @@ class _AddPostState extends State<AddPost> {
   Widget build(BuildContext context) {
     Widget imageView = SizedBox.shrink();
     double widthScreen = MediaQuery.of(context).size.width;
-    double heightScreen = MediaQuery.of(context).size.height;
+    double heightScreen = MediaQuery.of(context).size.height*0.9;
     print("Height:${heightScreen} Width:${widthScreen}");
     if (galleryFile != null) {
       imageView = Stack(children: [
@@ -90,79 +86,130 @@ class _AddPostState extends State<AddPost> {
       ]);
     }
     return Scaffold(
-      appBar: MyAppBar(title: "Add Post"),
-      body: ListView(
-          physics: NeverScrollableScrollPhysics(),
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          children: [
-            Padding(
-              padding: EdgeInsets.all(10),
-              child: Container(
-                height: heightScreen / 1.15,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: Colors.grey[100]),
-                child: Padding(
-                  padding: EdgeInsets.all(8),
-                  child: Column(
-                      // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TextField(
-                          controller: bloc.postTextController,
-                          minLines: 1,
-                          maxLines: 8,
-                          textCapitalization: TextCapitalization.sentences,
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: "What do you want to talk about?"),
-                        ),
-                        imageView,
-                        Expanded(
-                          child: Align(
-                            alignment: Alignment.bottomLeft,
-                            child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  IconButton(
-                                      onPressed: () {
-                                        _openGallery();
-                                      },
-                                      icon: Icon(Icons.photo)),
-                                  ValueListenableBuilder(
-                                      valueListenable: bloc.isAddPostLoading,
-                                      builder: (BuildContext context,bool isLoading,Widget? child){
-                                        return Row(children: [
-                                          isLoading?CircularProgressIndicator():
-                                          ElevatedButton(
-                                            onPressed: () {
-                                              if(bloc.postTextController.text.toString() == ''|| galleryFile ==null){
-                                                bloc.showMessage(MessageType.info('Please Select all field'));
-                                              }else{
-                                                bloc.addPost(context);
-                                              }
-                                            },
-                                            child: Text(
-                                              "Add Post",
-                                              style: TextStyle(color: Colors.white),
-                                            ),
-                                            style: ButtonStyle(
-                                                backgroundColor:
-                                                MaterialStatePropertyAll(
-                                                    K.themeColorPrimary)),
-                                          ),
-                                        ],
-                                        );
-                                      })
-                                ]),
-                          ),
-                        ),
-                      ]),
+      //appBar: MyAppBar(title: "Add Post"),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Stack(
+            children: [
+              Container(
+                height: 100,
+                width: 1.sw,
+                decoration: const BoxDecoration(
+                    color: Color(0xFF009FE3),
+                    borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(20),
+                        bottomRight: Radius.circular(20))
+                ),
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(height: 56,),
+                    Text(
+                      "Add Post",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ]),
+              Positioned(
+                top: 56,
+                left: 10,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: const CircleAvatar(
+                    backgroundColor: Colors.white,
+                    radius: 15,
+                    child: Icon(Icons.arrow_back, size: 18,),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Expanded(
+            child: ListView(
+                physics: NeverScrollableScrollPhysics(),
+                keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(10),
+                    child: Container(
+                      height: heightScreen / 1.15,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.grey[100]),
+                      child: Padding(
+                        padding: EdgeInsets.all(8),
+                        child: Column(
+                            // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              TextField(
+                                controller: bloc.postTextController,
+                                minLines: 1,
+                                maxLines: 8,
+                                textCapitalization: TextCapitalization.sentences,
+                                decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    hintText: "What do you want to talk about?"),
+                              ),
+                              imageView,
+                              Expanded(
+                                child: Align(
+                                  alignment: Alignment.bottomLeft,
+                                  child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        IconButton(
+                                            onPressed: () {
+                                              _openGallery();
+                                            },
+                                            icon: Icon(Icons.photo)),
+                                        ValueListenableBuilder(
+                                            valueListenable: bloc.isAddPostLoading,
+                                            builder: (BuildContext context,bool isLoading,Widget? child){
+                                              return Row(children: [
+                                                isLoading?CircularProgressIndicator():
+                                                ElevatedButton(
+                                                  onPressed: () {
+                                                    if(bloc.postTextController.text.toString() == ''|| galleryFile ==null){
+                                                      bloc.showMessage(MessageType.info('Please Select all field'));
+                                                    }else{
+                                                      bloc.addPost(context);
+                                                    }
+                                                  },
+                                                  child: Text(
+                                                    "Add Post",
+                                                    style: TextStyle(color: Colors.white),
+                                                  ),
+                                                  style: ButtonStyle(
+                                                      backgroundColor:
+                                                      MaterialStatePropertyAll(
+                                                          K.themeColorPrimary)),
+                                                ),
+                                              ],
+                                              );
+                                            })
+                                      ]),
+                                ),
+                              ),
+                            ]),
+                      ),
+                    ),
+                  ),
+                ]),
+          ),
+        ],
+      ),
     );
   }
 }

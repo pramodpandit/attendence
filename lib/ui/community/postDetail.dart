@@ -9,7 +9,7 @@ import 'package:office/ui/widget/more_sheet.dart';
 import '../../data/model/community_list.dart';
 
 class PostDetail extends StatefulWidget {
-  final Data data;
+  final Community data;
   const PostDetail({super.key, required this.data});
 
   @override
@@ -82,14 +82,15 @@ class _PostDetailState extends State<PostDetail> {
                       GestureDetector(
                         onTap: () {
                           Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => const CommunityProfile()));
+                              builder: (context) =>CommunityProfile(userid: widget.data.userId.toInt(),)));
                         },
-                        child: const CircleAvatar(
+                        child:  CircleAvatar(
                           minRadius: 20,
                           maxRadius: 25.5,
-                          child: Icon(
+                          backgroundImage: widget.data.userDetails!.image!=null?NetworkImage('https://freeze.talocare.co.in/public/${widget.data.userDetails!.image}'):null,
+                          child: widget.data.userDetails!.image==null?Icon(
                             Icons.person,
-                          ),
+                          ):null,
                         ),
                       ),
                       const SizedBox(
@@ -110,7 +111,7 @@ class _PostDetailState extends State<PostDetail> {
                               //       color: Color.fromRGBO(51, 51, 51, 1)),
                               // ),
                               Text(
-                                'Alex Smith',
+                                '${widget.data.userDetails!.name}',
                                 style: TextStyle(
                                     fontWeight: FontWeight.w600, fontSize: 16),
                               )

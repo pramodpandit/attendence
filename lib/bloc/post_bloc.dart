@@ -25,7 +25,7 @@ class PostBloc extends Bloc {
   StreamController<String> postStream = StreamController.broadcast();
   StreamController<String> deleteStream = StreamController.broadcast();
   ValueNotifier<bool> isUserDetailLoad = ValueNotifier(false);
-  ValueNotifier<Getcommunity?> userDetail = ValueNotifier(null);
+  //ValueNotifier<Getcommunity?> userDetail = ValueNotifier(null);
   TextEditingController postTextController = TextEditingController();
   File? image;
   addPost(context) async {
@@ -61,7 +61,7 @@ class PostBloc extends Bloc {
       isUserDetailLoad.value = false;
     }
   }
-  List<Data> feedbackData = [];
+  List<Community> feedbackData = [];
   fetchPostData() async{
     try{
       isUserDetailLoad.value = true;
@@ -85,7 +85,7 @@ class PostBloc extends Bloc {
       "user_post_like" : like,
     };
     try{
-      var result = await _repo.likePostApi(data);
+      var result = await _repo.likePostApi('post-like',data);
       print(result);
     }catch(e){
       print(e);
@@ -104,6 +104,46 @@ class PostBloc extends Bloc {
       List finalResult = result.data;
       postLikedAllUserList.value = finalResult;
       liked.value = finalResult.where((element) => element['user_id'].toString()==prefs.getString("uid").toString()).toList().isNotEmpty;
+    }catch(e){
+      print(e);
+    }
+  }
+
+  ValueNotifier<List?> postCommentAllUserList = ValueNotifier(null);
+  ValueNotifier<bool> isLoadingcomment = ValueNotifier(false);
+  getCommentPostUserDetails(String postId)async{
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Map<String,dynamic> data = {
+      "post_id" : postId,
+    };
+    try{
+      isLoadingcomment.value = true;
+      var result = await _repo.fetchCommentPostUserDetails(data);
+      List finalResult = result.data;
+      postCommentAllUserList.value = finalResult;
+    }catch(e){
+      print(e);
+    }
+    finally{
+      isLoadingcomment.value = false;
+    }
+  }
+
+  Future commentPost(String postId,String comment)async{
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    Map<String,dynamic> data = {
+      "post_id" : postId,
+      "user_id" : pref.getString("uid"),
+      "comment" : comment,
+    };
+    try{
+      var result = await _repo.commentPostApi('post-add-comment',data);
+      if(result.status ==true){
+        return true;
+      }
+
+      print(result);
     }catch(e){
       print(e);
     }

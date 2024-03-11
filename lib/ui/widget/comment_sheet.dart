@@ -2,18 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:office/ui/community/communityProfile.dart';
+import 'package:office/utils/message_handler.dart';
+
+import '../../bloc/post_bloc.dart';
 
 class CommentSheet extends StatefulWidget {
   final BuildContext ctx;
-  const CommentSheet({Key? key, required this.ctx}) : super(key: key);
+  final int postid;
+
+  final PostBloc bloc;
+
+  const CommentSheet({Key? key, required this.ctx,  required this.bloc, required this.postid}) : super(key: key);
 
   @override
   State<CommentSheet> createState() => _CommentSheetState();
 }
 
 class _CommentSheetState extends State<CommentSheet> {
+  TextEditingController comment = TextEditingController();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -29,123 +44,167 @@ class _CommentSheetState extends State<CommentSheet> {
         snap: true,
         builder: (context, scrollController) {
           return Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-            ),
-            child: Stack(
-              children: [
-                Container(
-                  padding: EdgeInsets.only(top: 10.h),
-                  // margin: MediaQuery.of(context).viewInsets,
-                  clipBehavior: Clip.hardEdge,
-                  decoration: const BoxDecoration(
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(15.0)),
-                  ),
-                  child: CustomScrollView(
-                    controller: scrollController,
-                    slivers: [
-                      SliverAppBar(
-                        automaticallyImplyLeading: true,
-                        title: Row(
-                          mainAxisSize: MainAxisSize.min,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+                ),
+                child: Stack(
+                  children: [
+                    ValueListenableBuilder(
+                      valueListenable: widget.bloc.isLoadingcomment,
+                      builder: (context, loading, child) {
+                        if(loading ==true){
+                          return Center(child:CircularProgressIndicator(),);
+                        }
+                       return  ValueListenableBuilder(
+                           valueListenable: widget.bloc.postCommentAllUserList,
+                           builder: (context, postcomment, child) {
+                             if (postcomment == null) {
+                               return  Center(
+                                   child: CircularProgressIndicator());
+                             }else if ( postcomment!.isEmpty) {
+                               return Center(child: Text('No comment found !'),);
+
+                             }else{
+                               return Container(
+                                 padding: EdgeInsets.only(),
+                                 // margin: MediaQuery.of(context).viewInsets,
+                                 clipBehavior: Clip.hardEdge,
+                                 decoration: const BoxDecoration(
+                                   borderRadius:
+                                   BorderRadius.vertical(top: Radius.circular(
+                                       15.0)),
+                                 ),
+                                 child: CustomScrollView(
+                                   controller: scrollController,
+                                   slivers: [
+                                     SliverAppBar(
+                                       automaticallyImplyLeading: true,
+                                       title: Row(
+                                         mainAxisSize: MainAxisSize.min,
+                                         children: [
+                                           const Icon(
+                                             PhosphorIcons.chat_circle_dots,
+                                           ),
+                                           const SizedBox(width: 10),
+                                           Text(
+                                             "Comments (${postcomment!.length})",
+                                             style: TextStyle(
+                                               fontWeight: FontWeight.bold,
+                                               fontSize: 16.sp,
+                                             ),
+                                           ),
+                                         ],
+                                       ),
+                                       centerTitle: true,
+                                       titleSpacing: 20.w,
+                                       pinned: true,
+                                     ),
+                                     SliverPadding(
+                                         padding: EdgeInsets.symmetric(
+                                             horizontal: 20.w, vertical: 10.h),
+                                         sliver: SliverList(
+                                           delegate: SliverChildBuilderDelegate(
+                                                   (context, i) {
+                                                 return PostCommentView(
+                                                   data: postcomment[i],);
+                                               },
+                                               childCount: postcomment!.length
+                                           ),
+                                         )),
+                                     SliverToBoxAdapter(
+                                         child: SizedBox(height: 60.h)),
+                                   ],
+                                 ),
+                               );
+                             }
+                           }
+                       );                      },
+
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(20),
+                                topRight: Radius.circular(20)),
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                spreadRadius: 0,
+                                blurRadius: 3,
+                                color: Colors.black.withOpacity(0.2),
+                              )
+                            ]),
+                        padding: const EdgeInsets.only(
+                            bottom: 10, top: 10, left: 10, right: 10),
+                        child: Row(
                           children: [
-                            const Icon(
-                              PhosphorIcons.chat_circle_dots,
+                            const CircleAvatar(
+                              child: Icon(Icons.person),
                             ),
-                            const SizedBox(width: 10),
-                            Text(
-                              "Comments (59)",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16.sp,
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Expanded(
+                              child: TextFormField(
+                                textCapitalization: TextCapitalization.sentences,
+                                controller: comment,
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  hintText: "Add a comment",
+                                ),
                               ),
                             ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            InkWell(
+                                onTap: (){
+                                  if(comment.text ==''){
+                                    widget.bloc.showMessage(MessageType.info('Please enter comment '));
+                                  }else{
+                                    widget.bloc.commentPost(widget.postid.toString(), comment.text).then((value) {
+                                      if(value ==true){
+                                        widget.bloc.postCommentAllUserList.value = null;
+                                        widget.bloc.getCommentPostUserDetails(widget.postid.toString());
+                                        FocusScope.of(context).requestFocus(FocusNode());
+                                        comment.text = '';
+                                      }
+                                    });
+                                  }
+                                },
+                                child: const Icon(PhosphorIcons.paper_plane_tilt)),
+                                const SizedBox(
+                                  width: 10,
+                                ),
                           ],
                         ),
-                        centerTitle: true,
-                        titleSpacing: 20.w,
-                        pinned: true,
                       ),
-                      SliverPadding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 20.w, vertical: 10.h),
-                          sliver: SliverList(
-                            delegate: SliverChildBuilderDelegate(
-                              (context, i) {
-                                return const PostCommentView();
-                              },
-                              childCount: 3,
-                            ),
-                          )),
-                      SliverToBoxAdapter(child: SizedBox(height: 60.h)),
-                    ],
-                  ),
-                ),
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                        borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(20),
-                            topRight: Radius.circular(20)),
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            spreadRadius: 0,
-                            blurRadius: 3,
-                            color: Colors.black.withOpacity(0.2),
-                          )
-                        ]),
-                    padding: const EdgeInsets.only(
-                        bottom: 10, top: 10, left: 10, right: 10),
-                    child: Row(
-                      children: [
-                        const CircleAvatar(
-                          child: Icon(Icons.person),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Expanded(
-                          child: TextFormField(
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              hintText: "Add a comment",
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        const Icon(PhosphorIcons.paper_plane_tilt),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                      ],
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
-          );
-        },
-      ),
+              );
+            },
+
+      )
     );
   }
 }
 
 class PostCommentView extends StatefulWidget {
-  const PostCommentView({Key? key}) : super(key: key);
+  final  data;
+  const PostCommentView({Key? key, required this.data}) : super(key: key);
 
   @override
   State<PostCommentView> createState() => _PostCommentViewState();
 }
 
 class _PostCommentViewState extends State<PostCommentView> {
+ 
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -156,11 +215,23 @@ class _PostCommentViewState extends State<PostCommentView> {
           InkWell(
             onTap: () {
               Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => CommunityProfile()));
+                  MaterialPageRoute(builder: (context) => CommunityProfile(userid: widget.data['user_id'],)));
             },
             child: ClipOval(
               child: Image.network(
-                "https://images.wallpaperscraft.com/image/single/laptop_keys_gradient_167934_1920x1080.jpg",
+                "https://freeze.talocare.co.in/public/${widget.data['user_details']['image']}",
+                loadingBuilder: (context, child, loadingProgress) {
+                  if(loadingProgress == null){
+                    return child;
+                  }
+                  return CircularProgressIndicator(
+                    value: loadingProgress.expectedTotalBytes!=null?
+                    loadingProgress.cumulativeBytesLoaded/
+                        loadingProgress.expectedTotalBytes!:
+                    null,
+                    strokeWidth: 2,
+                  );
+                },
                 height: 35.r,
                 width: 35.r,
                 fit: BoxFit.cover,
@@ -195,7 +266,7 @@ class _PostCommentViewState extends State<PostCommentView> {
                       InkWell(
                         onTap: () {},
                         child: Text(
-                          "Alex Smith",
+                          "${widget.data['user_details']['name']}",
                           style: TextStyle(
                             fontSize: 12.sp,
                             height: 1,
@@ -205,7 +276,7 @@ class _PostCommentViewState extends State<PostCommentView> {
                       ),
                       const Spacer(),
                       Text(
-                        'april 24,2000',
+                        DateFormat('MMM d,yyyy').format(DateTime.parse(widget.data['created_at'])),
                         style: TextStyle(
                             fontSize: 12.sp,
                             color: const Color(0xff828080),
@@ -214,7 +285,13 @@ class _PostCommentViewState extends State<PostCommentView> {
                     ],
                   ),
                   const SizedBox(height: 5),
-                  const TextCommentView(),
+                 Text(
+                   '${widget.data['comment']}',
+                    style: TextStyle(
+                      height: 1.2,
+                      fontSize: 13.sp,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -225,17 +302,3 @@ class _PostCommentViewState extends State<PostCommentView> {
   }
 }
 
-class TextCommentView extends StatelessWidget {
-  const TextCommentView({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      "Hello this is an example of the ParsedText, links like http://www.google.com or http://www.facebook.com are clickable and phone number 444-555-6666 can call too. But you can also do more with this package, for example Bob will change style and David too. foo@gmail.com And the magic number is 42! #react #react-native",
-      style: TextStyle(
-        height: 1.2,
-        fontSize: 13.sp,
-      ),
-    );
-  }
-}

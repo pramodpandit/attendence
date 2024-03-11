@@ -264,8 +264,8 @@ class _ChatScreenState extends State<ChatScreen> {
                           Expanded(
                             child: GestureDetector(
                               onTap: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => CommunityProfile()));
+                                // Navigator.of(context).push(MaterialPageRoute(
+                                //     builder: (context) => CommunityProfile()));
                               },
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,

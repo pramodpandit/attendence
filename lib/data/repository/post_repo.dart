@@ -35,13 +35,22 @@ class PostRepository {
     return ApiResponse3.fromJson(response);
   }
 
-  Future<ApiResponse3> likePostApi(Map<String,dynamic> data) async {
+  Future<ApiResponse3> likePostApi(url,Map<String,dynamic> data) async {
 
-    var response = await _api.postRequest("post-like", data);
+    var response = await _api.postRequest(url, data);
     if (response == null) {
       ApiException.fromString("response null");
     }
     return ApiResponse3.fromJson(response);
+  }
+
+  Future<ApiResponse> commentPostApi(url,Map<String,dynamic> data) async {
+
+    var response = await _api.postRequest(url, data);
+    if (response == null) {
+      ApiException.fromString("response null");
+    }
+    return ApiResponse.fromJson(response);
   }
   Future<ApiResponse3> fetchLikedPostUserDetails(Map<String,dynamic> data) async {
 
@@ -50,5 +59,25 @@ class PostRepository {
       ApiException.fromString("response null");
     }
     return ApiResponse3.fromJson(response,response['data']);
+  }
+  Future<ApiResponse3> fetchCommentPostUserDetails(Map<String,dynamic> data) async {
+
+    var response = await _api.postRequest("post-comment-details", data);
+    if (response == null) {
+      ApiException.fromString("response null");
+    }
+    return ApiResponse3.fromJson(response,response['data']);
+  }
+  Future<ApiResponse3> addback(String text, File? image) async {
+    var response = await _api.postRequest("addpost", {
+      "user_id": prefs.getString('uid'),
+      "description": text,
+      "image": await MultipartFile.fromFile(image!.path,
+          filename: image.path.split('/').last)
+    },withFile: true);
+    if (response == null) {
+      ApiException.fromString("response null");
+    }
+    return ApiResponse3.fromJson(response);
   }
 }

@@ -265,7 +265,6 @@ class _AddWaterState extends State<AddWater> {
                                           //       (waterType) => waterType.id == waterBloc.waterString.value,
                                           //   orElse: () => WaterType(name: ''),
                                           // );
-                                          //
                                           // // waterType.first.quantityController.text=selectedWater.quantity=='0'?'':selectedWater.quantity!;
                                           // print("${selectedWater.id}");
                                           waterBloc.fetchWaterDaily();

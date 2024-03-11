@@ -238,7 +238,7 @@ class _PostListState extends State<PostList> {
                         var date1 = date[0] ;
                         return Container(
                           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                          margin: const EdgeInsets.only(left: 20, right: 20, bottom: 15),
+                          margin: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(15),
                               color: Colors.white,
@@ -257,10 +257,11 @@ class _PostListState extends State<PostList> {
                                   GestureDetector(
                                     onTap: () {
                                       Navigator.of(context).push(MaterialPageRoute(
-                                          builder: (context) => const CommunityProfile()));
+                                          builder: (context) => CommunityProfile(userid: data.userId.toInt(),)));
                                     },
-                                    child: const CircleAvatar(
-                                      child: Icon(Icons.person),
+                                    child:  CircleAvatar(
+                                      backgroundImage: data.userDetails!.image!=null?NetworkImage('https://freeze.talocare.co.in/public/${data.userDetails!.image}'):null,
+                                      child:data.userDetails!.image==null? Icon(Icons.person):null,
                                     ),
                                   ),
                                   const SizedBox(
@@ -270,7 +271,7 @@ class _PostListState extends State<PostList> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        "Jhon Smith",
+                                        "${data.userDetails!.name}",
                                         style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),maxLines: 1,
                                       ),
                                       Text(
@@ -299,7 +300,7 @@ class _PostListState extends State<PostList> {
                                         // clipBehavior: Clip.antiAliasWithSaveLayer,
                                         builder: (BuildContext context) {
                                           return Container(
-                                            padding: EdgeInsets.only(top: 150),
+                                            // padding: EdgeInsets.only(top: 150),
                                             child: MoreSheet(
                                               ctx: context,
                                               deleteOnTap: () {

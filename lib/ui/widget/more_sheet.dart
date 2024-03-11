@@ -48,7 +48,7 @@ class _MoreSheetState extends State<MoreSheet> {
           return Container(
             decoration: const BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
             ),
             child: Stack(
               children: [

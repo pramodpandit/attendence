@@ -17,7 +17,7 @@ class _LikeSheetState extends State<LikeSheet> {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.only(
-        top: MediaQuery.of(widget.ctx).padding.top,
+       top: MediaQuery.of(widget.ctx).padding.top,
         bottom: MediaQuery.of(widget.ctx).viewInsets.bottom,
       ),
       child: DraggableScrollableSheet(
@@ -30,12 +30,13 @@ class _LikeSheetState extends State<LikeSheet> {
           return Container(
             decoration: const BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+              borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(10)),
             ),
             child: Stack(
               children: [
                 Container(
-                  padding: EdgeInsets.only(top: 10.h),
+                 // padding: EdgeInsets.only(top: 10.h),
                   // margin: MediaQuery.of(context).viewInsets,
                   clipBehavior: Clip.hardEdge,
                   decoration: const BoxDecoration(
@@ -88,7 +89,7 @@ class _LikeSheetState extends State<LikeSheet> {
                                           Navigator.of(context).push(
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      CommunityProfile()));
+                                                      CommunityProfile(userid: widget.users[i]['user_id'],)));
                                         },
                                         child: ClipOval(
                                           child: CircleAvatar(
