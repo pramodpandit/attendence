@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
-import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:office/bloc/profile_bloc.dart';
 import 'package:office/data/model/Assets_model.dart';
 import 'package:provider/provider.dart';
-
 import '../../../data/model/Assets_Detail_modal.dart';
 
 class assetsDetail extends StatefulWidget {
@@ -127,26 +124,30 @@ class _assetsDetailState extends State<assetsDetail> {
                                   );
                                 }
                                 return
-                                  SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: DataTable(
-                                      columnSpacing: 10.0,
-                                      columns: const [
-                                        DataColumn(label: Text('Date',style: TextStyle(fontWeight: FontWeight.w700),)),
-                                        DataColumn(label: Text('Description',style: TextStyle(fontWeight: FontWeight.w700))),
-                                        DataColumn(label: Text('Status',style: TextStyle(fontWeight: FontWeight.w700))),
-                                        DataColumn(label: Text('Value',style: TextStyle(fontWeight: FontWeight.w700))),
-                                      ],
-                                      rows: List.generate(
-                                          asset.length, (index) {
-                                        return DataRow(
-                                            cells: [
-                                          DataCell(Center(child: Container(width: 75, child: Text("${DateFormat.yMd().format(DateTime.parse(asset[index].createdAt.toString()))}",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w600,fontSize: 11),),))),
-                                          DataCell(Center(child: Container(  child: Text("${asset[index].remarks}",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w600,fontSize: 11),),)),),
-                                          DataCell(Center(child: Container(  child: Text("${asset[index].status}",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w600,fontSize: 11),),))),
-                                          DataCell(Center(child: Container( child: Text("${asset[index].returnable}",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w600,fontSize: 11),),)))
-                                        ]);
-                                      }),
+                                  Center(
+                                    child: SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Center(
+                                        child: DataTable(
+                                          columnSpacing: 10.0,
+                                          columns: const [
+                                            DataColumn(label: Text('Date',style: TextStyle(fontWeight: FontWeight.w700),)),
+                                            DataColumn(label: Text('Description',style: TextStyle(fontWeight: FontWeight.w700))),
+                                            DataColumn(label: Text('Status',style: TextStyle(fontWeight: FontWeight.w700))),
+                                            DataColumn(label: Text('Value',style: TextStyle(fontWeight: FontWeight.w700))),
+                                          ],
+                                          rows: List.generate(
+                                              asset.length, (index) {
+                                            return DataRow(
+                                                cells: [
+                                              DataCell(Center(child: Container(width: 75, child: Text("${DateFormat.yMd().format(DateTime.parse(asset[index].createdAt.toString()))}",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w600,fontSize: 11),),))),
+                                              DataCell(Center(child: Container(  child: Text("${asset[index].remarks}",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w600,fontSize: 11),),)),),
+                                              DataCell(Center(child: Container(  child: Text("${asset[index].status}",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w600,fontSize: 11),),))),
+                                              DataCell(Center(child: Container( child: Text("${asset[index].returnable}",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w600,fontSize: 11),),)))
+                                            ]);
+                                          }),
+                                        ),
+                                      ),
                                     ),
                                   );
                               });

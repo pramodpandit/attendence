@@ -94,7 +94,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
               if(projectData.isEmpty){
                 return SizedBox(
                     height: MediaQuery.of(context).size.height * 0.7,
-                    child: Center(child: Text("No data available")));
+                    child: Center(child: Text("No data available",style: TextStyle(fontWeight: FontWeight.w700),)));
               }
               return Expanded(
                 child: RefreshIndicator(
@@ -108,7 +108,6 @@ class _ProjectScreenState extends State<ProjectScreen> {
                       var data = projectData[index];
                       List imageList = projectData[index]["user_pic"]["user_p"];
                       var date = projectData[index]["deadline_date"].toString().split('-');
-
                       return GestureDetector(
                         onTap: () {
                           Navigator.of(context).push(MaterialPageRoute(
