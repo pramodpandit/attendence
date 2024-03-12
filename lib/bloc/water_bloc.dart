@@ -85,13 +85,11 @@ class WaterBloc extends Bloc {
       isWaterDailyLoad.value = false;
     }
   }
-
   ValueNotifier<DateTime?> month = ValueNotifier(DateTime.now());
 
   ValueNotifier<DateTime?> year = ValueNotifier(DateTime.now());
   updateMonth(DateTime value) => month.value = value;
   dateloop(DateTime value) => month.value = value;
-
   updateYear(DateTime value) => year.value = value;
   ScrollController scrollController = ScrollController();
   ValueNotifier<bool> isWaterListLoad = ValueNotifier(false);

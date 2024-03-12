@@ -165,7 +165,7 @@ class _TaskNotesListState extends State<TaskNotes> {
                       MaterialPageRoute(
                           builder: (_) => Provider.value(
                               value: bloc,
-                              child: TaskAddNotes(taskId: widget.id, bloc: bloc, )
+                              child: TaskAddNotes(taskId: widget.id, bloc: bloc,)
                           )));
                 },
                 backgroundColor: const  Color(0xFF009FE3),

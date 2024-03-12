@@ -24,11 +24,7 @@ class CommentSheet extends StatefulWidget {
 class _CommentSheetState extends State<CommentSheet> {
   TextEditingController comment = TextEditingController();
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -63,8 +59,7 @@ class _CommentSheetState extends State<CommentSheet> {
                                return  Center(
                                    child: CircularProgressIndicator());
                              }else if ( postcomment!.isEmpty) {
-                               return Center(child: Text('No comment found !'),);
-
+                               return Center(child: Text('No comment found !',style: TextStyle(fontWeight: FontWeight.w500),),);
                              }else{
                                return Container(
                                  padding: EdgeInsets.only(),
@@ -119,8 +114,8 @@ class _CommentSheetState extends State<CommentSheet> {
                                );
                              }
                            }
-                       );                      },
-
+                       );
+                        },
                     ),
                     Positioned(
                       bottom: 0,
@@ -171,8 +166,10 @@ class _CommentSheetState extends State<CommentSheet> {
                                       if(value ==true){
                                         widget.bloc.postCommentAllUserList.value = null;
                                         widget.bloc.getCommentPostUserDetails(widget.postid.toString());
+
                                         FocusScope.of(context).requestFocus(FocusNode());
                                         comment.text = '';
+                                        widget.bloc.fetchPostData();
                                       }
                                     });
                                   }

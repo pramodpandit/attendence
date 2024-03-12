@@ -83,7 +83,7 @@ class _ProjectLinksState extends State<ProjectLinks> {
                           Row(
                             children: [
                               Text(
-                                "${data['name']}",
+                                "${data['project_link_name']}",
                                 // "${document[index].name}",
                                 style: const TextStyle(
                                     color: Colors.black,

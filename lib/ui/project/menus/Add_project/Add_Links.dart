@@ -5,6 +5,7 @@ import 'package:nb_utils/nb_utils.dart';
 import 'package:office/ui/widget/custom_button.dart';
 import 'package:provider/provider.dart';
 import '../../../../bloc/project_bloc.dart';
+import '../../../../utils/message_handler.dart';
 import '../../../widget/app_dropdown.dart';
 
 class Add_Links extends StatefulWidget {
@@ -28,9 +29,13 @@ class _Add_LinksState extends State<Add_Links> {
   void initState() {
     bloc = context.read<ProjectBloc>();
     super.initState();
-    bloc.Comment.text = '';
+    bloc.links.text = '';
+    bloc.other.text = '';
     bloc.selectedLinktype = null;
     bloc.fetchLinktype();
+    bloc.msgController?.stream.listen((event) {
+      AppMessageHandler().showSnackBar(context, event);
+    });
     bloc.fetchAddMemberLit(int.parse(widget.branch_id));
     bloc.linkSteam.stream.listen((event) {
       if (event == 'notes') {
@@ -114,7 +119,22 @@ class _Add_LinksState extends State<Add_Links> {
                             ValueListenableBuilder(
                               valueListenable: bloc.linketype,
                               builder: (context, linktype, child) {
-
+                                if(linktype ==null){
+                                  return SizedBox(
+                                     // height: MediaQuery.of(context).size.height * 0.7,
+                                      child: Center(child: CircularProgressIndicator()));
+                                }
+                                if(linktype.isEmpty){
+                                  return Flexible(
+                                    child:  AppDropdown(
+                                      items: linktype!.map((e) => DropdownMenuItem(value: '${e['id']}', child: Text('Data not found!.'))
+                                      ).toList(),
+                                      onChanged: (v) {bloc.updatelink(v);},
+                                      value: null,
+                                      hintText: "Select",
+                                    ),
+                                  );
+                                }
                                 return  Flexible(
                                   child:  AppDropdown(
                                     items: linktype!.map((e) => DropdownMenuItem(value: '${e['id']}', child: Text(e['name']??""))
@@ -125,11 +145,9 @@ class _Add_LinksState extends State<Add_Links> {
                                   ),
                                 );
                               },
-
                             ),
                           ],
                         ),
-
                         const SizedBox(
                           height: 10,
                         ),

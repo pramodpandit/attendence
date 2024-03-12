@@ -215,8 +215,6 @@ String? selectedEmpId;
   TextEditingController other = TextEditingController();
   ValueNotifier<bool> addLinLoading  = ValueNotifier(false);
   StreamController<String> linkSteam = StreamController.broadcast();
-
-
   ValueNotifier<List?> linketype = ValueNotifier(null);
   String? selectedLinktype;
 
@@ -226,7 +224,8 @@ String? selectedEmpId;
 
   fetchLinktype() async{
     try{
-      // isUserDetailLoad.value = true;
+      // isUserDetailLoad.value =
+
       var result = await repo.getlinkList();
       if(result.status && result.data != null){
         linketype.value = result.data["data"];
@@ -238,20 +237,25 @@ String? selectedEmpId;
     }
   }
   addlink(int id,String private) async {
-    try {
-      addLinLoading.value = true;
-      var result = await repo.AddLink(other.text,private, id,links.text,int.parse(selectedLinktype!));
-      if(result.status == true){
-        linkSteam.sink.add('notes');
-      }else{
-        showMessage(MessageType.error("Something went wrong"));
+    if(selectedLinktype ==null){
+      showMessage(MessageType.info('Please select link type'));
+    }else{
+      try {
+        addLinLoading.value = true;
+        var result = await repo.AddLink(other.text,private, id,links.text,int.parse(selectedLinktype!));
+        if(result.status == true){
+          linkSteam.sink.add('notes');
+        }else{
+          showMessage(MessageType.error("Something went wrong"));
+        }
+      } catch (e, s) {
+        debugPrint("$e");
+        debugPrint("$s");
+      } finally {
+        addLinLoading.value = false;
       }
-    } catch (e, s) {
-      debugPrint("$e");
-      debugPrint("$s");
-    } finally {
-      addLinLoading.value = false;
     }
+
   }
 
   ValueNotifier userDetail = ValueNotifier(null);

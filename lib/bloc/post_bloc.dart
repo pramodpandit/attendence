@@ -62,6 +62,22 @@ class PostBloc extends Bloc {
     }
   }
   List<Community> feedbackData = [];
+  ValueNotifier<List?> userPost = ValueNotifier([]);
+
+  fetchPost(int id) async{
+    try{
+      isUserDetailLoad.value = true;
+      var result = await repo.getPost(id);
+      if(result.status && result.data != null){
+        userPost.value = result.data!.reversed.toList();
+      }
+    }catch (e, s) {
+      print(e);
+      print(s);
+    }finally{
+      isUserDetailLoad.value = false;
+    }
+  }
   fetchPostData() async{
     try{
       isUserDetailLoad.value = true;

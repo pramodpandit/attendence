@@ -38,7 +38,6 @@ class _CommunityHomePageState extends State<CommunityHomePage> {
     super.initState();
     bloc.fetchPostData();
     _scrollController.addListener(_loadMoreData);
-    bloc.fetchPostData();
     bloc.deleteStream.stream.listen((event) {
       if (event == 'Post') {
       setState(() {
@@ -158,8 +157,8 @@ class _CommunityHomePageState extends State<CommunityHomePage> {
                   if(isLoading){
                   return const Center(
                   child: CircularProgressIndicator(),
-                  );
-                  }
+                 );
+                }
                 return ListView.builder(
                   controller: _scrollController,
                   padding: EdgeInsets.only(top: 10),
@@ -167,7 +166,8 @@ class _CommunityHomePageState extends State<CommunityHomePage> {
                   itemBuilder: (context, index) {
                     return const PostList();
                   },
-                );}
+                );
+                  }
               ),
             ),
             const SizedBox(
