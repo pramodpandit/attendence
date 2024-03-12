@@ -3,8 +3,12 @@ import 'package:flutter_dash/flutter_dash.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../bloc/profile_bloc.dart';
 import '../../../bloc/project_bloc.dart';
+import '../../../data/repository/profile_repo.dart';
 import '../../../data/repository/project_repo.dart';
+import '../../chat/chatScreen.dart';
 import '../../profile/menus/basic_info.dart';
 
 class UserProfile extends StatefulWidget {
@@ -17,6 +21,7 @@ class UserProfile extends StatefulWidget {
 
 class _UserProfileState extends State<UserProfile> {
   late ProjectBloc bloc;
+  late ProfileBloc profileBloc;
 
 
   List<Widget> menusWidgets = [
@@ -35,7 +40,8 @@ class _UserProfileState extends State<UserProfile> {
   void initState() {
     // TODO: implement initState
     super.initState();
-
+    profileBloc=ProfileBloc(context.read<ProfileRepository>());
+    sharedPref();
      menusWidgets = [
       // ListView.builder(
       //   itemCount: 7,
@@ -50,6 +56,10 @@ class _UserProfileState extends State<UserProfile> {
      ];
     bloc = ProjectBloc(context.read<ProjectRepository>());
     bloc.fetchUserDetail(int.parse(widget.userid));
+  }
+  late SharedPreferences prefs;
+  void sharedPref()async{
+    prefs = await SharedPreferences.getInstance();
   }
   @override
   Widget build(BuildContext context) {
@@ -193,6 +203,15 @@ class _UserProfileState extends State<UserProfile> {
                       ],
                     ),
                   ),
+                  prefs.getString('uid').toString() == userdata['user_id'].toString()?Offstage():
+                  Positioned(
+                      right: 25,
+                      top: 60,
+                      child: InkWell(
+                          onTap: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=>ChatScreen(user: userdata, bloc: profileBloc, prefs: prefs,)));
+                          },
+                          child: Icon(Icons.chat,color: Colors.white,size: 25,))),
                   Positioned(
                     top: 56,
                     left: 10,

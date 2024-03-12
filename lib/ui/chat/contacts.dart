@@ -51,10 +51,6 @@ class _ContactsScreenState extends State<ContactsScreen> {
     prefs = await SharedPreferences.getInstance();
   }
 
-  void sendNotifications(){
-    
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

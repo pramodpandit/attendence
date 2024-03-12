@@ -13,7 +13,14 @@ class CommunityRepositary{
   CommunityRepositary(this.prefs, this._api);
   Future<ApiResponse2<List<Community>>> getPostRecords()async{
     var response=await _api.getRequest("getpost",data: {
-      "user_id":prefs.getString('uid'),
+      //"user_id":prefs.getString('uid'),
+    });
+    //print('jek${response['data']['data']}');
+    return ApiResponse2.fromJson(response,List.from((response['data']['data'] ?? []).map((e) => Community.fromJson(e))));
+  }
+  Future<ApiResponse2<List<Community>>> getPost(int id)async{
+    var response=await _api.getRequest("getpost",data: {
+      "user_id":id,
     });
     //print('jek${response['data']['data']}');
     return ApiResponse2.fromJson(response,List.from((response['data']['data'] ?? []).map((e) => Community.fromJson(e))));

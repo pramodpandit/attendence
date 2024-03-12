@@ -36,8 +36,9 @@ class _TaskAddTimeSheetState extends State<TaskAddTimeSheet> {
   @override
   void initState() {
     super.initState();
-    widget.bloc.comment.text ='';
+    widget.bloc.memo.text ='';
     widget.bloc.fetchexpensePaymentType();
+    widget.bloc.updateemployelist.value = null;
     widget.bloc.msgController?.stream.listen((event) {
       AppMessageHandler().showSnackBar(context, event);
     });
@@ -62,13 +63,13 @@ class _TaskAddTimeSheetState extends State<TaskAddTimeSheet> {
                 borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(20),
                     bottomRight: Radius.circular(20))),
-            child: const Column(
+            child:  Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(
                   height: 56,
                 ),
-                Text(
+                const Text(
                   "Add Timesheet",
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -84,7 +85,9 @@ class _TaskAddTimeSheetState extends State<TaskAddTimeSheet> {
             left: 10,
             child: GestureDetector(
               onTap: () {
+                print('press back');
                 Navigator.pop(context);
+
               },
               child: const CircleAvatar(
                 backgroundColor: Colors.white,

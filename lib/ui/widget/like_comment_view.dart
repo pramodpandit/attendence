@@ -71,7 +71,7 @@ class _LikeShareCommentState extends State<LikeShareComment> {
                 },),
             ),
             5.width,
-            GestureDetector(
+            InkWell(
               onTap: () {
                 // widget.bloc.getLikedPostUserDetails(widget.data.postId.toString());
                 if(postLikedAllUserList.value != null){
@@ -93,9 +93,12 @@ class _LikeShareCommentState extends State<LikeShareComment> {
               child: ValueListenableBuilder(
                 valueListenable: totalLike,
                 builder: (context, totalLike, child) {
-                return Text(
-                  "${totalLike}",
-                  style: TextStyle(fontWeight: FontWeight.w600),
+                return SizedBox(
+                  height: 20,
+                  child: Text(
+                    "${totalLike}",
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
                 );
               },),
             ),
@@ -104,7 +107,7 @@ class _LikeShareCommentState extends State<LikeShareComment> {
         const SizedBox(
           width: 15,
         ),
-        GestureDetector(
+        InkWell(
           onTap: () {
             widget.bloc.postCommentAllUserList.value = null;
             widget.bloc.getCommentPostUserDetails(widget.data.postId.toString());
