@@ -249,7 +249,7 @@ class ProfileRepository {
   }
 
   Future sendMessageApi(Map<String,dynamic> data)async{
-    var response=await _api.postRequest("chats/one_to_one_chat", data);
+    var response=await _api.postRequest("chats/one_to_one_chat", data,withFile: true);
     return response;
   }
 

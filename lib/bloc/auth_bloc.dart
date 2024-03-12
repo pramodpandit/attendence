@@ -30,7 +30,7 @@ class AuthBloc extends Bloc {
       if (response['status']) {
         Map<String, dynamic> uData = response['data'];
         await _pref.setString('uid', uData['id'].toString());
-        await _pref.setString('name', "${uData["first_name"]} ${uData["last_name"]}");
+        await _pref.setString('name', "${uData["first_name"]} ${uData["last_name"] ?? ''}");
         await _pref.setString('email', uData['email'].toString());
         await _pref.setString('phone', uData['phone'].toString());
         /*sharedPreferences.setString('fullname', uData['fullname'].toString());

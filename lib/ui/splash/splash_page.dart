@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:office/bloc/profile_bloc.dart';
 import 'package:office/data/repository/profile_repo.dart';
 import 'package:office/ui/auth/loginScreen.dart';
@@ -50,6 +51,24 @@ class _SplashPageState extends State<SplashPage> {
     }
   }
 
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+  void initLocalNotifications(RemoteMessage message)async{
+    var androidInitializationSettings = AndroidInitializationSettings("@mipmap/ic_launcher");
+    var iosInitializationSettings = DarwinInitializationSettings();
+    var initializationSettings = InitializationSettings(
+      android: androidInitializationSettings,
+      iOS: iosInitializationSettings,
+    );
+
+    await flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: (details) {
+
+      },
+    );
+  }
+
   initializeFirebase() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     print('initializeFirebase getting called');
@@ -57,42 +76,74 @@ class _SplashPageState extends State<SplashPage> {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       print('Got a message whilst in the foreground!');
       print('Message data: ${message.data}');
-
-      // if(message.data['screen'] == "chatting"){
-      //   Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ChatScreen(user: jsonDecode(message.data['data']), bloc: profileBloc, prefs: prefs)));
+      initLocalNotifications(message);
+      showNotifications(message);
+      // if (
+      // // This step (if condition) is only necessary if you pretend to use the
+      // // test page inside console.firebase.google.com
+      // !AwesomeStringUtils.isNullOrEmpty(message.notification?.title,
+      //     considerWhiteSpaceAsEmpty: true) ||
+      //     !AwesomeStringUtils.isNullOrEmpty(message.notification?.body,
+      //         considerWhiteSpaceAsEmpty: true)) {
+      //   print('Message also contained a notification: ${message.notification}');
+      //
+      //   String? imageUrl;
+      //   imageUrl ??= message.notification!.android?.imageUrl;
+      //   imageUrl ??= message.notification!.apple?.imageUrl;
+      //
+      //   // https://pub.dev/packages/awesome_notifications#notification-types-values-and-defaults
+      //   Map<String, dynamic> notificationAdapter = {
+      //     NOTIFICATION_CONTENT: {
+      //       NOTIFICATION_ID: Random().nextInt(2147483647),
+      //       NOTIFICATION_CHANNEL_KEY: 'basic_channel',
+      //       NOTIFICATION_TITLE: message.notification!.title,
+      //       NOTIFICATION_BODY: message.notification!.body,
+      //       NOTIFICATION_LAYOUT:
+      //       AwesomeStringUtils.isNullOrEmpty(imageUrl) ? 'Default' : 'BigPicture',
+      //       NOTIFICATION_BIG_PICTURE: imageUrl,
+      //     }
+      //   };
+      //
+      //   AwesomeNotifications().createNotificationFromJsonData(notificationAdapter);
+      // } else {
+      //   AwesomeNotifications().createNotificationFromJsonData(message.data);
       // }
-
-      if (
-      // This step (if condition) is only necessary if you pretend to use the
-      // test page inside console.firebase.google.com
-      !AwesomeStringUtils.isNullOrEmpty(message.notification?.title,
-          considerWhiteSpaceAsEmpty: true) ||
-          !AwesomeStringUtils.isNullOrEmpty(message.notification?.body,
-              considerWhiteSpaceAsEmpty: true)) {
-        print('Message also contained a notification: ${message.notification}');
-
-        String? imageUrl;
-        imageUrl ??= message.notification!.android?.imageUrl;
-        imageUrl ??= message.notification!.apple?.imageUrl;
-
-        // https://pub.dev/packages/awesome_notifications#notification-types-values-and-defaults
-        Map<String, dynamic> notificationAdapter = {
-          NOTIFICATION_CONTENT: {
-            NOTIFICATION_ID: Random().nextInt(2147483647),
-            NOTIFICATION_CHANNEL_KEY: 'basic_channel',
-            NOTIFICATION_TITLE: message.notification!.title,
-            NOTIFICATION_BODY: message.notification!.body,
-            NOTIFICATION_LAYOUT:
-            AwesomeStringUtils.isNullOrEmpty(imageUrl) ? 'Default' : 'BigPicture',
-            NOTIFICATION_BIG_PICTURE: imageUrl,
-          }
-        };
-
-        AwesomeNotifications().createNotificationFromJsonData(notificationAdapter);
-      } else {
-        AwesomeNotifications().createNotificationFromJsonData(message.data);
-      }
     });
+  }
+
+  Future<void> showNotifications(RemoteMessage message)async{
+    AndroidNotificationChannel channel = AndroidNotificationChannel(
+      Random.secure().nextInt(10000).toString(),
+      "High Importance Notification",
+      importance: Importance.max,
+    );
+
+    AndroidNotificationDetails androidNotificationDetails = AndroidNotificationDetails(
+      channel.id.toString(),
+      channel.name.toString(),
+      channelDescription: "your channel description",
+      importance: Importance.high,
+      priority: Priority.high,
+      ticker: "ticker"
+    );
+    DarwinNotificationDetails darwinNotificationDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
+    NotificationDetails notificationDetails = NotificationDetails(
+      android: androidNotificationDetails,
+      iOS: darwinNotificationDetails,
+    );
+
+    Future.delayed(Duration.zero,() {
+      flutterLocalNotificationsPlugin.show(
+          0,
+          message.notification!.title.toString(),
+          message.notification!.body.toString(),
+          notificationDetails,
+      );
+    },);
   }
 
   // getFirebaseToken() async {

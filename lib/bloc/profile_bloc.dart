@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:office/data/model/api_response.dart';
 import 'package:office/data/model/bankDetails_model.dart';
@@ -331,7 +333,7 @@ class ProfileBloc extends Bloc {
   TextEditingController sendMessageController = TextEditingController();
   ValueNotifier<bool> isSending = ValueNotifier(false);
 
-  sendMessage(String toUser,String chatType,String messageType)async{
+  Future sendMessage(String toUser,String chatType,String messageType,{File? image,Position? position})async{
     isSending.value = true;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Map<String,dynamic> data = {
@@ -339,8 +341,25 @@ class ProfileBloc extends Bloc {
       "to_user" : toUser,
       "type" : chatType,
       "message_type" : messageType,
-      "message" : sendMessageController.text
     };
+    if(messageType == "text"){
+      data.addAll({
+        "message" : sendMessageController.text
+      });
+    }
+    if(messageType == "image" && image!=null){
+      data.addAll({
+        "file_uploaded" : await MultipartFile.fromFile(image.path,
+        filename: image.path.split('/').last,
+        )
+      });
+    }
+    if(messageType == "location" && position != null){
+      data.addAll({
+        "latitude" : position.latitude,
+        "longitude" : position.longitude,
+        });
+    }
     try{
       var result = await _repo.sendMessageApi(data);
       if(result['status']){
@@ -356,34 +375,36 @@ class ProfileBloc extends Bloc {
     }
   }
 
-  sendNotification(Map<String,dynamic> user)async{
+  sendNotification(Map<String,dynamic> user,{File? image})async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Map<String,dynamic> notificationData = {
+      "body": sendMessageController.text,
+      "OrganizationId": "2",
+      "content_available": true,
+      "priority": "high",
+      // "subtitle": "Subtitle",
+      "title":  prefs.getString("name"),
+    };
+    // if(image!=null){
+    //   notificationData.addAll({
+    //     "image" : await MultipartFile.fromFile(image.path,
+    //         filename: image.path.split('/').last),
+    //   });
+    // }
     Map<String,dynamic> data = {
       "to": user['fcm_token'].toString(),
-      "notification": {
-        "body": sendMessageController.text,
-        "OrganizationId": "2",
-        "content_available": true,
-        "priority": "high",
-        "subtitle": "Subtitle",
-        "title":  "${user['first_name'] ?? ''} ${user['middle_name'] ?? ''} ${user['last_name'] ?? ''}",
-      },
-      "data": {
-        "priority": "high",
-        "content_available": true,
-        // "data" : "jsonEncode(user)",
-        // "screen" : "chatting",
-        "OrganizationId": "2",
-      }
+      "notification": notificationData,
     };
+    print("the main data is : ${data}");
     try{
       var result = await _repo.sendNotificationApi(data);
       if(result['success'].toString() == "1"){
-        // showMessage(MessageType.success("done"));
+        showMessage(MessageType.success("done"));
       }else{
-        // showMessage(MessageType.error("some error ${result['results'][0]}"));
+        showMessage(MessageType.error("some error ${result['results'][0]}"));
       }
     }catch(e){
-      // showMessage(MessageType.error(e.toString()));
+      showMessage(MessageType.error("catch error : ${e.toString()}"));
       print(e);
     }
   }

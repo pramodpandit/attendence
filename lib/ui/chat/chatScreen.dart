@@ -111,7 +111,8 @@ class _ChatScreenState extends State<ChatScreen> {
     double widthScreen = MediaQuery.of(context).size.width;
     double heightScreen = MediaQuery.of(context).size.height;
     if (galleryFile != null) {
-      imageView = Stack(children: [
+      imageView = Stack(
+          children: [
         //image container:::
         Container(
           height: heightScreen / 2,
@@ -120,7 +121,7 @@ class _ChatScreenState extends State<ChatScreen> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(4),
             image: DecorationImage(
-                fit: BoxFit.fill,
+                fit: BoxFit.contain,
                 image: FileImage(
                   galleryFile!,
                 )),
@@ -137,7 +138,44 @@ class _ChatScreenState extends State<ChatScreen> {
                 });
               },
               icon: Icon(Icons.highlight_remove)),
-        )
+        ),
+
+            Positioned(
+              bottom: 10,
+              right: 10,
+              child: ValueListenableBuilder(
+                valueListenable: profileBloc.isSending,
+                builder: (context, isSending, child) {
+                  if(isSending){
+                    return Center(
+                      child: SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    );
+                  }
+                  return InkWell(
+                    onTap: () {
+                      profileBloc.sendMessage(widget.user['user_id'].toString(),"one_to_one","image",image: galleryFile).then((value){
+                        setState(() {
+                          galleryFile = null;
+                        });
+                        // if(widget.user['fcm_token'] != null && profileBloc.sendMessageController.text.isNotEmpty){
+                        //   profileBloc.sendNotification(widget.user,image: galleryFile);
+                        // }
+                      });
+                    },
+                    child: Container(
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.black,
+                        ),
+                        child: const Icon(PhosphorIcons.paper_plane_tilt,color: Colors.white)),
+                  );
+                },),
+            ),
       ]);
     }
     if (position != null) {
@@ -169,7 +207,43 @@ class _ChatScreenState extends State<ChatScreen> {
                 });
               },
               icon: Icon(Icons.highlight_remove)),
-        )
+        ),
+        Positioned(
+          bottom: 10,
+          right: 10,
+          child: ValueListenableBuilder(
+            valueListenable: profileBloc.isSending,
+            builder: (context, isSending, child) {
+              if(isSending){
+                return Center(
+                  child: SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                );
+              }
+              return InkWell(
+                onTap: () {
+                  profileBloc.sendMessage(widget.user['user_id'].toString(),"one_to_one","location",position: position).then((value){
+                    setState(() {
+                      position = null;
+                    });
+                    // if(widget.user['fcm_token'] != null && profileBloc.sendMessageController.text.isNotEmpty){
+                    //   profileBloc.sendNotification(widget.user,image: galleryFile);
+                    // }
+                  });
+                },
+                child: Container(
+                  padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.black,
+                    ),
+                    child: const Icon(PhosphorIcons.paper_plane_tilt,color: Colors.white)),
+              );
+            },),
+        ),
       ]);
     }
     if (filePickerResult != null) {
@@ -197,7 +271,40 @@ class _ChatScreenState extends State<ChatScreen> {
                 });
               },
               icon: Icon(Icons.highlight_remove)),
-        )
+        ),
+        Positioned(
+          bottom: 10,
+          right: 10,
+          child: ValueListenableBuilder(
+            valueListenable: profileBloc.isSending,
+            builder: (context, isSending, child) {
+              if(isSending){
+                return Center(
+                  child: SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                );
+              }
+              return InkWell(
+                onTap: () {
+                  profileBloc.sendMessage(widget.user['user_id'].toString(),"one_to_one","file",image: galleryFile).then((value){
+                    // if(widget.user['fcm_token'] != null && profileBloc.sendMessageController.text.isNotEmpty){
+                    //   profileBloc.sendNotification(widget.user,image: galleryFile);
+                    // }
+                  });
+                },
+                child: Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.black,
+                    ),
+                    child: const Icon(PhosphorIcons.paper_plane_tilt,color: Colors.white)),
+              );
+            },),
+        ),
       ]);
     }
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -374,7 +481,9 @@ class _ChatScreenState extends State<ChatScreen> {
                                   Align(
                                     alignment: snapshot.data![index]['sender_id'].toString() == widget.prefs.getString("uid") ?Alignment.centerRight:Alignment.centerLeft,
                                     child: Container(
-                                      padding: const EdgeInsets.symmetric(
+                                      padding: snapshot.data![index]['message_type'] == "location" || snapshot.data![index]['message_type'] == "image" ?
+                                        const EdgeInsets.symmetric(horizontal: 1,vertical: 1):
+                                      const EdgeInsets.symmetric(
                                           horizontal: 15, vertical: 10),
                                       decoration: BoxDecoration(
                                         borderRadius: snapshot.data![index]['sender_id'].toString() == widget.prefs.getString("uid")
@@ -392,7 +501,60 @@ class _ChatScreenState extends State<ChatScreen> {
                                             ? Colors.blue
                                             : Colors.grey.withOpacity(0.3),
                                       ),
-                                      child: Text(
+                                      child: snapshot.data![index]['message_type'] == "image" ?
+                                      SizedBox(
+                                        width : 150,
+                                        height : 150,
+                                        child: ClipRRect(
+                                          borderRadius : BorderRadius.circular(10),
+                                          child: Image.network(
+                                              "https://freeze.talocare.co.in/public/${snapshot.data![index]['file_uploaded']}",
+                                            loadingBuilder: (context, child, loadingProgress) {
+                                                if(loadingProgress == null){
+                                                  return child;
+                                                }
+                                              return SizedBox(
+                                                height: 40,
+                                                width: 40,
+                                                child: Center(
+                                                  child: CircularProgressIndicator(
+                                                    value: loadingProgress.expectedTotalBytes != null?
+                                                        loadingProgress.cumulativeBytesLoaded/
+                                                        loadingProgress.expectedTotalBytes!
+                                                        : null,
+                                                    strokeWidth: 1,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      )
+                                      : snapshot.data![index]['message_type'] == "location" ?
+                                      SizedBox(
+                                        height : 150,
+                                        width : 150,
+                                        child: ClipRRect(
+                                          borderRadius : BorderRadius.circular(10),
+                                          child: GoogleMap(
+                                            myLocationButtonEnabled: true,
+                                            initialCameraPosition: CameraPosition(
+                                              target: LatLng(double.parse(snapshot.data![index]['latitude']), double.parse(snapshot.data![index]['longitude'])),
+                                              zoom: 12,
+                                            ),
+                                            mapType: MapType.terrain,
+                                            markers: Set.of([Marker(markerId: MarkerId("1"),position: LatLng(double.parse(snapshot.data![index]['latitude']), double.parse(snapshot.data![index]['longitude'])),icon: BitmapDescriptor.defaultMarker)]),
+                                            onMapCreated: (controller) {
+                                              _completer.complete(controller);
+                                            },
+                                            zoomControlsEnabled: false,
+                                            buildingsEnabled: true,
+                                          ),
+                                        ),
+                                      )
+                                     : Text(
                                         snapshot.data![index]['message'].toString(),
                                         style: TextStyle(
                                           color: snapshot.data![index]['sender_id'].toString() == widget.prefs.getString("uid")
@@ -456,6 +618,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         child: Column(
                           children: [
                             imageView,
+                            if(galleryFile==null && filePickerResult==null && position == null)
                             Row(
                               children: [
                                 Expanded(
@@ -532,10 +695,10 @@ class _ChatScreenState extends State<ChatScreen> {
                                     }
                                   return InkWell(
                                     onTap: () {
-                                      profileBloc.sendMessage(widget.user['user_id'].toString(),"one_to_one","text");
-                                      if(widget.user['fcm_token'] != null && profileBloc.sendMessageController.text.isNotEmpty){
-                                        profileBloc.sendNotification(widget.user);
-                                      }
+                                        profileBloc.sendMessage(widget.user['user_id'].toString(),"one_to_one","text");
+                                        if(widget.user['fcm_token'] != null){
+                                          profileBloc.sendNotification(widget.user);
+                                        }
                                     },
                                     child: const Icon(PhosphorIcons.paper_plane_tilt),
                                   );
