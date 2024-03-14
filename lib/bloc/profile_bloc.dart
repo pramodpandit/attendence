@@ -313,7 +313,7 @@ class ProfileBloc extends Bloc {
         print(e);
         print(s);
       }
-      await Future.delayed(Duration(seconds: 5));
+      await Future.delayed(Duration(seconds: 10));
     }
   }
 
@@ -328,6 +328,17 @@ class ProfileBloc extends Bloc {
       }
       await Future.delayed(Duration(seconds: 5));
     }
+  }
+
+  ValueNotifier<List?> allGroupList = ValueNotifier(null);
+  getGroupList() async{
+      try{
+        var result = await _repo.fetchGroupChats();
+        allGroupList.value = result.data;
+      }catch (e, s) {
+        print(e);
+        print(s);
+      }
   }
 
   TextEditingController sendMessageController = TextEditingController();
