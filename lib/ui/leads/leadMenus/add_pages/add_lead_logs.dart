@@ -28,11 +28,12 @@ class _AddLeadLogsState extends State<AddLeadLogs> {
     widget.bloc.getAllCurrencyData();
     widget.bloc.getAllBranchDetails();
     widget.bloc.getAllEmployeeDetails();
+    widget.bloc.message.text = '';
+    widget.bloc.logStatus.value = null;
     widget.bloc.msgController?.stream.listen((event) {
       AppMessageHandler().showSnackBar(context, event);
     });
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

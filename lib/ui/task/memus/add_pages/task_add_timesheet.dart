@@ -1,13 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-// import 'package:nb_utils/nb_utils.dart';
 import 'package:office/utils/message_handler.dart';
-import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
-import '../../../../bloc/leads_bloc.dart';
 import '../../../../bloc/task_bloc.dart';
-import '../../../../data/repository/task_repo.dart';
 import '../../../widget/app_dropdown.dart';
 import '../../../widget/custom_button.dart';
 import 'package:office/ui/widget/app_text_field.dart';
@@ -87,8 +83,7 @@ class _TaskAddTimeSheetState extends State<TaskAddTimeSheet> {
               onTap: () {
                 print('press back');
                 Navigator.pop(context);
-
-              },
+                },
               child: const CircleAvatar(
                 backgroundColor: Colors.white,
                 radius: 15,
