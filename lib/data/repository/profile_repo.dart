@@ -247,6 +247,12 @@ class ProfileRepository {
     });
     return ApiResponse2.fromJson(response,response['data']);
   }
+  Future<ApiResponse2> fetchGroupChats()async{
+    var response=await _api.postRequest("chats/fetch_group", {
+      "user_id": prefs.getString("uid"),
+    });
+    return ApiResponse2.fromJson(response,response['group']);
+  }
 
   Future sendMessageApi(Map<String,dynamic> data)async{
     var response=await _api.postRequest("chats/one_to_one_chat", data,withFile: true);

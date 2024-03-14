@@ -114,18 +114,20 @@ class _ChatScreenState extends State<ChatScreen> {
       imageView = Stack(
           children: [
         //image container:::
-        Container(
-          height: heightScreen / 2,
-          width: widthScreen *0.7,
-          margin: EdgeInsets.only(left: widthScreen*0.1,top: heightScreen*0.03),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(4),
-            image: DecorationImage(
-                fit: BoxFit.contain,
-                image: FileImage(
-                  galleryFile!,
-                )),
-            //color: Colors.amber,
+        Center(
+          child: Container(
+            height: heightScreen / 2,
+            width: widthScreen *0.7,
+            // margin: EdgeInsets.only(left: widthScreen*0.1,top: heightScreen*0.03),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(4),
+              image: DecorationImage(
+                  fit: BoxFit.cover,
+                  image: FileImage(
+                    galleryFile!,
+                  )),
+              //color: Colors.amber,
+            ),
           ),
         ),
         //cross::::

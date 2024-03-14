@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:office/bloc/profile_bloc.dart';
 import 'package:office/data/repository/profile_repo.dart';
+import 'package:office/ui/chat/add_group.dart';
 import 'package:office/ui/chat/chatScreen.dart';
 import 'package:office/ui/chat/contacts.dart';
 import 'package:office/ui/widget/app_bar.dart';
@@ -36,6 +37,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
     bloc.fetchUserDetail();
     // bloc.getRecentChats();
     chatStream = bloc.getRecentChats().asBroadcastStream();
+    bloc.getGroupList();
     bloc.fetchAllUserDetail();
   }
 
@@ -221,22 +223,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                       await Future.delayed(
                                           Duration(milliseconds: 1200));
                                     },
-                                    // child: ValueListenableBuilder(
-                                    //   valueListenable: bloc.allLastChats,
-                                    //   builder: (context, allLastChats, child) {
-                                    //     if(allLastChats == null){
-                                    //       return Center(
-                                    //         child: CircularProgressIndicator(),
-                                    //       );
-                                    //     }
-                                    //   return ListView.builder(
-                                    //     itemCount: allLastChats.length,
-                                    //     shrinkWrap: true,
-                                    //     itemBuilder: (context, index) {
-                                    //       return SingleChat(userData: allLastChats[index],bloc: bloc,prefs: prefs,);
-                                    //     },
-                                    //   );
-                                    // },),
                                     child: StreamBuilder(
                                       stream: chatStream,
                                       builder: (context, snapshot) {
@@ -247,6 +233,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                           itemCount: snapshot.data!.length,
                                           shrinkWrap: true,
                                           itemBuilder: (context, index) {
+                                            snapshot.data!.sort((a, b) => DateTime.parse(b['last_chat'][(b['last_chat'] as List).length-1]['created_at']).compareTo(DateTime.parse(a['last_chat'][(a['last_chat'] as List).length-1]['created_at'])));
                                             return SingleChat(userData: snapshot.data![index],bloc: bloc,prefs: prefs,);
                                           },
                                         );
@@ -295,13 +282,22 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                       await Future.delayed(
                                           const Duration(milliseconds: 1500));
                                     },
-                                    child: ListView.builder(
-                                      itemCount: 15,
-                                      shrinkWrap: true,
-                                      itemBuilder: (context, index) {
-                                        return GroupChat(bloc: bloc,prefs: prefs,);
-                                      },
-                                    ),
+                                    child: ValueListenableBuilder(
+                                      valueListenable: bloc.allGroupList,
+                                      builder: (context, allGroupList, child) {
+                                        if(allGroupList == null){
+                                          return Center(
+                                            child: CircularProgressIndicator(),
+                                          );
+                                        }
+                                      return ListView.builder(
+                                        itemCount: allGroupList.length,
+                                        shrinkWrap: true,
+                                        itemBuilder: (context, index) {
+                                          return GroupChat(groupData: allGroupList[index],bloc: bloc,prefs: prefs,);
+                                        },
+                                      );
+                                    },)
                                 ),
                                 Positioned(
                                   bottom: 110,
@@ -311,7 +307,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                         Navigator.of(context).push(
                                             MaterialPageRoute(
                                                 builder: (context) =>
-                                                    ContactsScreen()));
+                                                    AddGroup()));
                                       },
                                       backgroundColor: const Color(0xFF253772),
                                       label: AnimatedSwitcher(
@@ -422,8 +418,46 @@ class _SingleChatState extends State<SingleChat> {
             "${widget.userData['first_name'] ?? ''} ${widget.userData['middle_name'] ?? ''} ${widget.userData['last_name'] ?? ''}",
             style: TextStyle(fontWeight: FontWeight.w500),
           ),
-      subtitle: Text(
-        widget.userData['last_chat'].isEmpty ? '':widget.userData['last_chat'][widget.userData['last_chat'].length-1]['message'] ?? '',
+      subtitle: widget.userData['last_chat'].isEmpty?
+      Text(
+        '',
+        softWrap: true,
+        style: TextStyle(
+            fontWeight: FontWeight.w400,
+            overflow: TextOverflow.ellipsis,
+            fontSize: 12,
+            color: Colors.grey.shade400),
+      )
+      : widget.userData['last_chat'][widget.userData['last_chat'].length-1]['message_type'] == "image"
+      ? Row(
+        children: [
+          Icon(Icons.camera_alt_outlined,color: Colors.grey.shade400,size: 15),
+          const SizedBox(width: 3),
+          Text(
+            "image",
+            style: TextStyle(
+                fontWeight: FontWeight.w400,
+                overflow: TextOverflow.ellipsis,
+                fontSize: 12,
+                color: Colors.grey.shade400))
+        ],
+      )
+      : widget.userData['last_chat'][widget.userData['last_chat'].length-1]['message_type'] == "location"
+      ? Row(
+        children: [
+          Icon(Icons.location_on,color: Colors.grey.shade400,size: 15),
+          Text(
+              "location",
+              style: TextStyle(
+                  fontWeight: FontWeight.w400,
+                  overflow: TextOverflow.ellipsis,
+                  fontSize: 12,
+                  color: Colors.grey.shade400)
+            )
+          ],
+        )
+          : Text(
+        widget.userData['last_chat'][widget.userData['last_chat'].length-1]['message'] ?? '',
           softWrap: true,
           style: TextStyle(
               fontWeight: FontWeight.w400,
@@ -452,6 +486,9 @@ class _SingleChatState extends State<SingleChat> {
                       ),
                     );
                   },
+                  errorBuilder: (context, error, stackTrace) {
+                    return Icon(Icons.person);
+                  },
                   width: double.infinity,
                   height: double.infinity,
                   fit: BoxFit.fill,
@@ -462,9 +499,10 @@ class _SingleChatState extends State<SingleChat> {
 }
 
 class GroupChat extends StatefulWidget {
+  final Map<String,dynamic> groupData;
   final ProfileBloc bloc;
   final SharedPreferences prefs;
-  const GroupChat({super.key, required this.bloc, required this.prefs});
+  const GroupChat({super.key, required this.groupData, required this.bloc, required this.prefs});
   @override
   State<GroupChat> createState() => _GroupChatState();
 }
@@ -478,8 +516,8 @@ class _GroupChatState extends State<GroupChat> {
             .push(MaterialPageRoute(builder: (context) => ChatScreen(user: {"first_name" : "pramod"},bloc: widget.bloc,prefs: widget.prefs)));
       },
       contentPadding: EdgeInsets.symmetric(horizontal: 5),
-      title: const Text(
-        "Flutter Developer Group",
+      title: Text(
+        widget.groupData['group_name'],
         style: TextStyle(fontWeight: FontWeight.w500),
       ),
       subtitle: Text(
@@ -491,8 +529,35 @@ class _GroupChatState extends State<GroupChat> {
             fontSize: 12,
             color: Colors.grey.shade400),
       ),
+
       leading: CircleAvatar(
-        child: Icon(Icons.person),
+        child: ClipOval(
+            child: widget.groupData['logo'] == null?Icon(Icons.person):
+            Image.network(
+              "https://freeze.talocare.co.in/public/${widget.groupData['logo']}",
+              loadingBuilder: (context, child, loadingProgress) {
+                if(loadingProgress == null){
+                  return child;
+                }
+                return SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                    value: loadingProgress.expectedTotalBytes!=null?
+                    loadingProgress.cumulativeBytesLoaded/
+                        loadingProgress.expectedTotalBytes!
+                        : null,
+                    strokeWidth: 2,
+                  ),
+                );
+              },
+              errorBuilder: (context, error, stackTrace) {
+                return Icon(Icons.person);
+              },
+              width: double.infinity,
+              height: double.infinity,
+              fit: BoxFit.fill,
+            )),
       ),
     );
   }
