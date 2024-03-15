@@ -303,11 +303,12 @@ class ProfileBloc extends Bloc {
       isUserDetailLoad.value = false;
     }
   }
-
+ValueNotifier<List?> searchData = ValueNotifier([]);
   Stream<List> getRecentChats() async*{
     while(true){
       try{
         var result = await _repo.fetchRecentChats();
+        searchData.value = result.data;
         yield result.data as List;
       }catch (e, s) {
         print(e);
