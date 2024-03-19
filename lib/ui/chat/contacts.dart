@@ -210,7 +210,6 @@ class _ContactsScreenState extends State<ContactsScreen> {
                                             if(searchController.text.isNotEmpty){
                                               return GestureDetector(
                                                 onTap: () {
-
                                                   List currentData = snapshot.data!.where((element) => element['id'].toString() == searchedUser[index]['user_id'].toString()).toList();
                                                   if(currentData.isNotEmpty){
                                                     Navigator.of(context).push(

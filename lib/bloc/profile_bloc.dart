@@ -332,13 +332,12 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
   }
 
   ValueNotifier<List?> allGroupList = ValueNotifier(null);
-  ValueNotifier<List?> SearchGroup = ValueNotifier(null);
+  ValueNotifier<List?> searchGroup = ValueNotifier(null);
 
   getGroupList() async{
       try{
         var result = await _repo.fetchGroupChats();
-        SearchGroup.value = result.data;
-
+        searchGroup.value = result.data;
         allGroupList.value = result.data;
       }catch (e, s) {
         print(e);

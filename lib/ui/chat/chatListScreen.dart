@@ -103,6 +103,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
                           // Search bar for single user chat
                           TextField(
+                            controller: chatssearchConroller,
                             autofocus: true,
                             decoration: InputDecoration(
                               border: InputBorder.none,
@@ -112,28 +113,15 @@ class _ChatListScreenState extends State<ChatListScreen> {
                             },
                             onChanged: (value){
                               setState(() {
-                                searchedUser =
-                                    searchusers!
-                                        .where((element) => "${element['first_name'] == null ? '':
-                                        element['first_name']
-                                            .toString()
-                                            .toLowerCase()
-                                        } ${element['middle_name'] == null ? '':
-                                        element['middle_name']
-                                            .toString()
-                                            .toLowerCase()
-                                        } ${element['last_name'] == null ? '':
-                                        element['last_name']
-                                            .toString()
-                                            .toLowerCase()}".contains(
-                                            value!.toLowerCase()))
-                                        .toList();
+                                searchedUser = searchusers!.where((element) => "${element['first_name'] == null ? '': element['first_name'].toString().toLowerCase()} ${element['middle_name'] == null ? '':
+                                element['middle_name'].toString().toLowerCase()} ${element['last_name'] == null ? '':
+                                        element['last_name'].toString().toLowerCase()}".contains(value!.toLowerCase())).toList();
                               });
                             },
                           ):
                           // Search bar for group chat
                           ValueListenableBuilder(
-                            valueListenable: bloc.SearchGroup,
+                            valueListenable: bloc.searchGroup,
                             builder: (context, groupList, child) {
                               return TextField(
                                 controller: chatssearchConroller,
@@ -160,10 +148,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                 },
                               );
                             },
-
                           );
                         },
-
                       ),
                     ),
                   );
@@ -291,13 +277,21 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                           return Center(child: CircularProgressIndicator());
                                         }
                                         return ListView.builder(
-                                          itemCount:searchedUser.isEmpty? snapshot.data!.length:searchedUser.length,
+                                          itemCount:
+                                          chatssearchConroller.text.isEmpty? snapshot.data!.length:searchedUser.length,
                                           shrinkWrap: true,
                                           itemBuilder: (context, index) {
-                                            searchedUser.isEmpty?
-                                            snapshot.data!.sort((a, b) => DateTime.parse(b['last_chat'][(b['last_chat'] as List).length-1]['created_at']).compareTo(DateTime.parse(a['last_chat'][(a['last_chat'] as List).length-1]['created_at'])))
-                                            : searchedUser!.sort((a, b) => DateTime.parse(b['last_chat'][(b['last_chat'] as List).length-1]['created_at']).compareTo(DateTime.parse(a['last_chat'][(a['last_chat'] as List).length-1]['created_at'])));
-                                            return SingleChat(userData: searchedUser.isEmpty?snapshot.data![index]:searchedUser[index],bloc: bloc,prefs: prefs,);
+                                            if(chatssearchConroller.text.isEmpty){
+                                              snapshot.data!.sort((a, b) => DateTime.parse(b['last_chat'][(b['last_chat'] as List).length-1]['created_at']).compareTo(DateTime.parse(a['last_chat'][(a['last_chat'] as List).length-1]['created_at'])));
+                                              return SingleChat(userData: snapshot.data![index],bloc: bloc,prefs: prefs,);
+                                            }else{
+                                              searchedUser.isEmpty?Text('User does not exist'):
+                                            searchedUser!.sort((a, b) => DateTime.parse(b['last_chat'][(b['last_chat'] as List).length-1]['created_at']).compareTo(DateTime.parse(a['last_chat'][(a['last_chat'] as List).length-1]['created_at'])));
+                                            return SingleChat(userData:searchedUser[index],bloc: bloc,prefs: prefs,);
+                                            }
+                                            // searchedUser.isEmpty?
+                                            // snapshot.data!.sort((a, b) => DateTime.parse(b['last_chat'][(b['last_chat'] as List).length-1]['created_at']).compareTo(DateTime.parse(a['last_chat'][(a['last_chat'] as List).length-1]['created_at'])))
+                                            // : searchedUser!.sort((a, b) => DateTime.parse(b['last_chat'][(b['last_chat'] as List).length-1]['created_at']).compareTo(DateTime.parse(a['last_chat'][(a['last_chat'] as List).length-1]['created_at'])));
                                           },
                                         );
                                     },),
