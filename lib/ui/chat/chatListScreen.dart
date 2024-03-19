@@ -28,9 +28,11 @@ class _ChatListScreenState extends State<ChatListScreen> {
   late ProfileBloc bloc;
   ValueNotifier<int> tabIndex = ValueNotifier(0);
   ValueNotifier<bool> isSearchClicked = ValueNotifier(false);
+  ValueNotifier<bool> isSearchClickedgroup = ValueNotifier(false);
   late Stream<List> singleChatStream;
   late Stream<List> groupChatStream;
   TextEditingController chatssearchConroller = TextEditingController();
+  TextEditingController chatsGroupsearchConroller = TextEditingController();
   List searchedUser=[];
   List searchGroupData=[];
 
@@ -101,8 +103,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                       child: ValueListenableBuilder(
                         valueListenable: bloc.searchData,
                         builder:(context, List? searchusers, child) {
-                          return tabIndex.value ==0 ?
-
+                          return tabIndex.value.toString() =='0' ?
                           // Search bar for single user chat
                           TextField(
                             controller: chatssearchConroller,
@@ -126,16 +127,17 @@ class _ChatListScreenState extends State<ChatListScreen> {
                             valueListenable: bloc.searchGroup,
                             builder: (context, groupList, child) {
                               return TextField(
-                                controller: chatssearchConroller,
+                                controller: chatsGroupsearchConroller,
                                 autofocus: true,
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
                                 ),
                                 onSubmitted: (value) {
-                                  isSearchClicked.value = !isSearchClicked.value;
+                                  isSearchClickedgroup.value = !isSearchClickedgroup.value;
                                 },
                                 onChanged: (value){
                                   setState(() {
+                                    print('data');
                                     searchGroupData =
                                         groupList !
                                             .where((element) => "${element['group_name'] == null ? '':
@@ -208,6 +210,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                         child: TabBar(
                           onTap: (value) {
                             tabIndex.value = value;
+                            isSearchClicked.value = false;
                             },
                           dividerColor: Colors.white,
                           indicatorColor: const Color(0xFF0E83EA),
@@ -348,10 +351,15 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                         return Center(child: CircularProgressIndicator());
                                       }
                                     return ListView.builder(
-                                      itemCount: snapshot.data!.length,
+                                      itemCount:chatsGroupsearchConroller.text.isEmpty? snapshot.data!.length:searchGroupData.length,
                                       shrinkWrap: true,
                                       itemBuilder: (context, index) {
+                                        if(chatsGroupsearchConroller.text.isEmpty){
+
                                         return GroupChat(groupData: snapshot.data![index],bloc: bloc,prefs: prefs,);
+                                        }else{
+                                          return GroupChat(groupData: searchGroupData![index],bloc: bloc,prefs: prefs,);
+                                        }
                                       },
                                     );
                                   },),
