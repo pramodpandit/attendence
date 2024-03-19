@@ -2,8 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:office/data/model/api_response.dart';
 import 'package:office/data/model/bankDetails_model.dart';
@@ -330,15 +332,56 @@ class ProfileBloc extends Bloc {
     }
   }
 
-  ValueNotifier<List?> allGroupList = ValueNotifier(null);
-  getGroupList() async{
+  Stream<List> getGroupList() async*{
       try{
-        var result = await _repo.fetchGroupChats();
-        allGroupList.value = result.data;
+        var result = await _repo.fetchGroupList();
+        yield result.data as List;
       }catch (e, s) {
         print(e);
         print(s);
       }
+  }
+
+  Stream<List> getGroupChats(String senderId) async*{
+    while(true){
+      try{
+        var result = await _repo.fetchGroupChats(senderId);
+        yield (result.data as List).reversed.toList();
+      }catch (e, s) {
+        print(e);
+        print(s);
+      }
+      await Future.delayed(Duration(seconds: 5));
+    }
+  }
+
+  ValueNotifier<bool> addMemberLoading = ValueNotifier(false);
+  ValueNotifier<String> addingUsers = ValueNotifier("");
+  
+  addMemberInGroup(String groupId, String type)async{
+    Map<String,dynamic> data = {
+      "group_id" : groupId,
+      "type" : type,
+    };
+    if(type == "add"){
+      data.addAll({
+        "from_user" : addingUsers.value,
+      });
+    }
+    if(addingUsers.value.isEmpty){
+      showMessage(MessageType.info("Please select atleast one user"));
+      return;
+    }
+
+    try{
+      addMemberLoading.value = true;
+      var result = await _repo.addMemberInGroupApi(data);
+      print("main data is : ${result}");
+    }catch(e){
+      print(e);
+    }finally{
+      addMemberLoading.value = false;
+    }
   }
 
   TextEditingController sendMessageController = TextEditingController();
@@ -417,6 +460,50 @@ class ProfileBloc extends Bloc {
     }catch(e){
       showMessage(MessageType.error("catch error : ${e.toString()}"));
       print(e);
+    }
+  }
+
+  ValueNotifier<bool> createGroupLoading = ValueNotifier(false);
+  ValueNotifier<File?> groupLogo = ValueNotifier(null);
+  TextEditingController groupName = TextEditingController();
+  TextEditingController groupDesc = TextEditingController();
+
+  Future createNewGroup(BuildContext context) async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if(groupLogo.value == null){
+      showMessage(MessageType.info("Please choose group icon"));
+      return;
+    }
+    Map<String,dynamic> data = {
+      "from_user" : prefs.getString("uid"),
+      "type" : "group",
+      "group_name" : groupName.text,
+      "description" : groupDesc.text,
+      "logo" : await MultipartFile.fromFile(groupLogo.value!.path,
+          filename: groupLogo.value!.path.split('/').last)
+    };
+    if(groupName.text.isEmpty){
+      showMessage(MessageType.info("Please enter group name"));
+      return;
+    }
+    if(groupDesc.text.isEmpty){
+      showMessage(MessageType.info("Please enter group description"));
+      return;
+    }
+    try{
+      createGroupLoading.value = true;
+      var response = await _repo.createGroupApi(data);
+      if(response['status']){
+        showMessage(MessageType.success("Group Created Successfully"));
+        Navigator.pop(context);
+      }else{
+        showMessage(MessageType.success("Group not created"));
+      }
+    }catch(e){
+      showMessage(MessageType.error("Failed"));
+      print(e);
+    }finally{
+      createGroupLoading.value = false;
     }
   }
 

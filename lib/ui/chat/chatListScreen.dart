@@ -8,6 +8,7 @@ import 'package:office/data/repository/profile_repo.dart';
 import 'package:office/ui/chat/add_group.dart';
 import 'package:office/ui/chat/chatScreen.dart';
 import 'package:office/ui/chat/contacts.dart';
+import 'package:office/ui/chat/groupChatScreen.dart';
 import 'package:office/ui/widget/app_bar.dart';
 import 'package:office/ui/widget/more_sheet.dart';
 import 'package:office/utils/constants.dart';
@@ -24,10 +25,10 @@ class ChatListScreen extends StatefulWidget {
 
 class _ChatListScreenState extends State<ChatListScreen> {
   late ProfileBloc bloc;
-  // List<String> tabTittle = ["Chats", "Groups"];
   ValueNotifier<int> tabIndex = ValueNotifier(0);
   ValueNotifier<bool> isSearchClicked = ValueNotifier(false);
-  late Stream<List> chatStream;
+  late Stream<List> singleChatStream;
+  late Stream<List> groupChatStream;
 
   @override
   void initState() {
@@ -36,8 +37,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
     bloc = ProfileBloc(context.read<ProfileRepository>());
     bloc.fetchUserDetail();
     // bloc.getRecentChats();
-    chatStream = bloc.getRecentChats().asBroadcastStream();
-    bloc.getGroupList();
+    singleChatStream = bloc.getRecentChats().asBroadcastStream();
+    groupChatStream = bloc.getGroupList().asBroadcastStream();
+    // bloc.getGroupList();
     bloc.fetchAllUserDetail();
   }
 
@@ -224,7 +226,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                           Duration(milliseconds: 1200));
                                     },
                                     child: StreamBuilder(
-                                      stream: chatStream,
+                                      stream: singleChatStream,
                                       builder: (context, snapshot) {
                                         if(snapshot.data == null){
                                           return Center(child: CircularProgressIndicator());
@@ -282,22 +284,36 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                       await Future.delayed(
                                           const Duration(milliseconds: 1500));
                                     },
-                                    child: ValueListenableBuilder(
-                                      valueListenable: bloc.allGroupList,
-                                      builder: (context, allGroupList, child) {
-                                        if(allGroupList == null){
-                                          return Center(
-                                            child: CircularProgressIndicator(),
-                                          );
-                                        }
-                                      return ListView.builder(
-                                        itemCount: allGroupList.length,
-                                        shrinkWrap: true,
-                                        itemBuilder: (context, index) {
-                                          return GroupChat(groupData: allGroupList[index],bloc: bloc,prefs: prefs,);
-                                        },
-                                      );
-                                    },)
+                                  child: StreamBuilder(
+                                    stream: groupChatStream,
+                                    builder: (context, snapshot) {
+                                      if(snapshot.data == null){
+                                        return Center(child: CircularProgressIndicator());
+                                      }
+                                    return ListView.builder(
+                                      itemCount: snapshot.data!.length,
+                                      shrinkWrap: true,
+                                      itemBuilder: (context, index) {
+                                        return GroupChat(groupData: snapshot.data![index],bloc: bloc,prefs: prefs,);
+                                      },
+                                    );
+                                  },),
+                                    // child: ValueListenableBuilder(
+                                    //   valueListenable: bloc.allGroupList,
+                                    //   builder: (context, allGroupList, child) {
+                                    //     if(allGroupList == null){
+                                    //       return Center(
+                                    //         child: CircularProgressIndicator(),
+                                    //       );
+                                    //     }
+                                    //   return ListView.builder(
+                                    //     itemCount: allGroupList.length,
+                                    //     shrinkWrap: true,
+                                    //     itemBuilder: (context, index) {
+                                    //       return GroupChat(groupData: allGroupList[index],bloc: bloc,prefs: prefs,);
+                                    //     },
+                                    //   );
+                                    // },)
                                 ),
                                 Positioned(
                                   bottom: 110,
@@ -513,7 +529,7 @@ class _GroupChatState extends State<GroupChat> {
     return ListTile(
       onTap: () {
         Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => ChatScreen(user: {"first_name" : "pramod"},bloc: widget.bloc,prefs: widget.prefs)));
+            .push(MaterialPageRoute(builder: (context) => GroupChatScreen(group: widget.groupData,bloc: widget.bloc,prefs: widget.prefs)));
       },
       contentPadding: EdgeInsets.symmetric(horizontal: 5),
       title: Text(
@@ -521,7 +537,7 @@ class _GroupChatState extends State<GroupChat> {
         style: TextStyle(fontWeight: FontWeight.w500),
       ),
       subtitle: Text(
-        "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipi",
+        widget.groupData['description'] ?? '',
         softWrap: true,
         style: TextStyle(
             fontWeight: FontWeight.w400,

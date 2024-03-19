@@ -1,11 +1,17 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:office/bloc/profile_bloc.dart';
 import 'package:office/data/repository/profile_repo.dart';
 import 'package:office/ui/widget/app_button.dart';
 import 'package:office/ui/widget/app_dropdown.dart';
 import 'package:office/ui/widget/app_text_field.dart';
+import 'package:office/utils/message_handler.dart';
 import 'package:provider/provider.dart';
 
 class AddGroup extends StatefulWidget {
@@ -23,7 +29,18 @@ class _AddGroupState extends State<AddGroup> {
     // TODO: implement initState
     super.initState();
     bloc = ProfileBloc(context.read<ProfileRepository>());
+    bloc.msgController?.stream.listen((event) {
+      AppMessageHandler().showSnackBar(context, event);
+    });
+    // bloc.fetchAllUserDetail();
   }
+
+  void pickImage()async{
+    ImagePicker picker = ImagePicker();
+    XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    bloc.groupLogo.value = File(pickedFile!.path);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,7 +62,7 @@ class _AddGroupState extends State<AddGroup> {
                   children: [
                     SizedBox(height: 56,),
                     Text(
-                      "Add Expenses",
+                      "Create Group",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                           color: Colors.white,
@@ -76,106 +93,102 @@ class _AddGroupState extends State<AddGroup> {
           Expanded(
                 child: SingleChildScrollView(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 40),
+                    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 30),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Row(
-                          children: [
-                            SizedBox(width: 10),
-                            Text("Expense type"),
-                            Text("*",style: TextStyle(color: Colors.red),)
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        AppDropdown(
-                          items: [],
-                          onChanged: (value) {
-
-                          },
-                          value: null,
-                          hintText: "Expense type",
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        const Row(
-                          children: [
-                            SizedBox(width: 10),
-                            Text("Select Date"),
-                            Text("*",style: TextStyle(color: Colors.red),)
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        InkWell(
-                          onTap: () async {
-                            await showDatePicker(
-                              context: context,
-                              initialDate: DateTime.now(),
-                              firstDate: DateTime(2000),
-                              lastDate: DateTime(3000),
-                            ).then((value) {
-                              if(value != null){
-                                // widget.bloc.date.value = value.toString().split(" ").first;
-                              }
-                            });
-                          },
-                          child: Container(
-                            height: 50,
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[100],
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(PhosphorIcons.clock),
-                                SizedBox(width: 15),
-                                Text(
-                                  "Select Date",
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
+                        Center(
+                          child: Stack(
+                            children: [
+                              ValueListenableBuilder(
+                                valueListenable: bloc.groupLogo,
+                                builder: (context, groupLogo, child) {
+                                  if(groupLogo == null){
+                                    return Container(
+                                      height: 100,
+                                      width: 100,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade200,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(PhosphorIcons.user),
+                                    );
+                                  }
+                                  return Container(
+                                    height: 100,
+                                    width: 100,
+                                    decoration: BoxDecoration(
+                                        color: Colors.grey.shade200,
+                                        shape: BoxShape.circle,
+                                        image: DecorationImage(
+                                            image: FileImage(groupLogo),
+                                            fit: BoxFit.cover
+                                        )
+                                    ),
+                                  );
+                                },),
+                              Positioned(
+                                right: 2,
+                                bottom: 2,
+                                child: InkWell(
+                                  onTap: () {
+                                    pickImage();
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.all(7),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(Icons.edit,color: Colors.white,size: 15,),
                                   ),
-                                )
-                              ],
-                            ),
+                                ),
+                              )
+                            ],
                           ),
                         ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        const Row(
+                          children: [
+                            SizedBox(width: 10),
+                            Text("Group Name"),
+                            Text("*",style: TextStyle(color: Colors.red),)
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        AppTextField(
+                          controller: bloc.groupName,
+                          title: "Name",
+                          showTitle: false,
+                        ),
                         const SizedBox(
                           height: 20,
                         ),
                         AppTextField(
-                          controller: TextEditingController(),
+                          controller: bloc.groupDesc,
                           title: "Description",
-                          validate: true,
-                          maxLines: 5,
                           inputAction: TextInputAction.done,
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        AppTextField(
-                          controller: TextEditingController(),
-                          title: "Amount",
                           validate: true,
-                          keyboardType: TextInputType.number,
                         ),
                         const SizedBox(
                           height: 20,
                         ),
-                        AppButton(
-                          title: "Submit",
-                          loading: false,
-                          onTap: () {
-                            // if (widget.bloc.formKey.currentState!.validate()) {
-                            //   widget.bloc.addExpense(context);
-                            // }
-                          },
-                          margin: EdgeInsets.zero,
-                          // loading: loading,
-                        )
+                        ValueListenableBuilder(
+                          valueListenable: bloc.createGroupLoading,
+                          builder: (context, createGroupLoading, child) {
+                            return AppButton(
+                              title: "Create",
+                              loading: createGroupLoading,
+                              onTap: () {
+                                bloc.createNewGroup(context);
+                              },
+                              margin: EdgeInsets.zero,
+                              // loading: loading,
+                            );
+                          },)
                       ],
                     ),
                   ),

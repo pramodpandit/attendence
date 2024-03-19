@@ -12,6 +12,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:office/data/model/user.dart';
+import 'package:office/ui/chat/group_detail.dart';
 import 'package:office/ui/community/communityProfile.dart';
 import 'package:office/ui/widget/more_sheet.dart';
 import 'package:office/utils/message_handler.dart';
@@ -20,17 +21,17 @@ import 'package:provider/provider.dart';
 import '../../bloc/profile_bloc.dart';
 import '../../data/repository/profile_repo.dart';
 
-class ChatScreen extends StatefulWidget {
-  final Map<String,dynamic> user;
+class GroupChatScreen extends StatefulWidget {
+  final Map<String,dynamic> group;
   final ProfileBloc bloc;
   final SharedPreferences prefs;
-  const ChatScreen({Key? key,required this.user, required this.bloc, required this.prefs}) : super(key: key);
+  const GroupChatScreen({Key? key,required this.group, required this.bloc, required this.prefs}) : super(key: key);
 
   @override
-  State<ChatScreen> createState() => _ChatScreenState();
+  State<GroupChatScreen> createState() => _GroupChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _GroupChatScreenState extends State<GroupChatScreen> {
   File? galleryFile;
   PlayerController playerController = PlayerController();
   // var waveFormData;
@@ -82,7 +83,7 @@ class _ChatScreenState extends State<ChatScreen> {
       AppMessageHandler().showSnackBar(context, event);
     });
     super.initState();
-    chattingStream = profileBloc.getOneToOneChat(widget.user['user_id'].toString()).asBroadcastStream();
+    chattingStream = profileBloc.getGroupChats(widget.group['id'].toString()).asBroadcastStream();
   }
 
   Future<void> getLocation() async {
@@ -159,14 +160,14 @@ class _ChatScreenState extends State<ChatScreen> {
                   }
                   return InkWell(
                     onTap: () {
-                      profileBloc.sendMessage(widget.user['user_id'].toString(),"one_to_one","image",image: galleryFile).then((value){
-                        setState(() {
-                          galleryFile = null;
-                        });
-                        // if(widget.user['fcm_token'] != null && profileBloc.sendMessageController.text.isNotEmpty){
-                        //   profileBloc.sendNotification(widget.user,image: galleryFile);
-                        // }
-                      });
+                      // profileBloc.sendMessage(widget.group['user_id'].toString(),"one_to_one","image",image: galleryFile).then((value){
+                      //   setState(() {
+                      //     galleryFile = null;
+                      //   });
+                      //   // if(widget.user['fcm_token'] != null && profileBloc.sendMessageController.text.isNotEmpty){
+                      //   //   profileBloc.sendNotification(widget.user,image: galleryFile);
+                      //   // }
+                      // });
                     },
                     child: Container(
                         padding: EdgeInsets.all(10),
@@ -227,14 +228,14 @@ class _ChatScreenState extends State<ChatScreen> {
               }
               return InkWell(
                 onTap: () {
-                  profileBloc.sendMessage(widget.user['user_id'].toString(),"one_to_one","location",position: position).then((value){
-                    setState(() {
-                      position = null;
-                    });
-                    // if(widget.user['fcm_token'] != null && profileBloc.sendMessageController.text.isNotEmpty){
-                    //   profileBloc.sendNotification(widget.user,image: galleryFile);
-                    // }
-                  });
+                  // profileBloc.sendMessage(widget.user['user_id'].toString(),"one_to_one","location",position: position).then((value){
+                  //   setState(() {
+                  //     position = null;
+                  //   });
+                  //   // if(widget.user['fcm_token'] != null && profileBloc.sendMessageController.text.isNotEmpty){
+                  //   //   profileBloc.sendNotification(widget.user,image: galleryFile);
+                  //   // }
+                  // });
                 },
                 child: Container(
                   padding: EdgeInsets.all(10),
@@ -291,11 +292,11 @@ class _ChatScreenState extends State<ChatScreen> {
               }
               return InkWell(
                 onTap: () {
-                  profileBloc.sendMessage(widget.user['user_id'].toString(),"one_to_one","file",image: galleryFile).then((value){
-                    // if(widget.user['fcm_token'] != null && profileBloc.sendMessageController.text.isNotEmpty){
-                    //   profileBloc.sendNotification(widget.user,image: galleryFile);
-                    // }
-                  });
+                  // profileBloc.sendMessage(widget.user['user_id'].toString(),"one_to_one","file",image: galleryFile).then((value){
+                  //   // if(widget.user['fcm_token'] != null && profileBloc.sendMessageController.text.isNotEmpty){
+                  //   //   profileBloc.sendNotification(widget.user,image: galleryFile);
+                  //   // }
+                  // });
                 },
                 child: Container(
                     padding: EdgeInsets.all(10),
@@ -362,8 +363,8 @@ class _ChatScreenState extends State<ChatScreen> {
                           CircleAvatar(
                             radius: 20,
                             child: ClipOval(
-                              child: widget.user['image'] != null?Image.network(
-                                "https://freeze.talocare.co.in/public/${widget.user['image']}",
+                              child: widget.group['logo'] != null?Image.network(
+                                "https://freeze.talocare.co.in/public/${widget.group['logo']}",
                                 height: 50,
                                 width: 50,
                                 fit: BoxFit.cover,
@@ -374,13 +375,13 @@ class _ChatScreenState extends State<ChatScreen> {
                           Expanded(
                             child: GestureDetector(
                               onTap: () {
-                                // Navigator.of(context).push(MaterialPageRoute(
-                                //     builder: (context) => CommunityProfile()));
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => GroupDetail(group: widget.group)));
                               },
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  Text("${widget.user['first_name']??''} ${widget.user['middle_name']??''} ${widget.user['last_name']??''}",
+                                  Text("${widget.group['group_name']??''}",
                                     maxLines: 1,
                                     style: const TextStyle(fontWeight: FontWeight.w500,overflow: TextOverflow.ellipsis),
                                   ),
@@ -462,7 +463,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               child: Column(
                                 children: [
                                   index == snapshot.data!.length-1
-                                    ?Container(
+                                      ?Container(
                                       padding: EdgeInsets.all(5),
                                       decoration : BoxDecoration(
                                         color : Colors.grey.shade200,
@@ -470,9 +471,9 @@ class _ChatScreenState extends State<ChatScreen> {
                                       ),
                                       child: Text("${DateTime.parse(snapshot.data![index]['created_at']).isToday ? 'Today' :DateTime.parse(snapshot.data![index]['created_at']).isYesterday ? 'Yesterday' :DateFormat("dd/MM/yyyy").format(DateTime.parse(snapshot.data![index]['created_at']))}",
                                       ))
-                                  : DateTime.parse(snapshot.data![index]['created_at']).day > DateTime.parse(snapshot.data![index+1]['created_at']).day
-                                  ? Container(
-                                    padding: EdgeInsets.all(5),
+                                      : DateTime.parse(snapshot.data![index]['created_at']).day > DateTime.parse(snapshot.data![index+1]['created_at']).day
+                                      ? Container(
+                                      padding: EdgeInsets.all(5),
                                       decoration : BoxDecoration(
                                         color : Colors.grey.shade200,
                                         borderRadius: BorderRadius.circular(5),
@@ -482,89 +483,132 @@ class _ChatScreenState extends State<ChatScreen> {
                                       : Offstage(),
                                   Align(
                                     alignment: snapshot.data![index]['sender_id'].toString() == widget.prefs.getString("uid") ?Alignment.centerRight:Alignment.centerLeft,
-                                    child: Container(
-                                      padding: snapshot.data![index]['message_type'] == "location" || snapshot.data![index]['message_type'] == "image" ?
-                                        const EdgeInsets.symmetric(horizontal: 1,vertical: 1):
-                                      const EdgeInsets.symmetric(
-                                          horizontal: 15, vertical: 10),
-                                      decoration: BoxDecoration(
-                                        borderRadius: snapshot.data![index]['sender_id'].toString() == widget.prefs.getString("uid")
-                                            ? const BorderRadius.only(
-                                          topLeft: Radius.circular(10),
-                                          topRight: Radius.circular(10),
-                                          bottomLeft: Radius.circular(10),
-                                        )
-                                            : const BorderRadius.only(
-                                          topLeft: Radius.circular(10),
-                                          topRight: Radius.circular(10),
-                                          bottomRight: Radius.circular(10),
-                                        ),
-                                        color: snapshot.data![index]['sender_id'].toString() == widget.prefs.getString("uid")
-                                            ? Colors.blue
-                                            : Colors.grey.withOpacity(0.3),
-                                      ),
-                                      child: snapshot.data![index]['message_type'] == "image" ?
-                                      SizedBox(
-                                        width : 150,
-                                        height : 150,
-                                        child: ClipRRect(
-                                          borderRadius : BorderRadius.circular(10),
-                                          child: Image.network(
-                                              "https://freeze.talocare.co.in/public/${snapshot.data![index]['file_uploaded']}",
-                                            loadingBuilder: (context, child, loadingProgress) {
-                                                if(loadingProgress == null){
-                                                  return child;
-                                                }
-                                              return SizedBox(
-                                                height: 40,
-                                                width: 40,
-                                                child: Center(
-                                                  child: CircularProgressIndicator(
-                                                    value: loadingProgress.expectedTotalBytes != null?
+                                    child: Row(
+                                      mainAxisSize : MainAxisSize.min,
+                                      children: [
+                                        GestureDetector(
+                                          onTap : () {
+                                            Navigator.push(context, MaterialPageRoute(builder: (context) => CommunityProfile(userid: int.parse(snapshot.data![index]['sender_id']))));
+                                          },
+                                          child: CircleAvatar(
+                                            child: ClipRRect(
+                                              borderRadius : BorderRadius.circular(1000),
+                                              child: Image.network(
+                                                "https://freeze.talocare.co.in/public/${snapshot.data![index]['image']}",
+                                                loadingBuilder: (context, child, loadingProgress) {
+                                                  if(loadingProgress == null){
+                                                    return child;
+                                                  }
+                                                  return SizedBox(
+                                                    height: 20,
+                                                    width: 20,
+                                                    child: Center(
+                                                      child: CircularProgressIndicator(
+                                                        value: loadingProgress.expectedTotalBytes != null?
                                                         loadingProgress.cumulativeBytesLoaded/
-                                                        loadingProgress.expectedTotalBytes!
-                                                        : null,
-                                                    strokeWidth: 1,
-                                                    color: Colors.white,
-                                                    backgroundColor: Colors.grey,
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                      )
-                                      : snapshot.data![index]['message_type'] == "location" ?
-                                      SizedBox(
-                                        height : 150,
-                                        width : 150,
-                                        child: ClipRRect(
-                                          borderRadius : BorderRadius.circular(10),
-                                          child: GoogleMap(
-                                            myLocationButtonEnabled: true,
-                                            initialCameraPosition: CameraPosition(
-                                              target: LatLng(double.parse(snapshot.data![index]['latitude']), double.parse(snapshot.data![index]['longitude'])),
-                                              zoom: 12,
+                                                            loadingProgress.expectedTotalBytes!
+                                                            : null,
+                                                        strokeWidth: 1,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                                errorBuilder: (context, error, stackTrace) {
+                                                  return Icon(PhosphorIcons.user);
+                                                },
+                                                width: double.infinity,
+                                                height: double.infinity,
+                                                fit: BoxFit.cover,
+                                              ),
                                             ),
-                                            mapType: MapType.terrain,
-                                            markers: Set.of([Marker(markerId: MarkerId("1"),position: LatLng(double.parse(snapshot.data![index]['latitude']), double.parse(snapshot.data![index]['longitude'])),icon: BitmapDescriptor.defaultMarker)]),
-                                            onMapCreated: (controller) {
-                                              _completer.complete(controller);
-                                            },
-                                            zoomControlsEnabled: false,
-                                            buildingsEnabled: true,
                                           ),
                                         ),
-                                      )
-                                     : Text(
-                                        snapshot.data![index]['message'].toString(),
-                                        style: TextStyle(
-                                          color: snapshot.data![index]['sender_id'].toString() == widget.prefs.getString("uid")
-                                              ? Colors.white
-                                              : Colors.black,
+                                        const SizedBox(width: 5),
+                                        Container(
+                                          padding: snapshot.data![index]['message_type'] == "location" || snapshot.data![index]['message_type'] == "image" ?
+                                          const EdgeInsets.symmetric(horizontal: 1,vertical: 1):
+                                          const EdgeInsets.symmetric(
+                                              horizontal: 15, vertical: 10),
+                                          decoration: BoxDecoration(
+                                            borderRadius: snapshot.data![index]['sender_id'].toString() == widget.prefs.getString("uid")
+                                                ? const BorderRadius.only(
+                                              topLeft: Radius.circular(10),
+                                              topRight: Radius.circular(10),
+                                              bottomLeft: Radius.circular(10),
+                                            )
+                                                : const BorderRadius.only(
+                                              topLeft: Radius.circular(10),
+                                              topRight: Radius.circular(10),
+                                              bottomRight: Radius.circular(10),
+                                            ),
+                                            color: snapshot.data![index]['sender_id'].toString() == widget.prefs.getString("uid")
+                                                ? Colors.blue
+                                                : Colors.grey.withOpacity(0.3),
+                                          ),
+                                          child: snapshot.data![index]['message_type'] == "image" ?
+                                          SizedBox(
+                                            width : 150,
+                                            height : 150,
+                                            child: ClipRRect(
+                                              borderRadius : BorderRadius.circular(10),
+                                              child: Image.network(
+                                                "https://freeze.talocare.co.in/public/${snapshot.data![index]['file_uploaded']}",
+                                                loadingBuilder: (context, child, loadingProgress) {
+                                                  if(loadingProgress == null){
+                                                    return child;
+                                                  }
+                                                  return SizedBox(
+                                                    height: 40,
+                                                    width: 40,
+                                                    child: Center(
+                                                      child: CircularProgressIndicator(
+                                                        value: loadingProgress.expectedTotalBytes != null?
+                                                        loadingProgress.cumulativeBytesLoaded/
+                                                            loadingProgress.expectedTotalBytes!
+                                                            : null,
+                                                        strokeWidth: 1,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          )
+                                              : snapshot.data![index]['message_type'] == "location" ?
+                                          SizedBox(
+                                            height : 150,
+                                            width : 150,
+                                            child: ClipRRect(
+                                              borderRadius : BorderRadius.circular(10),
+                                              child: GoogleMap(
+                                                myLocationButtonEnabled: true,
+                                                initialCameraPosition: CameraPosition(
+                                                  target: LatLng(double.parse(snapshot.data![index]['latitude']), double.parse(snapshot.data![index]['longitude'])),
+                                                  zoom: 12,
+                                                ),
+                                                mapType: MapType.terrain,
+                                                markers: Set.of([Marker(markerId: MarkerId("1"),position: LatLng(double.parse(snapshot.data![index]['latitude']), double.parse(snapshot.data![index]['longitude'])),icon: BitmapDescriptor.defaultMarker)]),
+                                                onMapCreated: (controller) {
+                                                  _completer.complete(controller);
+                                                },
+                                                zoomControlsEnabled: false,
+                                                buildingsEnabled: true,
+                                              ),
+                                            ),
+                                          )
+                                              : Text(
+                                            snapshot.data![index]['message'].toString(),
+                                            style: TextStyle(
+                                              color: snapshot.data![index]['sender_id'].toString() == widget.prefs.getString("uid")
+                                                  ? Colors.white
+                                                  : Colors.black,
+                                            ),
+                                          ),
                                         ),
-                                      ),
+                                      ],
                                     ),
                                   ),
                                   Padding(
@@ -622,95 +666,95 @@ class _ChatScreenState extends State<ChatScreen> {
                           children: [
                             imageView,
                             if(galleryFile==null && filePickerResult==null && position == null)
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: TextFormField(
-                                    controller: profileBloc.sendMessageController,
-                                    keyboardType: TextInputType.multiline,
-                                    maxLines: 3,
-                                    minLines: 1,
-                                    decoration: const InputDecoration(
-                                      border: InputBorder.none,
-                                      hintText: "Send Message...",
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: TextFormField(
+                                      controller: profileBloc.sendMessageController,
+                                      keyboardType: TextInputType.multiline,
+                                      maxLines: 3,
+                                      minLines: 1,
+                                      decoration: const InputDecoration(
+                                        border: InputBorder.none,
+                                        hintText: "Send Message...",
+                                      ),
                                     ),
                                   ),
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                InkWell(
-                                    onTap: (){
-                                      showModalBottomSheet(context: context, builder: (context) {
-                                        return Container(
-                                          color: Colors.white,
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              ListTile(
-                                                onTap : () {
-                                                  _openImagePicker(ImageSource.camera);
-                                                },
-                                                title: Text("Camera"),
-                                                leading: Icon(PhosphorIcons.camera),
-                                              ),
-                                              ListTile(
-                                                onTap : () {
-                                                  _openImagePicker(ImageSource.gallery);
-                                                },
-                                                title: Text("Gallery"),
-                                                leading: Icon(Icons.browse_gallery),
-                                              ),
-                                              ListTile(
-                                                onTap : () {
-                                                  openFilePicker();
-                                                },
-                                                title: Text("Audio"),
-                                                leading: Icon(PhosphorIcons.file_audio),
-                                              ),
-                                              ListTile(
-                                                onTap : () {
-                                                  getLocation();
-                                                },
-                                                title: Text("Location"),
-                                                leading: Icon(Icons.location_on),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      },);
-                                    },
-                                    child: const Icon(Icons.attach_file)),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                ValueListenableBuilder(
-                                  valueListenable: profileBloc.isSending,
-                                  builder: (context, isSending, child) {
-                                    if(isSending){
-                                      return Center(
-                                        child: SizedBox(
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  InkWell(
+                                      onTap: (){
+                                        showModalBottomSheet(context: context, builder: (context) {
+                                          return Container(
+                                            color: Colors.white,
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                ListTile(
+                                                  onTap : () {
+                                                    _openImagePicker(ImageSource.camera);
+                                                  },
+                                                  title: Text("Camera"),
+                                                  leading: Icon(PhosphorIcons.camera),
+                                                ),
+                                                ListTile(
+                                                  onTap : () {
+                                                    _openImagePicker(ImageSource.gallery);
+                                                  },
+                                                  title: Text("Gallery"),
+                                                  leading: Icon(Icons.browse_gallery),
+                                                ),
+                                                ListTile(
+                                                  onTap : () {
+                                                    openFilePicker();
+                                                  },
+                                                  title: Text("Audio"),
+                                                  leading: Icon(PhosphorIcons.file_audio),
+                                                ),
+                                                ListTile(
+                                                  onTap : () {
+                                                    getLocation();
+                                                  },
+                                                  title: Text("Location"),
+                                                  leading: Icon(Icons.location_on),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },);
+                                      },
+                                      child: const Icon(Icons.attach_file)),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  ValueListenableBuilder(
+                                    valueListenable: profileBloc.isSending,
+                                    builder: (context, isSending, child) {
+                                      if(isSending){
+                                        return Center(
+                                          child: SizedBox(
                                             height: 20,
                                             width: 20,
                                             child: CircularProgressIndicator(strokeWidth: 2),
-                                        ),
+                                          ),
+                                        );
+                                      }
+                                      return InkWell(
+                                        onTap: () {
+                                          // profileBloc.sendMessage(widget.user['user_id'].toString(),"one_to_one","text");
+                                          // if(widget.user['fcm_token'] != null){
+                                          //   profileBloc.sendNotification(widget.user);
+                                          // }
+                                        },
+                                        child: const Icon(PhosphorIcons.paper_plane_tilt),
                                       );
-                                    }
-                                  return InkWell(
-                                    onTap: () {
-                                        profileBloc.sendMessage(widget.user['user_id'].toString(),"one_to_one","text");
-                                        if(widget.user['fcm_token'] != null){
-                                          profileBloc.sendNotification(widget.user);
-                                        }
-                                    },
-                                    child: const Icon(PhosphorIcons.paper_plane_tilt),
-                                  );
-                                },),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                              ],
-                            ),
+                                    },),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                ],
+                              ),
                           ],
                         ),
                       ),
@@ -719,8 +763,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 );
               }
             }
-              return Offstage();
-        },),
+            return Offstage();
+          },),
       ),
     );
   }

@@ -247,11 +247,25 @@ class ProfileRepository {
     });
     return ApiResponse2.fromJson(response,response['data']);
   }
-  Future<ApiResponse2> fetchGroupChats()async{
+  Future<ApiResponse2> fetchGroupList()async{
     var response=await _api.postRequest("chats/fetch_group", {
       "user_id": prefs.getString("uid"),
     });
     return ApiResponse2.fromJson(response,response['group']);
+  }
+  Future createGroupApi(Map<String,dynamic> data)async{
+    var response=await _api.postRequest("chats/creategroup", data,withFile: true);
+    return response;
+  }
+  Future addMemberInGroupApi(Map<String,dynamic> data)async{
+    var response=await _api.postRequest("chats/add_member", data);
+    return response;
+  }
+  Future<ApiResponse2> fetchGroupChats(String chatId)async{
+    var response=await _api.postRequest("chats/group_chat", {
+      "group_id" : chatId,
+    });
+    return ApiResponse2.fromJson(response,response['chat']);
   }
 
   Future sendMessageApi(Map<String,dynamic> data)async{
