@@ -1,5 +1,6 @@
 
 import 'package:container_tab_indicator/container_tab_indicator.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nb_utils/nb_utils.dart';
@@ -28,6 +29,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
   ValueNotifier<int> tabIndex = ValueNotifier(0);
   ValueNotifier<bool> isSearchClicked = ValueNotifier(false);
   late Stream<List> chatStream;
+  TextEditingController chatssearchConroller = TextEditingController();
+  List searchedUser=[];
+  List searchGroupData=[];
 
   @override
   void initState() {
@@ -40,7 +44,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
     bloc.getGroupList();
     bloc.fetchAllUserDetail();
   }
-
   late SharedPreferences prefs;
   void sharedPref()async{
     prefs = await SharedPreferences.getInstance();
@@ -93,14 +96,74 @@ class _ChatListScreenState extends State<ChatListScreen> {
                         // boxShadow: K.boxShadow,
                         color: Colors.grey.withOpacity(0.2),
                       ),
-                      child: TextField(
-                        autofocus: true,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                        ),
-                        onSubmitted: (value) {
-                          isSearchClicked.value = !isSearchClicked.value;
+                      child: ValueListenableBuilder(
+                        valueListenable: bloc.searchData,
+                        builder:(context, List? searchusers, child) {
+                          return tabIndex.value ==0 ?
+
+                          // Search bar for single user chat
+                          TextField(
+                            autofocus: true,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                            ),
+                            onSubmitted: (value) {
+                              isSearchClicked.value = !isSearchClicked.value;
+                            },
+                            onChanged: (value){
+                              setState(() {
+                                searchedUser =
+                                    searchusers!
+                                        .where((element) => "${element['first_name'] == null ? '':
+                                        element['first_name']
+                                            .toString()
+                                            .toLowerCase()
+                                        } ${element['middle_name'] == null ? '':
+                                        element['middle_name']
+                                            .toString()
+                                            .toLowerCase()
+                                        } ${element['last_name'] == null ? '':
+                                        element['last_name']
+                                            .toString()
+                                            .toLowerCase()}".contains(
+                                            value!.toLowerCase()))
+                                        .toList();
+                              });
+                            },
+                          ):
+                          // Search bar for group chat
+                          ValueListenableBuilder(
+                            valueListenable: bloc.SearchGroup,
+                            builder: (context, groupList, child) {
+                              return TextField(
+                                controller: chatssearchConroller,
+                                autofocus: true,
+                                decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                ),
+                                onSubmitted: (value) {
+                                  isSearchClicked.value = !isSearchClicked.value;
+                                },
+                                onChanged: (value){
+                                  setState(() {
+                                    searchGroupData =
+                                        groupList !
+                                            .where((element) => "${element['group_name'] == null ? '':
+                                        element['group_name']
+                                            .toString()
+                                            .toLowerCase()
+                                        } ".contains(
+                                            value!.toLowerCase()))
+                                            .toList();
+                                  });
+                                  print('search group list ${searchGroupData.toList()}');
+                                },
+                              );
+                            },
+
+                          );
                         },
+
                       ),
                     ),
                   );
@@ -125,9 +188,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                             ctx: context,
                             items: ["Report", "Block",],
                             icons: [Icon(Icons.report), Icon(Icons.block)],
-                            deleteOnTap: () {
-
-                            },
+                            deleteOnTap: () {},
                         );
                       },
                     );
@@ -142,7 +203,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
             valueListenable: bloc.userDetail,
             builder: (context, value, child) {
               if(value == null){
-                return Expanded(
+                return const Expanded(
                     child: Center(child: CircularProgressIndicator()));
               }
             return Expanded(
@@ -159,7 +220,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                         child: TabBar(
                           onTap: (value) {
                             tabIndex.value = value;
-                          },
+                            },
                           dividerColor: Colors.white,
                           indicatorColor: const Color(0xFF0E83EA),
                           indicator: ContainerTabIndicator(
@@ -230,11 +291,13 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                           return Center(child: CircularProgressIndicator());
                                         }
                                         return ListView.builder(
-                                          itemCount: snapshot.data!.length,
+                                          itemCount:searchedUser.isEmpty? snapshot.data!.length:searchedUser.length,
                                           shrinkWrap: true,
                                           itemBuilder: (context, index) {
-                                            snapshot.data!.sort((a, b) => DateTime.parse(b['last_chat'][(b['last_chat'] as List).length-1]['created_at']).compareTo(DateTime.parse(a['last_chat'][(a['last_chat'] as List).length-1]['created_at'])));
-                                            return SingleChat(userData: snapshot.data![index],bloc: bloc,prefs: prefs,);
+                                            searchedUser.isEmpty?
+                                            snapshot.data!.sort((a, b) => DateTime.parse(b['last_chat'][(b['last_chat'] as List).length-1]['created_at']).compareTo(DateTime.parse(a['last_chat'][(a['last_chat'] as List).length-1]['created_at'])))
+                                            : searchedUser!.sort((a, b) => DateTime.parse(b['last_chat'][(b['last_chat'] as List).length-1]['created_at']).compareTo(DateTime.parse(a['last_chat'][(a['last_chat'] as List).length-1]['created_at'])));
+                                            return SingleChat(userData: searchedUser.isEmpty?snapshot.data![index]:searchedUser[index],bloc: bloc,prefs: prefs,);
                                           },
                                         );
                                     },),
@@ -261,7 +324,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                                   child: child,
                                                 ),
                                               ),
-                                          child: Icon(
+                                          child: const Icon(
                                             Icons.add,
                                             color: Colors.white,
                                           ),
@@ -286,7 +349,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                       valueListenable: bloc.allGroupList,
                                       builder: (context, allGroupList, child) {
                                         if(allGroupList == null){
-                                          return Center(
+                                          return const Center(
                                             child: CircularProgressIndicator(),
                                           );
                                         }
@@ -321,7 +384,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                                 child: child,
                                               ),
                                             ),
-                                        child: Icon(
+                                        child: const Icon(
                                           Icons.add,
                                           color: Colors.white,
                                         ),

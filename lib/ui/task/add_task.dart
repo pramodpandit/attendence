@@ -2,14 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:intl/intl.dart';
-import 'package:office/bloc/leads_bloc.dart';
-import 'package:office/ui/widget/app_bar.dart';
 import 'package:provider/provider.dart';
-
 import '../../bloc/task_bloc.dart';
 import '../../data/repository/task_repo.dart';
-import '../../utils/constants.dart';
 import '../widget/app_button.dart';
 import '../widget/app_dropdown.dart';
 import '../widget/app_text_field.dart';
@@ -110,6 +105,7 @@ class _addTask extends State<addTask> {
                                   items: const [],
                                   onChanged: (value) {
                                     bloc.taskCategory.value = value.toString();
+                                    bloc.getAllProjectsData();
                                   },
                                   value: null,
                                   hintText: "Select",
@@ -119,6 +115,7 @@ class _addTask extends State<addTask> {
                                 items: allTaskCategory.map((e) => DropdownMenuItem(value: e['id'].toString(),child: Text(e['name']),)).toList(),
                                 onChanged: (value) {
                                   bloc.taskCategory.value = value.toString();
+                                  bloc.getAllProjectsData();
                                 }, 
                                 value: bloc.taskCategory.value, 
                                 hintText: "Select",
