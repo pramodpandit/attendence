@@ -305,11 +305,12 @@ class ProfileBloc extends Bloc {
       isUserDetailLoad.value = false;
     }
   }
-
+ValueNotifier<List?> searchData = ValueNotifier([]);
   Stream<List> getRecentChats() async*{
     while(true){
       try{
         var result = await _repo.fetchRecentChats();
+        searchData.value = result.data;
         yield result.data as List;
       }catch (e, s) {
         print(e);
@@ -332,9 +333,12 @@ class ProfileBloc extends Bloc {
     }
   }
 
+  ValueNotifier<List?> searchGroup = ValueNotifier(null);
+
   Stream<List> getGroupList() async*{
       try{
         var result = await _repo.fetchGroupList();
+        searchGroup.value = result.data;
         yield result.data as List;
       }catch (e, s) {
         print(e);

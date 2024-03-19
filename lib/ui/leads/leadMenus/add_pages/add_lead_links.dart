@@ -31,6 +31,7 @@ class _AddLeadLinksState extends State<AddLeadLinks> {
     widget.bloc.getAllLinkTypes();
     widget.bloc.link.text = '';
     widget.bloc.other.text = '';
+    widget.bloc.linkType.value = null;
   }
 
   @override
