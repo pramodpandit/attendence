@@ -333,6 +333,7 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
     }
   }
 
+  ValueNotifier<List?> allGroupList = ValueNotifier(null);
   ValueNotifier<List?> searchGroup = ValueNotifier(null);
 
   Stream<List> getGroupList() async*{
