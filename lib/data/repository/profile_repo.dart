@@ -257,8 +257,12 @@ class ProfileRepository {
     var response=await _api.postRequest("chats/creategroup", data,withFile: true);
     return response;
   }
-  Future addMemberInGroupApi(Map<String,dynamic> data)async{
-    var response=await _api.postRequest("chats/add_member", data);
+  Future addRemoveMemberInGroupApi(Map<String,dynamic> data)async{
+    var response=await _api.postRequest("chats/addmember", data);
+    return response;
+  }
+  Future makeRemoveAdminInGroupApi(Map<String,dynamic> data)async{
+    var response=await _api.postRequest("chats/memberpermission", data);
     return response;
   }
   Future<ApiResponse2> fetchGroupChats(String chatId)async{

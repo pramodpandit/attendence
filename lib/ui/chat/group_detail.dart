@@ -180,7 +180,7 @@ class _CommunityProfileState extends State<GroupDetail> {
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: ListTile(
                       onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => AddGroupMember()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => AddGroupMember(groupId: widget.group['id'].toString())));
                       },
                       title: Text("Add Member"),
                       leading: Icon(Icons.add),
@@ -198,8 +198,21 @@ class _CommunityProfileState extends State<GroupDetail> {
                             position: PopupMenuPosition.under,
                             itemBuilder: (context) {
                               return [
-                                PopupMenuItem(child: Text("Make admin")),
-                                PopupMenuItem(child: Text("Remove")),
+                                PopupMenuItem(
+                                  child: Text("Make admin"),
+                                  onTap: () {
+                                    // make admin
+                                    // bloc.makeRemoveAdminInGroup(widget.group['id'].toString(), "67687", "1");
+                                    // remove from admin
+                                    // bloc.makeRemoveAdminInGroup(widget.group['id'].toString(), "67687", "0");
+                                  },
+                                ),
+                                PopupMenuItem(
+                                  child: Text("Remove"),
+                                  onTap: () {
+                                    // bloc.addRemoveMemberInGroup(context, widget.group['id'].toString(), "remove",removeUser: "76457687");
+                                  },
+                                ),
                               ];
                             },
                           ),

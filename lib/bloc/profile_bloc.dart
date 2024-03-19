@@ -363,7 +363,7 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
   ValueNotifier<bool> addMemberLoading = ValueNotifier(false);
   ValueNotifier<String> addingUsers = ValueNotifier("");
   
-  addMemberInGroup(String groupId, String type)async{
+  addRemoveMemberInGroup(BuildContext context,String groupId, String type,{String? removeUser})async{
     Map<String,dynamic> data = {
       "group_id" : groupId,
       "type" : type,
@@ -373,21 +373,58 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
         "from_user" : addingUsers.value,
       });
     }
-    if(addingUsers.value.isEmpty){
-      showMessage(MessageType.info("Please select atleast one user"));
-      return;
+    if(type == "remove" && removeUser!=null){
+      data.addAll({
+        "from_user" : removeUser,
+      });
+    }
+    if(type == "add") {
+      if (addingUsers.value.isEmpty) {
+        showMessage(MessageType.info("Please select atleast one user"));
+        return;
+      }
     }
 
     try{
       addMemberLoading.value = true;
-      var result = await _repo.addMemberInGroupApi(data);
-      print("main data is : ${result}");
+      var result = await _repo.addRemoveMemberInGroupApi(data);
+      if(result['status']){
+        Navigator.pop(context);
+        showMessage(MessageType.success("Members added successfully"));
+      }else{
+        showMessage(MessageType.error("Somethimg went wrong"));
+      }
     }catch(e){
+      showMessage(MessageType.error("Something went wrong"));
       print(e);
     }finally{
       addMemberLoading.value = false;
     }
   }
+
+  makeRemoveAdminInGroup(String groupId,String userId,String permission)async{
+    Map<String,dynamic> data = {
+      "group_id" : groupId,
+      "from_user" : userId,
+      "permission" : permission
+    };
+
+    try{
+      addMemberLoading.value = true;
+      var result = await _repo.makeRemoveAdminInGroupApi(data);
+      if(result['status']){
+        showMessage(MessageType.success("Admin approved"));
+      }else{
+        showMessage(MessageType.error("Somethimg went wrong"));
+      }
+    }catch(e){
+      showMessage(MessageType.error("Something went wrong"));
+      print(e);
+    }finally{
+      addMemberLoading.value = false;
+    }
+  }
+
 
   TextEditingController sendMessageController = TextEditingController();
   ValueNotifier<bool> isSending = ValueNotifier(false);
@@ -422,7 +459,7 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
     try{
       var result = await _repo.sendMessageApi(data);
       if(result['status']){
-        sendMessageController.clear();
+        // sendMessageController.clear();
         showMessage(MessageType.success(result['message']));
       }else{
         showMessage(MessageType.error(result['message']));
@@ -430,6 +467,7 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
     }catch(e){
       print(e);
     }finally{
+      sendMessageController.clear();
       isSending.value = false;
     }
   }
@@ -441,7 +479,6 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
       "OrganizationId": "2",
       "content_available": true,
       "priority": "high",
-      // "subtitle": "Subtitle",
       "title":  prefs.getString("name"),
     };
     // if(image!=null){

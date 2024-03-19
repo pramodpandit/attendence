@@ -742,7 +742,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                       }
                                       return InkWell(
                                         onTap: () {
-                                          // profileBloc.sendMessage(widget.user['user_id'].toString(),"one_to_one","text");
+                                          // profileBloc.sendMessage(widget.user['user_id'].toString(),"group","text");
                                           // if(widget.user['fcm_token'] != null){
                                           //   profileBloc.sendNotification(widget.user);
                                           // }

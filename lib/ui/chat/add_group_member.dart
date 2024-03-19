@@ -15,7 +15,8 @@ import 'package:office/utils/message_handler.dart';
 import 'package:provider/provider.dart';
 
 class AddGroupMember extends StatefulWidget {
-  const AddGroupMember({super.key});
+  final String groupId;
+  const AddGroupMember({super.key, required this.groupId});
 
   @override
   State<AddGroupMember> createState() => _AddGroupMemberState();
@@ -122,13 +123,17 @@ class _AddGroupMemberState extends State<AddGroupMember> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      AppButton(
-                        title: "Add",
-                        loading : true,
-                        onTap: () {
-
-                        },
-                      ),
+                      ValueListenableBuilder(
+                        valueListenable: bloc.addMemberLoading,
+                        builder: (context, addMemberLoading, child) {
+                        return AppButton(
+                          title: "Add",
+                          loading : addMemberLoading,
+                          onTap: () {
+                            // bloc.addRemoveMemberInGroup(context, widget.groupId, "add");
+                          },
+                        );
+                      },),
                     ],
                   ),
                 ),
