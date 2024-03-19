@@ -10,6 +10,14 @@ class ChatImageAnimation extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
+
+          Hero(
+              tag: "imageAnimation",
+              child: Center(
+                child: Container(
+
+                    child: Image.network('${img}',fit: BoxFit.cover,)),
+              )),
           Positioned(
             top: 56,
             left: 10,
@@ -19,13 +27,12 @@ class ChatImageAnimation extends StatelessWidget {
               },
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(color: Colors.grey,blurRadius: 1)
-                  ]
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(color: Colors.grey,blurRadius: 1)
+                    ]
                 ),
-
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Icon(
@@ -36,13 +43,6 @@ class ChatImageAnimation extends StatelessWidget {
               ),
             ),
           ),
-          Hero(
-              tag: "imageAnimation",
-              child: Center(
-                child: Container(
-
-                    child: Image.network('${img}',fit: BoxFit.cover,)),
-              )),
         ],
 
       ),
