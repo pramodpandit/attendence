@@ -217,6 +217,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.6"
+  custom_zoom_widget:
+    dependency: "direct main"
+    description:
+      name: custom_zoom_widget
+      sha256: "24416750afd276a04df42b6231dc513031a10ec1baf00fbc30e5287962fe444d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.3"
   dashed_circular_progress_bar:
     dependency: "direct main"
     description:

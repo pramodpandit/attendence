@@ -253,10 +253,12 @@ class ProfileRepository {
     });
     return ApiResponse2.fromJson(response,response['group']);
   }
+
   Future createGroupApi(Map<String,dynamic> data)async{
     var response=await _api.postRequest("chats/creategroup", data,withFile: true);
     return response;
   }
+
   Future fetchSpecificGroupDetail(String groupId)async{
     var response=await _api.postRequest("chats/getgroupdetails", {
       "group_id" : groupId,

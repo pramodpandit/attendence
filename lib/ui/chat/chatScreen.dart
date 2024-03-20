@@ -512,7 +512,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                           borderRadius : BorderRadius.circular(10),
                                           child: InkWell(
                                             onTap:(){
-                                              Navigator.push(context, MaterialPageRoute(builder: (context)=>ChatImageAnimation(img: "https://freeze.talocare.co.in/public/${snapshot.data![index]['file_uploaded']}",tag: 'img${index}',)));
+                                              Navigator.push(context, MaterialPageRoute(builder:(context)=>ChatImageAnimation(img: "https://freeze.talocare.co.in/public/${snapshot.data![index]['file_uploaded']}",tag: 'img${index}',)));
                                             },
                                             child: Hero(
                                               tag:'img${index}',
@@ -707,6 +707,9 @@ class _ChatScreenState extends State<ChatScreen> {
                                     }
                                   return InkWell(
                                     onTap: () {
+                                      if(profileBloc.sendMessageController.text.isEmpty){
+                                        return;
+                                      }
                                         profileBloc.sendMessage(widget.user['user_id'].toString(),"one_to_one","text");
                                         if(widget.user['fcm_token'] != null){
                                           profileBloc.sendNotification(widget.user);

@@ -461,6 +461,7 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
   ValueNotifier<bool> isSending = ValueNotifier(false);
 
   Future sendMessage(String toUser,String chatType,String messageType,{File? image,Position? position})async{
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Map<String,dynamic> data = {
       "from_user" : prefs.getString("uid"),
