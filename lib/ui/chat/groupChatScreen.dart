@@ -160,14 +160,14 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                   }
                   return InkWell(
                     onTap: () {
-                      // profileBloc.sendMessage(widget.group['user_id'].toString(),"one_to_one","image",image: galleryFile).then((value){
-                      //   setState(() {
-                      //     galleryFile = null;
-                      //   });
+                      profileBloc.sendMessage(widget.group['id'].toString(),"group","image",image: galleryFile).then((value){
+                        setState(() {
+                          galleryFile = null;
+                        });
                       //   // if(widget.user['fcm_token'] != null && profileBloc.sendMessageController.text.isNotEmpty){
                       //   //   profileBloc.sendNotification(widget.user,image: galleryFile);
                       //   // }
-                      // });
+                      });
                     },
                     child: Container(
                         padding: EdgeInsets.all(10),
@@ -228,14 +228,14 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
               }
               return InkWell(
                 onTap: () {
-                  // profileBloc.sendMessage(widget.user['user_id'].toString(),"one_to_one","location",position: position).then((value){
-                  //   setState(() {
-                  //     position = null;
-                  //   });
+                  profileBloc.sendMessage(widget.group['id'].toString(),"group","location",position: position).then((value){
+                    setState(() {
+                      position = null;
+                    });
                   //   // if(widget.user['fcm_token'] != null && profileBloc.sendMessageController.text.isNotEmpty){
                   //   //   profileBloc.sendNotification(widget.user,image: galleryFile);
                   //   // }
-                  // });
+                  });
                 },
                 child: Container(
                   padding: EdgeInsets.all(10),
@@ -484,6 +484,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                     alignment: snapshot.data![index]['sender_id'].toString() == widget.prefs.getString("uid") ?Alignment.centerRight:Alignment.centerLeft,
                                     child: Row(
                                       mainAxisSize : MainAxisSize.min,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         GestureDetector(
                                           onTap : () {
@@ -741,7 +742,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                       }
                                       return InkWell(
                                         onTap: () {
-                                          // profileBloc.sendMessage(widget.user['user_id'].toString(),"group","text");
+                                          profileBloc.sendMessage(widget.group['id'].toString(),"group","text");
                                           // if(widget.user['fcm_token'] != null){
                                           //   profileBloc.sendNotification(widget.user);
                                           // }

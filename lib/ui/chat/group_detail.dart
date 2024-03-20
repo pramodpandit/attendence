@@ -87,7 +87,7 @@ class _CommunityProfileState extends State<GroupDetail> {
                           height: 130,
                         ),
                         Container(
-                          height: 130,
+                          height: 100,
                           width: 0.9.sw,
                           decoration: BoxDecoration(
                             boxShadow: [
@@ -152,7 +152,7 @@ class _CommunityProfileState extends State<GroupDetail> {
                                         decoration: BoxDecoration(
                                             borderRadius: BorderRadius.circular(5),
                                             image: DecorationImage(
-                                                image: NetworkImage(groupDetails['group']['logo']==null? 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png':
+                                                image: NetworkImage(groupDetails['group']['logo']==null? 'https://icones.pro/wp-content/uploads/2021/03/icone-de-groupe-symbole-png-gris.png':
                                                 "https://freeze.talocare.co.in/public/${groupDetails['group']['logo']}"),
                                                 fit: BoxFit.cover)),
                                       ),
@@ -161,7 +161,7 @@ class _CommunityProfileState extends State<GroupDetail> {
                                 );
                               },
                               child: ClipOval(
-                                child: Image.network(groupDetails['group']['logo']==null?'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png':
+                                child: Image.network(groupDetails['group']['logo']==null?'https://icones.pro/wp-content/uploads/2021/03/icone-de-groupe-symbole-png-gris.png':
                                 "https://freeze.talocare.co.in/public/${groupDetails['group']['logo']}",
                                   fit: BoxFit.cover,
                                 ),

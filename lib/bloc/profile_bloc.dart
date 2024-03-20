@@ -461,7 +461,6 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
   ValueNotifier<bool> isSending = ValueNotifier(false);
 
   Future sendMessage(String toUser,String chatType,String messageType,{File? image,Position? position})async{
-    isSending.value = true;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Map<String,dynamic> data = {
       "from_user" : prefs.getString("uid"),
@@ -488,6 +487,7 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
         });
     }
     try{
+      isSending.value = true;
       var result = await _repo.sendMessageApi(data);
       if(result['status']){
         // sendMessageController.clear();
