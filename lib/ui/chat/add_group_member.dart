@@ -130,7 +130,7 @@ class _AddGroupMemberState extends State<AddGroupMember> {
                           title: "Add",
                           loading : addMemberLoading,
                           onTap: () {
-                            // bloc.addRemoveMemberInGroup(context, widget.groupId, "add");
+                            bloc.addRemoveMemberInGroup(context, widget.groupId, "add");
                           },
                         );
                       },),

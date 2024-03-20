@@ -381,17 +381,16 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  Text("${widget.group['group_name']??''}",
+                                  Text(widget.group['group_name']??'',
                                     maxLines: 1,
                                     style: const TextStyle(fontWeight: FontWeight.w500,overflow: TextOverflow.ellipsis),
                                   ),
                                   Text(
-                                    "online",
+                                    widget.group['description'] ?? '',
                                     style: TextStyle(
-                                        fontWeight: FontWeight.w500,
                                         overflow: TextOverflow.ellipsis,
                                         fontSize: 12,
-                                        color: Colors.blue.shade400),
+                                        color: Colors.green),
                                   ),
                                 ],
                               ),

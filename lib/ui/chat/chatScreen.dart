@@ -375,11 +375,11 @@ class _ChatScreenState extends State<ChatScreen> {
                           Expanded(
                             child: GestureDetector(
                               onTap: () {
-                                // Navigator.of(context).push(MaterialPageRoute(
-                                //     builder: (context) => CommunityProfile()));
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => CommunityProfile(userid: widget.user['user_id'])));
                               },
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
                                   Text("${widget.user['first_name']??''} ${widget.user['middle_name']??''} ${widget.user['last_name']??''}",
                                     maxLines: 1,

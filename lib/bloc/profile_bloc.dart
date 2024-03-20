@@ -389,10 +389,18 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
       addMemberLoading.value = true;
       var result = await _repo.addRemoveMemberInGroupApi(data);
       if(result['status']){
-        Navigator.pop(context);
-        showMessage(MessageType.success("Members added successfully"));
+        if(type == "add"){
+          Navigator.pop(context);
+          showMessage(MessageType.success("Users added successfully"));
+        }else{
+          showMessage(MessageType.success("User removed successfully"));
+        }
       }else{
-        showMessage(MessageType.error("Somethimg went wrong"));
+        if(type == "add"){
+          showMessage(MessageType.error("User already added"));
+        }else{
+          showMessage(MessageType.error("Something went wrong"));
+        }
       }
     }catch(e){
       showMessage(MessageType.error("Something went wrong"));
