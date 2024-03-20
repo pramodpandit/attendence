@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 
 class ChatImageAnimation extends StatelessWidget {
   final String img;
-  const ChatImageAnimation({super.key, required this.img});
+  final String tag;
+  const ChatImageAnimation({super.key, required this.img, required this.tag});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +14,7 @@ class ChatImageAnimation extends StatelessWidget {
           Center(
             child: Container(
                 child: Hero(
-                    tag: "img",
+                    tag: tag,
                     child: Image.network(img,fit: BoxFit.cover,))),
           ),
           Positioned(

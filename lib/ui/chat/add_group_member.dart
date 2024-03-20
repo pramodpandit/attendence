@@ -16,7 +16,8 @@ import 'package:provider/provider.dart';
 
 class AddGroupMember extends StatefulWidget {
   final String groupId;
-  const AddGroupMember({super.key, required this.groupId});
+  final List groupMembers;
+  const AddGroupMember({super.key, required this.groupId, required this.groupMembers});
 
   @override
   State<AddGroupMember> createState() => _AddGroupMemberState();
@@ -112,6 +113,11 @@ class _AddGroupMemberState extends State<AddGroupMember> {
                           onOptionSelected: (selectedOptions) {
                             bloc.addingUsers.value = selectedOptions.map((e) => e.value.toString()).toList().join(",");
                           },
+                          disabledOptions: widget.groupMembers.map((e) =>
+                              ValueItem(label: "${e['first_name'] ??
+                                  ''} ${e['middle_name'] ??
+                                  ''} ${e['last_name'] ?? ''}",
+                                  value: e['user1'].toString())).toList(),
                           options: allUserDetail.map((e) =>
                               ValueItem(label: "${e['first_name'] ??
                                   ''} ${e['middle_name'] ??

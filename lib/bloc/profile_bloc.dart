@@ -416,6 +416,7 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
         }else{
           showMessage(MessageType.success("User removed successfully"));
         }
+        getSpecificGroupDetails(groupId);
       }else{
         if(type == "add"){
           showMessage(MessageType.error("User already added"));
@@ -446,6 +447,7 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
       }else{
         showMessage(MessageType.error("Somethimg went wrong"));
       }
+      getSpecificGroupDetails(groupId);
     }catch(e){
       showMessage(MessageType.error("Something went wrong"));
       print(e);

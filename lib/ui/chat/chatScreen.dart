@@ -512,10 +512,10 @@ class _ChatScreenState extends State<ChatScreen> {
                                           borderRadius : BorderRadius.circular(10),
                                           child: InkWell(
                                             onTap:(){
-                                              Navigator.push(context, MaterialPageRoute(builder: (context)=>ChatImageAnimation(img: "https://freeze.talocare.co.in/public/${snapshot.data![index]['file_uploaded']}",)));
+                                              Navigator.push(context, MaterialPageRoute(builder: (context)=>ChatImageAnimation(img: "https://freeze.talocare.co.in/public/${snapshot.data![index]['file_uploaded']}",tag: 'img${index}',)));
                                             },
                                             child: Hero(
-                                              tag:'img',
+                                              tag:'img${index}',
                                               child: Image.network(
                                                   "https://freeze.talocare.co.in/public/${snapshot.data![index]['file_uploaded']}",
                                                 loadingBuilder: (context, child, loadingProgress) {
