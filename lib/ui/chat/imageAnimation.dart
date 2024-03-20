@@ -10,14 +10,12 @@ class ChatImageAnimation extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-
-          Hero(
-              tag: "imageAnimation",
-              child: Center(
-                child: Container(
-
-                    child: Image.network('${img}',fit: BoxFit.cover,)),
-              )),
+          Center(
+            child: Container(
+                child: Hero(
+                    tag: "img",
+                    child: Image.network(img,fit: BoxFit.cover,))),
+          ),
           Positioned(
             top: 56,
             left: 10,

@@ -360,6 +360,27 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
     }
   }
 
+  ValueNotifier<bool> groupDetailLoading = ValueNotifier(false);
+  ValueNotifier<Map<String,dynamic>?> groupDetails = ValueNotifier({});
+
+  getSpecificGroupDetails(String groupId)async {
+    try{
+      groupDetailLoading.value = true;
+      var result = await _repo.fetchSpecificGroupDetail(groupId);
+      if(result['status']){
+        groupDetails.value = result;
+      }else{
+        groupDetails.value = null;
+      }
+    }catch(e){
+      showMessage(MessageType.error("Something went wrong"));
+      groupDetails.value = null;
+      print(e);
+    }finally{
+      groupDetailLoading.value = false;
+    }
+  }
+
   ValueNotifier<bool> addMemberLoading = ValueNotifier(false);
   ValueNotifier<String> addingUsers = ValueNotifier("");
   

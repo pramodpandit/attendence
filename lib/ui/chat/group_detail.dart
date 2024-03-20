@@ -15,8 +15,8 @@ import '../chat/chatScreen.dart';
 import '../project/menus/User_profile.dart';
 
 class GroupDetail extends StatefulWidget {
-  final Map<String,dynamic> group;
-  const GroupDetail({Key? key, required this.group}) : super(key: key);
+  final String groupId;
+  const GroupDetail({Key? key, required this.groupId}) : super(key: key);
 
   @override
   State<GroupDetail> createState() => _CommunityProfileState();
@@ -29,6 +29,7 @@ class _CommunityProfileState extends State<GroupDetail> {
     // TODO: implement initState
     super.initState();
     bloc = ProfileBloc(context.read<ProfileRepository>());
+    bloc.getSpecificGroupDetails(widget.groupId);
   }
 
   @override
@@ -36,194 +37,241 @@ class _CommunityProfileState extends State<GroupDetail> {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
-      body: Column(
-        children: [
-          Stack(
+      body: ValueListenableBuilder(
+        valueListenable: bloc.groupDetailLoading,
+        builder: (context, groupDetailLoading, child) {
+          if(groupDetailLoading){
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        return ValueListenableBuilder(
+          valueListenable: bloc.groupDetails,
+          builder: (context, groupDetails, child) {
+            if(groupDetails!.isEmpty){
+              return Text("Something went wrong");
+            }
+          return Column(
             children: [
-              const SizedBox(
-                height: 50,
-              ),
-              Container(
-                height: 190,
-                width: 1.sw,
-                decoration: const BoxDecoration(
-                    color: Color(0xFF009FE3),
-                    borderRadius:
-                    BorderRadius.only(bottomLeft: Radius.circular(30))),
-                child: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      height: 56,
-                    ),
-                  ],
-                ),
-              ),
-              Center(
-                child: Column(
-                  children: [
-                    const SizedBox(
-                      height: 130,
-                    ),
-                    Container(
-                      height: 130,
-                      width: 0.9.sw,
-                      decoration: BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                              color: Colors.grey.withOpacity(0.2),
-                              blurRadius: 3,
-                              spreadRadius: 2)
-                        ],
-                        color: Colors.white,
+              Stack(
+                children: [
+                  const SizedBox(
+                    height: 50,
+                  ),
+                  Container(
+                    height: 190,
+                    width: 1.sw,
+                    decoration: const BoxDecoration(
+                        color: Color(0xFF009FE3),
                         borderRadius:
-                        const BorderRadius.all(Radius.circular(10)),
-                      ),
-                      child: Column(
-                        children: [
-                          SizedBox(
-                            height: 40.h,
-                          ),
-                          Text(
-                            "${widget.group['group_name']??''}",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 3,
-                          ),
-                          Text(
-                            "${widget.group['description']??''}",
-                            textAlign: TextAlign.center,
-                            style:
-                            TextStyle(color: Colors.black87, fontSize: 12),
-                          ),
-                        ],
-                      ),
+                        BorderRadius.only(bottomLeft: Radius.circular(30))),
+                    child: const Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          height: 56,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-              Center(
-                child: Column(
-                  children: [
-                    const SizedBox(
-                      height: 100,
+                  ),
+                  Center(
+                    child: Column(
+                      children: [
+                        const SizedBox(
+                          height: 130,
+                        ),
+                        Container(
+                          height: 130,
+                          width: 0.9.sw,
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.grey.withOpacity(0.2),
+                                  blurRadius: 3,
+                                  spreadRadius: 2)
+                            ],
+                            color: Colors.white,
+                            borderRadius:
+                            const BorderRadius.all(Radius.circular(10)),
+                          ),
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                height: 40.h,
+                              ),
+                              Text(
+                                "${groupDetails['group']['group_name']??''}",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 3,
+                              ),
+                              Text(
+                                "${groupDetails['group']['description']??''}",
+                                textAlign: TextAlign.center,
+                                style:
+                                TextStyle(color: Colors.black87, fontSize: 12),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    CircleAvatar(
-                      radius: 33,
-                      backgroundColor: Colors.white,
-                      child: SizedBox(
-                        height: 60,
-                        width: 60,
-                        child: GestureDetector(
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return Dialog(
-                                  child: Container(
-                                    height: height / 2.5,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(5),
-                                        image: DecorationImage(
-                                            image: NetworkImage(widget.group['logo']==null? 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png':
-                                            "https://freeze.talocare.co.in/public/${widget.group['logo']}"),
-                                            fit: BoxFit.cover)),
-                                  ),
+                  ),
+                  Center(
+                    child: Column(
+                      children: [
+                        const SizedBox(
+                          height: 100,
+                        ),
+                        CircleAvatar(
+                          radius: 33,
+                          backgroundColor: Colors.white,
+                          child: SizedBox(
+                            height: 60,
+                            width: 60,
+                            child: GestureDetector(
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return Dialog(
+                                      child: Container(
+                                        height: height / 2.5,
+                                        decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(5),
+                                            image: DecorationImage(
+                                                image: NetworkImage(groupDetails['group']['logo']==null? 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png':
+                                                "https://freeze.talocare.co.in/public/${groupDetails['group']['logo']}"),
+                                                fit: BoxFit.cover)),
+                                      ),
+                                    );
+                                  },
                                 );
                               },
-                            );
-                          },
-                          child: ClipOval(
-                            child: Image.network(widget.group['logo']==null?'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png':
-                            "https://freeze.talocare.co.in/public/${widget.group['logo']}",
-                              fit: BoxFit.cover,
+                              child: ClipOval(
+                                child: Image.network(groupDetails['group']['logo']==null?'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png':
+                                "https://freeze.talocare.co.in/public/${groupDetails['group']['logo']}",
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
                             ),
                           ),
                         ),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    top: 56,
+                    left: 10,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: const CircleAvatar(
+                        backgroundColor: Colors.white,
+                        radius: 18,
+                        child: Icon(
+                          Icons.arrow_back,
+                          size: 18,
+                        ),
                       ),
                     ),
-                  ],
-                ),
-              ),
-              Positioned(
-                top: 56,
-                left: 10,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: const CircleAvatar(
-                    backgroundColor: Colors.white,
-                    radius: 18,
-                    child: Icon(
-                      Icons.arrow_back,
-                      size: 18,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Expanded(
-              child : Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: ListTile(
-                      onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => AddGroupMember(groupId: widget.group['id'].toString())));
-                      },
-                      title: Text("Add Member"),
-                      leading: Icon(Icons.add),
-                    ),
-                  ),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: 10,
-                      padding: EdgeInsets.symmetric(horizontal: 15),
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          title: Text("Pramod"),
-                          leading: CircleAvatar(),
-                          trailing: PopupMenuButton(
-                            position: PopupMenuPosition.under,
-                            itemBuilder: (context) {
-                              return [
-                                PopupMenuItem(
-                                  child: Text("Make admin"),
-                                  onTap: () {
-                                    // make admin
-                                    // bloc.makeRemoveAdminInGroup(widget.group['id'].toString(), "67687", "1");
-                                    // remove from admin
-                                    // bloc.makeRemoveAdminInGroup(widget.group['id'].toString(), "67687", "0");
-                                  },
-                                ),
-                                PopupMenuItem(
-                                  child: Text("Remove"),
-                                  onTap: () {
-                                    // bloc.addRemoveMemberInGroup(context, widget.group['id'].toString(), "remove",removeUser: "76457687");
-                                  },
-                                ),
-                              ];
-                            },
-                          ),
-                        );
-                      },),
                   ),
                 ],
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Expanded(
+                  child : Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: ListTile(
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => AddGroupMember(groupId: widget.groupId)));
+                          },
+                          title: Text("Add Member"),
+                          leading: Icon(Icons.add),
+                        ),
+                      ),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: (groupDetails['data'] as List).length,
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          itemBuilder: (context, index) {
+                            return ListTile(
+                              contentPadding: EdgeInsets.symmetric(vertical: 5),
+                              title: Text(groupDetails['data'][index]['user_name']),
+                              leading: CircleAvatar(
+                                radius: 33,
+                                backgroundColor: Colors.white,
+                                child: SizedBox(
+                                  height: 60,
+                                  width: 60,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return Dialog(
+                                            child: Container(
+                                              height: height / 2.5,
+                                              decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(5),
+                                                  image: DecorationImage(
+                                                      image: NetworkImage(groupDetails['data'][index]['image']==null? 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png':
+                                                      "https://freeze.talocare.co.in/public/${groupDetails['data'][index]['image']}"),
+                                                      fit: BoxFit.cover)),
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    },
+                                    child: ClipOval(
+                                      child: Image.network(groupDetails['data'][index]['image']==null?'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png':
+                                      "https://freeze.talocare.co.in/public/${groupDetails['data'][index]['image']}",
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              trailing: PopupMenuButton(
+                                position: PopupMenuPosition.under,
+                                itemBuilder: (context) {
+                                  return [
+                                    PopupMenuItem(
+                                      child: Text(groupDetails['data'][index]['role'].toString() == "1"?"Remove From Admin" : "Make admin"),
+                                      onTap: () {
+                                        bloc.makeRemoveAdminInGroup(widget.groupId.toString(), groupDetails['data'][index]['user1'], groupDetails['data'][index]['role'].toString() == "1" ? "0" : "1");
+                                      },
+                                    ),
+                                    PopupMenuItem(
+                                      child: Text("Remove"),
+                                      onTap: () {
+                                        // bloc.addRemoveMemberInGroup(context, widget.group['id'].toString(), "remove",removeUser: "76457687");
+                                      },
+                                    ),
+                                  ];
+                                },
+                              ),
+                            );
+                          },),
+                      ),
+                    ],
+                  )
               )
-          )
-        ],
-      ),
+            ],
+          );
+        },);
+      },),
     );
   }
 }

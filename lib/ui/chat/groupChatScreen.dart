@@ -376,7 +376,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                             child: GestureDetector(
                               onTap: () {
                                 Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => GroupDetail(group: widget.group)));
+                                    builder: (context) => GroupDetail(groupId: widget.group['id'].toString())));
                               },
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
