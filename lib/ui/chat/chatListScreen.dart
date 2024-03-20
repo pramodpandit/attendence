@@ -597,7 +597,7 @@ class _GroupChatState extends State<GroupChat> {
 
       leading: CircleAvatar(
         child: ClipOval(
-            child: widget.groupData['logo'] == null?Icon(Icons.person):
+            child: widget.groupData['logo'] == null?Icon(Icons.groups,color: Colors.blueGrey):
             Image.network(
               "https://freeze.talocare.co.in/public/${widget.groupData['logo']}",
               loadingBuilder: (context, child, loadingProgress) {
@@ -617,7 +617,7 @@ class _GroupChatState extends State<GroupChat> {
                 );
               },
               errorBuilder: (context, error, stackTrace) {
-                return Icon(Icons.person);
+                return Icon(Icons.groups,color: Colors.blueGrey);
               },
               width: double.infinity,
               height: double.infinity,
