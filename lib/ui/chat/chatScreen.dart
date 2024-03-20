@@ -54,6 +54,7 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+
   Future<void> openFilePicker() async{
     filePickerResult = await FilePicker.platform.pickFiles(
       type: FileType.audio,
