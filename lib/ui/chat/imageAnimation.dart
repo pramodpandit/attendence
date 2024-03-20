@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:custom_zoom_widget/custom_zoom_widget.dart';
 
 class ChatImageAnimation extends StatelessWidget {
   final String img;
@@ -15,7 +16,13 @@ class ChatImageAnimation extends StatelessWidget {
             child: Container(
                 child: Hero(
                     tag: tag,
-                    child: Image.network(img,fit: BoxFit.cover,))),
+                    child:CustomZoomWidget(
+                      child: Image.network(
+                        img,fit: BoxFit.cover,
+                      ),
+                    ),
+                   // child: Image.network(img,fit: BoxFit.cover,)
+                )),
           ),
           Positioned(
             top: 56,

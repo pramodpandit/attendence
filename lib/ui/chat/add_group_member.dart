@@ -17,30 +17,26 @@ import 'package:provider/provider.dart';
 class AddGroupMember extends StatefulWidget {
   final String groupId;
   final List groupMembers;
-  const AddGroupMember({super.key, required this.groupId, required this.groupMembers});
+  final ProfileBloc bloc;
+  const AddGroupMember({super.key, required this.groupId, required this.groupMembers, required this.bloc});
 
   @override
   State<AddGroupMember> createState() => _AddGroupMemberState();
 }
 
 class _AddGroupMemberState extends State<AddGroupMember> {
-  late ProfileBloc bloc;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    bloc = ProfileBloc(context.read<ProfileRepository>());
-    bloc.msgController?.stream.listen((event) {
-      AppMessageHandler().showSnackBar(context, event);
-    });
-    bloc.fetchAllUserDetail();
+    widget.bloc.fetchAllUserDetail();
   }
 
   void pickImage()async{
     ImagePicker picker = ImagePicker();
     XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    bloc.groupLogo.value = File(pickedFile!.path);
+    widget.bloc.groupLogo.value = File(pickedFile!.path);
   }
 
   @override
@@ -94,7 +90,7 @@ class _AddGroupMemberState extends State<AddGroupMember> {
           ),
           Expanded(
             child: ValueListenableBuilder(
-              valueListenable: bloc.allUserDetail,
+              valueListenable: widget.bloc.allUserDetail,
               builder: (context, allUserDetail, child) {
                 if(allUserDetail == null){
                   return Center(
@@ -111,7 +107,7 @@ class _AddGroupMemberState extends State<AddGroupMember> {
                       Container(
                         child: MultiSelectDropDown(
                           onOptionSelected: (selectedOptions) {
-                            bloc.addingUsers.value = selectedOptions.map((e) => e.value.toString()).toList().join(",");
+                            widget.bloc.addingUsers.value = selectedOptions.map((e) => e.value.toString()).toList().join(",");
                           },
                           disabledOptions: widget.groupMembers.map((e) =>
                               ValueItem(label: "${e['first_name'] ??
@@ -130,13 +126,13 @@ class _AddGroupMemberState extends State<AddGroupMember> {
                       ),
                       const SizedBox(height: 20),
                       ValueListenableBuilder(
-                        valueListenable: bloc.addMemberLoading,
+                        valueListenable: widget.bloc.addMemberLoading,
                         builder: (context, addMemberLoading, child) {
                         return AppButton(
                           title: "Add",
                           loading : addMemberLoading,
                           onTap: () {
-                            bloc.addRemoveMemberInGroup(context, widget.groupId, "add");
+                            widget.bloc.addRemoveMemberInGroup(context, widget.groupId, "add");
                           },
                         );
                       },),

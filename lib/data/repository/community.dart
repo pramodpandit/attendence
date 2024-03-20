@@ -22,7 +22,6 @@ class CommunityRepositary{
     var response=await _api.getRequest("getpost",data: {
       "user_id":id,
     });
-    //print('jek${response['data']['data']}');
     return ApiResponse2.fromJson(response,List.from((response['data']['data'] ?? []).map((e) => Community.fromJson(e))));
   }
 

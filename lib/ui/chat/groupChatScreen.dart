@@ -20,6 +20,7 @@ import 'package:provider/provider.dart';
 
 import '../../bloc/profile_bloc.dart';
 import '../../data/repository/profile_repo.dart';
+import 'imageAnimation.dart';
 
 class GroupChatScreen extends StatefulWidget {
   final Map<String,dynamic> group;
@@ -552,28 +553,37 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                             height : 150,
                                             child: ClipRRect(
                                               borderRadius : BorderRadius.circular(10),
-                                              child: Image.network(
-                                                "https://freeze.talocare.co.in/public/${snapshot.data![index]['file_uploaded']}",
-                                                loadingBuilder: (context, child, loadingProgress) {
-                                                  if(loadingProgress == null){
-                                                    return child;
-                                                  }
-                                                  return SizedBox(
-                                                    height: 40,
-                                                    width: 40,
-                                                    child: Center(
-                                                      child: CircularProgressIndicator(
-                                                        value: loadingProgress.expectedTotalBytes != null?
-                                                        loadingProgress.cumulativeBytesLoaded/
-                                                            loadingProgress.expectedTotalBytes!
-                                                            : null,
-                                                        strokeWidth: 1,
-                                                        color: Colors.white,
-                                                      ),
-                                                    ),
-                                                  );
+                                              child: InkWell(
+                                                onTap:(){
+                                                  Navigator.push(context, MaterialPageRoute(builder:(context)=>ChatImageAnimation(img: "https://freeze.talocare.co.in/public/${snapshot.data![index]['file_uploaded']}",tag: 'img${index}',)));
+
                                                 },
-                                                fit: BoxFit.cover,
+                                                child: Hero(
+                                                  tag:'img${index}',
+                                                  child: Image.network(
+                                                    "https://freeze.talocare.co.in/public/${snapshot.data![index]['file_uploaded']}",
+                                                    loadingBuilder: (context, child, loadingProgress) {
+                                                      if(loadingProgress == null){
+                                                        return child;
+                                                      }
+                                                      return SizedBox(
+                                                        height: 40,
+                                                        width: 40,
+                                                        child: Center(
+                                                          child: CircularProgressIndicator(
+                                                            value: loadingProgress.expectedTotalBytes != null?
+                                                            loadingProgress.cumulativeBytesLoaded/
+                                                                loadingProgress.expectedTotalBytes!
+                                                                : null,
+                                                            strokeWidth: 1,
+                                                            color: Colors.white,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
                                               ),
                                             ),
                                           )
@@ -742,6 +752,9 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                       }
                                       return InkWell(
                                         onTap: () {
+                                          if(profileBloc.sendMessageController.text.isEmpty){
+                                            return;
+                                          }
                                           profileBloc.sendMessage(widget.group['id'].toString(),"group","text");
                                           // if(widget.user['fcm_token'] != null){
                                           //   profileBloc.sendNotification(widget.user);
