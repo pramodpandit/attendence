@@ -515,7 +515,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                               Navigator.push(context, MaterialPageRoute(builder: (context)=>ChatImageAnimation(img: "https://freeze.talocare.co.in/public/${snapshot.data![index]['file_uploaded']}",)));
                                             },
                                             child: Hero(
-                                              tag:'imageAnimation',
+                                              tag:'img',
                                               child: Image.network(
                                                   "https://freeze.talocare.co.in/public/${snapshot.data![index]['file_uploaded']}",
                                                 loadingBuilder: (context, child, loadingProgress) {
