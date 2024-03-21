@@ -260,14 +260,14 @@ class _AddWaterState extends State<AddWater> {
                                           const TextStyle(color: Colors.black54, fontSize: 15),
                                         ),
                                         onChanged: (v) {
-                                          waterBloc.waterString.value = v??"";
+                                           waterBloc.waterString.value = v??"";
                                           // final selectedWater = waterBloc.waterType.value.firstWhere(
                                           //       (waterType) => waterType.id == waterBloc.waterString.value,
                                           //   orElse: () => WaterType(name: ''),
                                           // );
                                           // // waterType.first.quantityController.text=selectedWater.quantity=='0'?'':selectedWater.quantity!;
                                           // print("${selectedWater.id}");
-                                          waterBloc.fetchWaterDaily();
+                                          //waterBloc.fetchWaterDaily();
                                           print("v $v ${waterBloc.waterString.value}");
                                         },
                                         items: waterBloc.waterType.value.map((WaterType items) {
