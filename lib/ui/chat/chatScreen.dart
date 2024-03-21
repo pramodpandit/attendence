@@ -26,6 +26,7 @@ import 'package:video_player/video_player.dart';
 
 import '../../bloc/profile_bloc.dart';
 import '../../data/repository/profile_repo.dart';
+import 'call.dart';
 import 'imageAnimation.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -161,7 +162,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   image: FileImage(
                     imageFile!,
                   )),
-              //color: Colors.amber,
             ),
           ),
         ),
@@ -184,7 +184,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 valueListenable: profileBloc.isSending,
                 builder: (context, isSending, child) {
                   if(isSending){
-                    return Center(
+                    return const Center(
                       child: SizedBox(
                         height: 20,
                         width: 20,
@@ -564,12 +564,15 @@ class _ChatScreenState extends State<ChatScreen> {
                             width: 15,
                           ),
                           GestureDetector(
-                              onTap: () {},
+                              onTap: () {
+                               // Navigator.push(context, MaterialPageRoute(builder: (context)=>CallPage(fcm: widget.user['fcm_token'],username: "${widget.user['first_name']??''} ${widget.user['middle_name']??''} ${widget.user['last_name']??''}",user:widget.user ,)));
+                              },
                               child: Icon(
                                 Icons.call,
                                 color: Colors.blue,
                                 size: 20,
-                              )),
+                              )
+                          ),
                           SizedBox(
                             width: 15,
                           ),

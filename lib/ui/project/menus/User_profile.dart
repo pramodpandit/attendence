@@ -9,6 +9,7 @@ import '../../../bloc/project_bloc.dart';
 import '../../../data/repository/profile_repo.dart';
 import '../../../data/repository/project_repo.dart';
 import '../../chat/chatScreen.dart';
+import '../../community/communityProfile.dart';
 import '../../profile/menus/basic_info.dart';
 
 class UserProfile extends StatefulWidget {
@@ -28,7 +29,7 @@ class _UserProfileState extends State<UserProfile> {
 
   ];
   List<String> menuItems =[
-    // "My Timeline",
+     "My Timeline",
     "Profile Info",
     "About",
   ];
@@ -43,14 +44,7 @@ class _UserProfileState extends State<UserProfile> {
     profileBloc=ProfileBloc(context.read<ProfileRepository>());
     sharedPref();
      menusWidgets = [
-      // ListView.builder(
-      //   itemCount: 7,
-      //   physics: ScrollPhysics(),
-      //   // shrinkWrap: true,
-      //   itemBuilder: (context, index) {
-      //     return PostList();
-      //   },
-      // ),
+       PostData(id: int.parse( widget.userid),),
       ProfileInfo(userid: widget.userid),
        AboutInfo(userid: widget.userid),
      ];
