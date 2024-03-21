@@ -507,6 +507,34 @@ class _SingleChatState extends State<SingleChat> {
                 color: Colors.grey.shade400))
         ],
       )
+          : widget.userData['last_chat'][widget.userData['last_chat'].length-1]['message_type'] == "video"
+          ? Row(
+            children: [
+              Icon(Icons.videocam_outlined,color: Colors.grey.shade400,size: 15),
+              const SizedBox(width: 3),
+              Text(
+                  "video",
+                  style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      overflow: TextOverflow.ellipsis,
+                      fontSize: 12,
+                      color: Colors.grey.shade400))
+            ],
+          )
+          : widget.userData['last_chat'][widget.userData['last_chat'].length-1]['message_type'] == "audio"
+          ? Row(
+            children: [
+              Icon(Icons.audiotrack_outlined,color: Colors.grey.shade400,size: 15),
+              const SizedBox(width: 3),
+              Text(
+                  "audio",
+                  style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      overflow: TextOverflow.ellipsis,
+                      fontSize: 12,
+                      color: Colors.grey.shade400))
+            ],
+          )
       : widget.userData['last_chat'][widget.userData['last_chat'].length-1]['message_type'] == "location"
       ? Row(
         children: [

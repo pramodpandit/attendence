@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:android_path_provider/android_path_provider.dart';
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -11,12 +12,16 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:http/http.dart';
 import 'package:office/data/model/user.dart';
 import 'package:office/ui/chat/group_detail.dart';
+import 'package:office/ui/chat/play_video_screen.dart';
 import 'package:office/ui/community/communityProfile.dart';
 import 'package:office/ui/widget/more_sheet.dart';
 import 'package:office/utils/message_handler.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../bloc/profile_bloc.dart';
 import '../../data/repository/profile_repo.dart';
@@ -33,10 +38,12 @@ class GroupChatScreen extends StatefulWidget {
 }
 
 class _GroupChatScreenState extends State<GroupChatScreen> {
-  File? galleryFile;
-  PlayerController playerController = PlayerController();
-  // var waveFormData;
-  FilePickerResult? filePickerResult;
+  File? imageFile;
+  File? videoFile;
+  late VideoPlayerController videoPlayerController;
+  late RecorderController recordController;
+  bool recorder = false;
+  ValueNotifier<bool> isRecording = ValueNotifier(false);
   final Completer<GoogleMapController> _completer = Completer();
   Position? position;
   late ProfileBloc profileBloc;
@@ -49,31 +56,38 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
 
     if (pickedFile != null) {
       setState(() {
-        galleryFile = File(pickedFile.path);
-        profileBloc.image = galleryFile;
+        imageFile = File(pickedFile.path);
+        profileBloc.image = imageFile;
       });
     }
   }
+  Future<void> _openVideoPicker(ImageSource source) async {
+    Navigator.of(context).pop();
+    print("Opening Video Picker");
+    final picker = ImagePicker();
+    final pickedVideo = await picker.pickVideo(source: source);
+    if (pickedVideo != null) {
+      setState(() {
+        videoFile = File(pickedVideo.path);
+      });
+      videoPlayerController = VideoPlayerController.file(File(pickedVideo.path))
+        ..initialize().then((value){
+          setState(() {});
+          profileBloc.showMessage(MessageType.info("Tap on video to play/pause"));
+        });
+    }
+  }
 
-  Future<void> openFilePicker() async{
-    filePickerResult = await FilePicker.platform.pickFiles(
-      type: FileType.audio,
-    );
-    File audioFile = File(filePickerResult!.files.single.path!);
-    // waveFormData = await playerController.extractWaveformData(
-    //   path: filePickerResult.paths,
-    //   // noOfSamples: 100,
-    // );
-    setState(() { });
-// Or directly extract from preparePlayer and initialise audio player
-    await playerController.preparePlayer(
-      path: audioFile.path,
-      shouldExtractWaveform: true,
-      noOfSamples: 100,
-      volume: 1.0,
-    );
-    // AudioPlayer audioPlayer = AudioPlayer();
-    // audioPlayer.play(DeviceFileSource(audioFile.path));
+  Future<void> startRecorder() async{
+    Navigator.of(context).pop();
+    final hasPermission = await recordController.checkPermission();
+    if(hasPermission){
+      setState(() {
+        recorder = true;
+      });
+      isRecording.value = true;
+      await recordController.record();
+    }
   }
 
   late Stream<List> chattingStream;
@@ -84,7 +98,16 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       AppMessageHandler().showSnackBar(context, event);
     });
     super.initState();
+    initRecorder();
     chattingStream = profileBloc.getGroupChats(widget.group['id'].toString()).asBroadcastStream();
+  }
+  initRecorder(){
+    recordController = RecorderController()
+      ..androidEncoder = AndroidEncoder.aac
+      ..androidOutputFormat = AndroidOutputFormat.mpeg4
+      ..iosEncoder = IosEncoder.kAudioFormatMPEG4AAC
+      ..currentScrolledDuration
+      ..sampleRate = 44100;
   }
 
   Future<void> getLocation() async {
@@ -108,11 +131,19 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    recordController.dispose();
+    videoPlayerController.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     Widget imageView = SizedBox.shrink();
     double widthScreen = MediaQuery.of(context).size.width;
     double heightScreen = MediaQuery.of(context).size.height;
-    if (galleryFile != null) {
+    if (imageFile != null) {
       imageView = Stack(
           children: [
         //image container:::
@@ -126,7 +157,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
               image: DecorationImage(
                   fit: BoxFit.cover,
                   image: FileImage(
-                    galleryFile!,
+                    imageFile!,
                   )),
               //color: Colors.amber,
             ),
@@ -138,7 +169,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
           child: IconButton(
               onPressed: () {
                 setState(() {
-                  galleryFile = null;
+                  imageFile = null;
                 });
               },
               icon: Icon(Icons.highlight_remove)),
@@ -161,9 +192,9 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                   }
                   return InkWell(
                     onTap: () {
-                      profileBloc.sendMessage(widget.group['id'].toString(),"group","image",image: galleryFile).then((value){
+                      profileBloc.sendMessage(widget.group['id'].toString(),"group","image",image: imageFile).then((value){
                         setState(() {
-                          galleryFile = null;
+                          imageFile = null;
                         });
                       //   // if(widget.user['fcm_token'] != null && profileBloc.sendMessageController.text.isNotEmpty){
                       //   //   profileBloc.sendNotification(widget.user,image: galleryFile);
@@ -181,6 +212,72 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                 },),
             ),
       ]);
+    }
+    if (videoFile != null) {
+      imageView = Stack(
+          children: [
+            //image container:::
+            Center(
+              child: Container(
+                height: heightScreen / 2,
+                width: widthScreen *0.7,
+                child: AspectRatio(
+                  aspectRatio: videoPlayerController.value.aspectRatio,
+                  child: VideoPlayer(videoPlayerController).onTap((){
+                    videoPlayerController.value.isPlaying?videoPlayerController.pause():videoPlayerController.play();
+                  }).cornerRadiusWithClipRRect(10),
+                ),
+              ),
+            ),
+            //cross::::
+            Align(
+              alignment: Alignment.topRight,
+              child: IconButton(
+                  onPressed: () {
+                    setState(() {
+                      videoFile = null;
+                    });
+                  },
+                  icon: Icon(Icons.highlight_remove)),
+            ),
+
+            Positioned(
+              bottom: 10,
+              right: 10,
+              child: ValueListenableBuilder(
+                valueListenable: profileBloc.isSending,
+                builder: (context, isSending, child) {
+                  if(isSending){
+                    return Center(
+                      child: SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    );
+                  }
+                  return InkWell(
+                    onTap: () {
+                      profileBloc.sendMessage(widget.group['id'].toString(),"group","video",video: videoFile).then((value){
+                        setState(() {
+                          videoFile = null;
+                        });
+                        // if(widget.user['fcm_token'] != null && profileBloc.sendMessageController.text.isNotEmpty){
+                        //   profileBloc.sendNotification(widget.user,image: galleryFile);
+                        // }
+                      });
+                    },
+                    child: Container(
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.black,
+                        ),
+                        child: const Icon(PhosphorIcons.paper_plane_tilt,color: Colors.white)),
+                  );
+                },),
+            ),
+          ]);
     }
     if (position != null) {
       imageView = Stack(children: [
@@ -250,19 +347,29 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
         ),
       ]);
     }
-    if (filePickerResult != null) {
+    if (recorder) {
       imageView = Stack(children: [
-        //image container:::
-        Text("ui"),
-        AudioFileWaveforms(
-            size: Size(MediaQuery.of(context).size.width,100.0),
-            playerController: playerController,
-          waveformType: WaveformType.long,
-          waveformData: const [10.0,20.0],
-          playerWaveStyle: const PlayerWaveStyle(
-              fixedWaveColor: Colors.white54,
-              liveWaveColor: Colors.blueAccent,
-              spacing: 6,
+        const SizedBox(height: 100),
+        Positioned(
+          bottom: 0,
+          child: AudioWaveforms(
+            enableGesture: true,
+            size: Size(
+                MediaQuery.of(context).size.width /2,
+                50),
+            recorderController: recordController,
+            waveStyle: const WaveStyle(
+              waveColor: Colors.white,
+              extendWaveform: true,
+              showMiddleLine: false,
+            ),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12.0),
+              color: Colors.black,
+            ),
+            padding: const EdgeInsets.only(left: 18),
+            margin: const EdgeInsets.symmetric(
+                horizontal: 15),
           ),
         ),
         //cross::::
@@ -270,14 +377,42 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
           alignment: Alignment.topRight,
           child: IconButton(
               onPressed: () {
+                recordController.reset();
                 setState(() {
-                  filePickerResult = null;
+                  recorder = false;
                 });
               },
               icon: Icon(Icons.highlight_remove)),
         ),
         Positioned(
-          bottom: 10,
+          bottom: 5,
+          right: 55,
+          child: InkWell(
+            onTap: () {
+              if(recordController.isRecording){
+                isRecording.value = false;
+                recordController.pause();
+              }else{
+                isRecording.value = true;
+                recordController.record();
+              }
+            },
+            child: Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.black,
+              ),
+              child: ValueListenableBuilder(
+                valueListenable: isRecording,
+                builder: (context, isRecording, child) {
+                  return Icon(isRecording?PhosphorIcons.pause:PhosphorIcons.play,color: Colors.white,size: 20);
+                },),
+            ),
+          ),
+        ),
+        Positioned(
+          bottom: 5,
           right: 10,
           child: ValueListenableBuilder(
             valueListenable: profileBloc.isSending,
@@ -292,20 +427,34 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                 );
               }
               return InkWell(
-                onTap: () {
+                onTap: () async{
+                  // if(isRecording.value){
+                  String? path = await recordController.stop();
+                  recordController.reset();
+                  // }
+                  profileBloc.sendMessage(widget.group['id'].toString(),"group","audio",audioPath: path).then((value){
+                    setState(() {
+                      recorder = false;
+                    });
+                  });
                   // profileBloc.sendMessage(widget.user['user_id'].toString(),"one_to_one","file",image: galleryFile).then((value){
-                  //   // if(widget.user['fcm_token'] != null && profileBloc.sendMessageController.text.isNotEmpty){
-                  //   //   profileBloc.sendNotification(widget.user,image: galleryFile);
-                  //   // }
+                  // if(widget.user['fcm_token'] != null && profileBloc.sendMessageController.text.isNotEmpty){
+                  //   profileBloc.sendNotification(widget.user,image: galleryFile);
+                  // }
                   // });
                 },
                 child: Container(
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.black,
-                    ),
-                    child: const Icon(PhosphorIcons.paper_plane_tilt,color: Colors.white)),
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.black,
+                  ),
+                  child: ValueListenableBuilder(
+                    valueListenable: isRecording,
+                    builder: (context, isRecording, child) {
+                      return Icon(isRecording? PhosphorIcons.stop: PhosphorIcons.paper_plane_tilt,color: Colors.white,size: 20);
+                    },),
+                ),
               );
             },),
         ),
@@ -481,6 +630,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                       child: Text("${DateTime.parse(snapshot.data![index]['created_at']).isToday ? 'Today' :DateTime.parse(snapshot.data![index]['created_at']).isYesterday ? 'Yesterday' :DateFormat("dd/MM/yyyy").format(DateTime.parse(snapshot.data![index]['created_at']))}",
                                       ))
                                       : Offstage(),
+                                  const SizedBox(height: 10),
                                   Align(
                                     alignment: snapshot.data![index]['sender_id'].toString() == widget.prefs.getString("uid") ?Alignment.centerRight:Alignment.centerLeft,
                                     child: Row(
@@ -527,7 +677,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                         ),
                                         const SizedBox(width: 5),
                                         Container(
-                                          padding: snapshot.data![index]['message_type'] == "location" || snapshot.data![index]['message_type'] == "image" ?
+                                          padding: snapshot.data![index]['message_type'] == "location" || snapshot.data![index]['message_type'] == "image" || snapshot.data![index]['message_type'] == "video" || snapshot.data![index]['message_type'] == "audio" ?
                                           const EdgeInsets.symmetric(horizontal: 1,vertical: 1):
                                           const EdgeInsets.symmetric(
                                               horizontal: 15, vertical: 10),
@@ -587,6 +737,10 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                               ),
                                             ),
                                           )
+                                              : snapshot.data![index]['message_type'] == "video" ?
+                                          VideoPlayerWidget(videoPath: snapshot.data![index]['file_uploaded'],index: index)
+                                              : snapshot.data![index]['message_type'] == "audio" ?
+                                          GroupAudioPlayerWidget(audioPath : snapshot.data![index]['file_uploaded'])
                                               : snapshot.data![index]['message_type'] == "location" ?
                                           SizedBox(
                                             height : 150,
@@ -675,7 +829,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                         child: Column(
                           children: [
                             imageView,
-                            if(galleryFile==null && filePickerResult==null && position == null)
+                            if(imageFile==null && videoFile==null && recorder==false && position == null)
                               Row(
                                 children: [
                                   Expanded(
@@ -710,6 +864,13 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                                 ),
                                                 ListTile(
                                                   onTap : () {
+                                                    _openVideoPicker(ImageSource.camera);
+                                                  },
+                                                  title: Text("Video"),
+                                                  leading: Icon(PhosphorIcons.video_camera),
+                                                ),
+                                                ListTile(
+                                                  onTap : () {
                                                     _openImagePicker(ImageSource.gallery);
                                                   },
                                                   title: Text("Gallery"),
@@ -717,7 +878,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                                 ),
                                                 ListTile(
                                                   onTap : () {
-                                                    openFilePicker();
+                                                    startRecorder();
                                                   },
                                                   title: Text("Audio"),
                                                   leading: Icon(PhosphorIcons.file_audio),
@@ -779,6 +940,218 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
             return Offstage();
           },),
       ),
+    );
+  }
+}
+
+class GroupAudioPlayerWidget extends StatefulWidget {
+  final String audioPath;
+  const GroupAudioPlayerWidget({super.key, required this.audioPath});
+
+  @override
+  State<GroupAudioPlayerWidget> createState() => _GroupAudioPlayerWidgetState();
+}
+
+class _GroupAudioPlayerWidgetState extends State<GroupAudioPlayerWidget> {
+  PlayerController playerController = PlayerController();
+  File? audioFile;
+  ValueNotifier<bool> isPermissionGranted = ValueNotifier(true);
+  ValueNotifier<bool> showError = ValueNotifier(false);
+  ValueNotifier<PlayerState> playerState = ValueNotifier(PlayerState.stopped);
+
+  initPlayerController(String audioPath)async{
+    PermissionStatus permissionStatus = await Permission.manageExternalStorage.request();
+    if(permissionStatus.isGranted){
+      isPermissionGranted.value = false;
+      return;
+    }
+    isPermissionGranted.value = true;
+    try{
+      var downloadsPath = await AndroidPathProvider.downloadsPath;
+      Response response = await get(Uri.parse(audioPath));
+      Uint8List bytes = response.bodyBytes;
+      audioFile = File("$downloadsPath/${audioPath.split('/').last}");
+      if(response.statusCode == 200){
+        await audioFile!.writeAsBytes(bytes);
+        await playerController.preparePlayer(path: audioFile!.path).then((value){
+          playerState.value = playerController.playerState;
+        });
+      }else{
+        showError.value = true;
+      }
+
+      playerController.onPlayerStateChanged.listen((event) {
+        playerState.value = event;
+      });
+    }catch(e){
+      showError.value = true;
+      debugPrint("this is the error $e");
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    initPlayerController("https://freeze.talocare.co.in/public/${widget.audioPath}");
+  }
+
+  @override
+  void dispose() async{
+    // TODO: implement dispose
+    super.dispose();
+    if(playerController.playerState == PlayerState.playing){
+      await playerController.pausePlayer();
+    }
+    playerController.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: isPermissionGranted,
+      builder: (context, isPermissionGranted, child) {
+        if(!isPermissionGranted){
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisSize : MainAxisSize.min,
+              children: [
+                Icon(Icons.error_outline,color: Colors.white),
+                SizedBox(width: 5),
+                SizedBox(
+                  width : 150,
+                  child: Text("Permission not granted to view audio",style: TextStyle(color: Colors.white, overflow: TextOverflow.ellipsis)),
+                ),
+              ],
+            ),
+          );
+        }
+        return ValueListenableBuilder(
+          valueListenable: showError,
+          builder: (context, showError, child) {
+            if(showError){
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisSize : MainAxisSize.min,
+                  children: [
+                    Icon(Icons.error_outline,color: Colors.white),
+                    SizedBox(width: 5),
+                    SizedBox(
+                      width : 150,
+                      child: Text("Error downloading audio",style: TextStyle(color: Colors.white, overflow: TextOverflow.ellipsis)),
+                    ),
+                  ],
+                ),
+              );
+            }
+            return ValueListenableBuilder(
+              valueListenable: playerState,
+              builder: (context, playerState, child) {
+                if(playerState == PlayerState.stopped){
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisSize : MainAxisSize.min,
+                      children: [
+                        Icon(Icons.stacked_line_chart_outlined,color: Colors.white),
+                        SizedBox(width: 5),
+                        SizedBox(
+                          width : 150,
+                          child: Text("Downloading audio...",style: TextStyle(color: Colors.white, overflow: TextOverflow.ellipsis)),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(onPressed: () async{
+                      PlayerState res = playerController.playerState;
+                      if(res==PlayerState.playing) {
+                        await playerController.pausePlayer();
+                      } else {
+                        await playerController.startPlayer(finishMode: FinishMode.pause);
+                      }
+                    }, icon: Icon(playerState == PlayerState.playing ? PhosphorIcons.pause_fill:PhosphorIcons.play_fill,color: Colors.white)),
+                    AudioFileWaveforms(
+                      size: Size(MediaQuery.of(context).size.width / 3, 40.0),
+                      playerController: playerController,
+                      enableSeekGesture: true,
+                      waveformType: WaveformType.long,
+                      waveformData: playerController.waveformData,
+                      playerWaveStyle: const PlayerWaveStyle(
+                        fixedWaveColor: Colors.white54,
+                        liveWaveColor: Colors.green,
+                        spacing: 5,
+                      ),
+                    )
+                  ],
+                );
+              },);
+          },);
+      },);
+  }
+}
+
+
+class VideoPlayerWidget extends StatefulWidget {
+  final String videoPath;
+  final int index;
+  const VideoPlayerWidget({super.key, required this.videoPath, required this.index});
+
+  @override
+  State<VideoPlayerWidget> createState() => _VideoPlayerWidgetState();
+}
+
+class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
+  late VideoPlayerController videoPlayerController;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    videoPlayerController = VideoPlayerController.networkUrl(Uri.parse("https://freeze.talocare.co.in/public/${widget.videoPath}"))
+      ..initialize().then((value){
+        setState(() {});
+      })..setLooping(false);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    videoPlayerController.dispose();
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Hero(
+          tag: "animateVideo${widget.index}",
+          child: Material(
+            child: SizedBox(
+              width: 150,
+              height: 150,
+              child: AspectRatio(
+                aspectRatio: videoPlayerController.value.aspectRatio,
+                child: VideoPlayer(videoPlayerController).onTap((){
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => PlayVideoScreen(videoPlayerController: videoPlayerController,animationTag: "animateVideo${widget.index}")));
+                }),
+              ),
+            ),
+          ).cornerRadiusWithClipRRect(10),
+        ),
+        IconButton(
+          color: Colors.white,
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => PlayVideoScreen(videoPlayerController: videoPlayerController,animationTag: "animateVideo")));
+          },
+          icon: Icon(PhosphorIcons.play_fill),
+        )
+      ],
     );
   }
 }

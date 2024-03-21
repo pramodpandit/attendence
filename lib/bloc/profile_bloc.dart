@@ -460,7 +460,7 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
   TextEditingController sendMessageController = TextEditingController();
   ValueNotifier<bool> isSending = ValueNotifier(false);
 
-  Future sendMessage(String toUser,String chatType,String messageType,{File? image,Position? position,String? audioPath})async{
+  Future sendMessage(String toUser,String chatType,String messageType,{File? image,File? video, Position? position,String? audioPath})async{
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Map<String,dynamic> data = {
@@ -478,6 +478,13 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
       data.addAll({
         "file_uploaded" : await MultipartFile.fromFile(image.path,
         filename: image.path.split('/').last,
+        )
+      });
+    }
+    if(messageType == "video" && video!=null){
+      data.addAll({
+        "file_uploaded" : await MultipartFile.fromFile(video.path,
+          filename: video.path.split('/').last,
         )
       });
     }

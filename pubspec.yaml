@@ -126,6 +126,7 @@ dependencies:
   flutter_file_downloader: ^1.2.1
   multi_dropdown: ^2.1.4
   custom_zoom_widget: ^0.0.3
+  video_player: ^2.8.3
 
 dev_dependencies:
   flutter_test:
