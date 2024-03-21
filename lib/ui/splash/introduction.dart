@@ -60,9 +60,7 @@ class _IntroductionPageState extends State<IntroductionPage> {
                           if(index==0)Image.asset("images/intro1.png"),
                           if(index==1)Image.asset("images/into2.png"),
                           if(index==2)Image.asset("images/intro3.png"),
-                          if(index==0)const Text(
-                            "Smart and Fast",
-                            style: TextStyle(
+                          if(index==0)const Text("Smart and Fast", style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 18
                             ),),
