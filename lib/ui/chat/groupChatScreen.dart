@@ -369,7 +369,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
                                 height: 50,
                                 width: 50,
                                 fit: BoxFit.cover,
-                              ):const Icon(Icons.person),
+                              ):const Icon(Icons.groups,color: Colors.blueGrey),
                             ),
                           ),
                           const SizedBox(width: 10),

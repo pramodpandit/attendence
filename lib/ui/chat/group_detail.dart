@@ -6,6 +6,7 @@ import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:office/data/repository/project_repo.dart';
 import 'package:office/ui/chat/add_group_member.dart';
+import 'package:office/utils/message_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../bloc/profile_bloc.dart';
@@ -31,6 +32,9 @@ class _CommunityProfileState extends State<GroupDetail> {
     super.initState();
     bloc = ProfileBloc(context.read<ProfileRepository>());
     sharedPrefs();
+    bloc.msgController?.stream.listen((event) {
+      AppMessageHandler().showSnackBar(context, event);
+    });
     bloc.getSpecificGroupDetails(widget.groupId);
   }
 
@@ -226,7 +230,7 @@ class _CommunityProfileState extends State<GroupDetail> {
                         padding: const EdgeInsets.symmetric(horizontal: 20.0),
                         child: ListTile(
                           onTap: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => AddGroupMember(groupId: widget.groupId,groupMembers: groupDetails['data'],)));
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => AddGroupMember(groupId: widget.groupId,groupMembers: groupDetails['data'],bloc: bloc)));
                           },
                           title: Text("Add Member"),
                           leading: Icon(Icons.add),
@@ -239,7 +243,7 @@ class _CommunityProfileState extends State<GroupDetail> {
                           itemBuilder: (context, index) {
                             return ListTile(
                               contentPadding: EdgeInsets.symmetric(vertical: 0),
-                              title: Text(groupDetails['data'][index]['user_name']),
+                              title: Text("${groupDetails['data'][index]['user_name']} ${groupDetails['data'][index]['user1'].toString() == prefs.getString("uid") ? '(You)' : ''}"),
                               leading: SizedBox(
                                 height: 50,
                                 width: 50,

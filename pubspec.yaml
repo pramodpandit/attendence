@@ -121,7 +121,7 @@ dependencies:
   open_settings: ^2.0.2
   nb_utils: ^6.1.2
 #  audioplayers: ^5.2.1
-  audio_waveforms: ^1.0.4
+  audio_waveforms: ^1.0.5
   google_fonts: ^6.1.0
   flutter_file_downloader: ^1.2.1
   multi_dropdown: ^2.1.4

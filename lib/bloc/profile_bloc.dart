@@ -419,7 +419,7 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
         getSpecificGroupDetails(groupId);
       }else{
         if(type == "add"){
-          showMessage(MessageType.error("User already added"));
+          showMessage(MessageType.info("User already added"));
         }else{
           showMessage(MessageType.error("Something went wrong"));
         }
@@ -460,7 +460,7 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
   TextEditingController sendMessageController = TextEditingController();
   ValueNotifier<bool> isSending = ValueNotifier(false);
 
-  Future sendMessage(String toUser,String chatType,String messageType,{File? image,Position? position})async{
+  Future sendMessage(String toUser,String chatType,String messageType,{File? image,Position? position,String? audioPath})async{
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Map<String,dynamic> data = {
@@ -478,6 +478,13 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
       data.addAll({
         "file_uploaded" : await MultipartFile.fromFile(image.path,
         filename: image.path.split('/').last,
+        )
+      });
+    }
+    if(messageType == "audio" && audioPath!=null){
+      data.addAll({
+        "file_uploaded" : await MultipartFile.fromFile(audioPath,
+          filename: audioPath.split('/').last,
         )
       });
     }

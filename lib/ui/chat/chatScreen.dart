@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:android_path_provider/android_path_provider.dart';
 import 'package:audio_waveforms/audio_waveforms.dart';
+import 'package:http/http.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,6 +17,7 @@ import 'package:office/data/model/user.dart';
 import 'package:office/ui/community/communityProfile.dart';
 import 'package:office/ui/widget/more_sheet.dart';
 import 'package:office/utils/message_handler.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import '../../bloc/profile_bloc.dart';
@@ -33,7 +36,9 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   File? galleryFile;
-  PlayerController playerController = PlayerController();
+  late RecorderController recordController;
+  bool recorder = false;
+  ValueNotifier<bool> isRecording = ValueNotifier(false);
   // var waveFormData;
   FilePickerResult? filePickerResult;
   final Completer<GoogleMapController> _completer = Completer();
@@ -55,25 +60,16 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
 
-  Future<void> openFilePicker() async{
-    filePickerResult = await FilePicker.platform.pickFiles(
-      type: FileType.audio,
-    );
-    File audioFile = File(filePickerResult!.files.single.path!);
-    // waveFormData = await playerController.extractWaveformData(
-    //   path: filePickerResult.paths,
-    //   // noOfSamples: 100,
-    // );
-    setState(() { });
-// Or directly extract from preparePlayer and initialise audio player
-    await playerController.preparePlayer(
-      path: audioFile.path,
-      shouldExtractWaveform: true,
-      noOfSamples: 100,
-      volume: 1.0,
-    );
-    // AudioPlayer audioPlayer = AudioPlayer();
-    // audioPlayer.play(DeviceFileSource(audioFile.path));
+  Future<void> startRecorder() async{
+    Navigator.of(context).pop();
+    final hasPermission = await recordController.checkPermission();
+    if(hasPermission){
+      setState(() {
+        recorder = true;
+      });
+      isRecording.value = true;
+      await recordController.record();
+    }
   }
 
   late Stream<List> chattingStream;
@@ -84,7 +80,17 @@ class _ChatScreenState extends State<ChatScreen> {
       AppMessageHandler().showSnackBar(context, event);
     });
     super.initState();
+    initRecorder();
     chattingStream = profileBloc.getOneToOneChat(widget.user['user_id'].toString()).asBroadcastStream();
+  }
+
+  initRecorder(){
+    recordController = RecorderController()
+      ..androidEncoder = AndroidEncoder.aac
+      ..androidOutputFormat = AndroidOutputFormat.mpeg4
+      ..iosEncoder = IosEncoder.kAudioFormatMPEG4AAC
+      ..currentScrolledDuration
+      ..sampleRate = 44100;
   }
 
   Future<void> getLocation() async {
@@ -105,6 +111,13 @@ class _ChatScreenState extends State<ChatScreen> {
         position = currentPosition;
       });
     }
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    recordController.dispose();
   }
 
   @override
@@ -250,19 +263,30 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
       ]);
     }
-    if (filePickerResult != null) {
+    // if (filePickerResult != null) {
+    if (recorder) {
       imageView = Stack(children: [
-        //image container:::
-        Text("ui"),
-        AudioFileWaveforms(
-            size: Size(MediaQuery.of(context).size.width,100.0),
-            playerController: playerController,
-          waveformType: WaveformType.long,
-          waveformData: const [10.0,20.0],
-          playerWaveStyle: const PlayerWaveStyle(
-              fixedWaveColor: Colors.white54,
-              liveWaveColor: Colors.blueAccent,
-              spacing: 6,
+        const SizedBox(height: 100),
+        Positioned(
+          bottom: 0,
+          child: AudioWaveforms(
+            enableGesture: true,
+            size: Size(
+                MediaQuery.of(context).size.width /2,
+                50),
+            recorderController: recordController,
+            waveStyle: const WaveStyle(
+              waveColor: Colors.white,
+              extendWaveform: true,
+              showMiddleLine: false,
+            ),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12.0),
+              color: Colors.black,
+            ),
+            padding: const EdgeInsets.only(left: 18),
+            margin: const EdgeInsets.symmetric(
+                horizontal: 15),
           ),
         ),
         //cross::::
@@ -270,14 +294,42 @@ class _ChatScreenState extends State<ChatScreen> {
           alignment: Alignment.topRight,
           child: IconButton(
               onPressed: () {
+                recordController.reset();
                 setState(() {
-                  filePickerResult = null;
+                  recorder = false;
                 });
               },
               icon: Icon(Icons.highlight_remove)),
         ),
         Positioned(
-          bottom: 10,
+          bottom: 5,
+          right: 55,
+          child: InkWell(
+            onTap: () {
+              if(recordController.isRecording){
+                isRecording.value = false;
+                recordController.pause();
+              }else{
+                isRecording.value = true;
+                recordController.record();
+              }
+            },
+            child: Container(
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.black,
+                ),
+                child: ValueListenableBuilder(
+                  valueListenable: isRecording,
+                  builder: (context, isRecording, child) {
+                  return Icon(isRecording?PhosphorIcons.pause:PhosphorIcons.play,color: Colors.white,size: 20);
+                },),
+            ),
+          ),
+        ),
+        Positioned(
+          bottom: 5,
           right: 10,
           child: ValueListenableBuilder(
             valueListenable: profileBloc.isSending,
@@ -292,12 +344,21 @@ class _ChatScreenState extends State<ChatScreen> {
                 );
               }
               return InkWell(
-                onTap: () {
-                  profileBloc.sendMessage(widget.user['user_id'].toString(),"one_to_one","file",image: galleryFile).then((value){
+                onTap: () async{
+                  // if(isRecording.value){
+                    String? path = await recordController.stop();
+                    recordController.reset();
+                  // }
+                    profileBloc.sendMessage(widget.user['user_id'].toString(),"one_to_one","audio",audioPath: path).then((value){
+                      setState(() {
+                        recorder = false;
+                      });
+                    });
+                  // profileBloc.sendMessage(widget.user['user_id'].toString(),"one_to_one","file",image: galleryFile).then((value){
                     // if(widget.user['fcm_token'] != null && profileBloc.sendMessageController.text.isNotEmpty){
                     //   profileBloc.sendNotification(widget.user,image: galleryFile);
                     // }
-                  });
+                  // });
                 },
                 child: Container(
                     padding: EdgeInsets.all(10),
@@ -305,7 +366,12 @@ class _ChatScreenState extends State<ChatScreen> {
                       shape: BoxShape.circle,
                       color: Colors.black,
                     ),
-                    child: const Icon(PhosphorIcons.paper_plane_tilt,color: Colors.white)),
+                    child: ValueListenableBuilder(
+                      valueListenable: isRecording,
+                      builder: (context, isRecording, child) {
+                      return Icon(isRecording? PhosphorIcons.stop: PhosphorIcons.paper_plane_tilt,color: Colors.white,size: 20);
+                    },),
+                ),
               );
             },),
         ),
@@ -485,7 +551,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                   Align(
                                     alignment: snapshot.data![index]['sender_id'].toString() == widget.prefs.getString("uid") ?Alignment.centerRight:Alignment.centerLeft,
                                     child: Container(
-                                      padding: snapshot.data![index]['message_type'] == "location" || snapshot.data![index]['message_type'] == "image" ?
+                                      padding: snapshot.data![index]['message_type'] == "location" || snapshot.data![index]['message_type'] == "image" || snapshot.data![index]['message_type'] == "audio" ?
                                         const EdgeInsets.symmetric(horizontal: 1,vertical: 1):
                                       const EdgeInsets.symmetric(
                                           horizontal: 15, vertical: 10),
@@ -545,6 +611,8 @@ class _ChatScreenState extends State<ChatScreen> {
                                           ),
                                         ),
                                       )
+                                      : snapshot.data![index]['message_type'] == "audio" ?
+                                        AudioPlayerWidget(audioPath : snapshot.data![index]['file_uploaded'])
                                       : snapshot.data![index]['message_type'] == "location" ?
                                       SizedBox(
                                         height : 150,
@@ -631,7 +699,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         child: Column(
                           children: [
                             imageView,
-                            if(galleryFile==null && filePickerResult==null && position == null)
+                            if(galleryFile==null && recorder==false && position == null)
                             Row(
                               children: [
                                 Expanded(
@@ -673,7 +741,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                               ),
                                               ListTile(
                                                 onTap : () {
-                                                  openFilePicker();
+                                                  startRecorder();
                                                 },
                                                 title: Text("Audio"),
                                                 leading: Icon(PhosphorIcons.file_audio),
@@ -736,5 +804,155 @@ class _ChatScreenState extends State<ChatScreen> {
         },),
       ),
     );
+  }
+}
+
+
+class AudioPlayerWidget extends StatefulWidget {
+  final String audioPath;
+  const AudioPlayerWidget({super.key, required this.audioPath});
+
+  @override
+  State<AudioPlayerWidget> createState() => _AudioPlayerWidgetState();
+}
+
+class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
+  PlayerController playerController = PlayerController();
+  File? audioFile;
+  ValueNotifier<bool> isPermissionGranted = ValueNotifier(false);
+  ValueNotifier<bool> showError = ValueNotifier(false);
+  ValueNotifier<PlayerState> playerState = ValueNotifier(PlayerState.stopped);
+
+  // ValueNotifier<List<double>> waveFormData = ValueNotifier([]);
+  initPlayerController(String audioPath)async{
+    PermissionStatus permissionStatus = await Permission.manageExternalStorage.request();
+    if(permissionStatus.isGranted){
+      isPermissionGranted.value = false;
+      return;
+    }
+    isPermissionGranted.value = true;
+    try{
+      var downloadsPath = await AndroidPathProvider.downloadsPath;
+      Response response = await get(Uri.parse(audioPath));
+      Uint8List bytes = response.bodyBytes;
+      audioFile = File("$downloadsPath/${audioPath.split('/').last}");
+      if(response.statusCode == 200){
+        await audioFile!.writeAsBytes(bytes);
+        await playerController.preparePlayer(path: audioFile!.path).then((value){
+          playerState.value = playerController.playerState;
+        });
+      }else{
+        showError.value = true;
+      }
+
+      playerController.onPlayerStateChanged.listen((event) {
+        playerState.value = event;
+      });
+    }catch(e){
+      showError.value = true;
+      debugPrint("this is the error $e");
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    initPlayerController("https://freeze.talocare.co.in/public/${widget.audioPath}");
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    playerController.dispose();
+  }
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: isPermissionGranted,
+      builder: (context, isPermissionGranted, child) {
+        if(!isPermissionGranted){
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisSize : MainAxisSize.min,
+              children: [
+                Icon(Icons.error_outline,color: Colors.white),
+                SizedBox(width: 5),
+                SizedBox(
+                    width : 200,
+                    child: Text("Permission not granted to view audio",style: TextStyle(color: Colors.white, overflow: TextOverflow.ellipsis)),
+                ),
+              ],
+            ),
+          );
+        }
+      return ValueListenableBuilder(
+        valueListenable: showError,
+        builder: (context, showError, child) {
+          if(showError){
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisSize : MainAxisSize.min,
+                children: [
+                  Icon(Icons.error_outline,color: Colors.white),
+                  SizedBox(width: 5),
+                  SizedBox(
+                    width : 200,
+                    child: Text("Error downloading audio",style: TextStyle(color: Colors.white, overflow: TextOverflow.ellipsis)),
+                  ),
+                ],
+              ),
+            );
+          }
+        return ValueListenableBuilder(
+          valueListenable: playerState,
+          builder: (context, playerState, child) {
+            if(playerState == PlayerState.stopped){
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisSize : MainAxisSize.min,
+                  children: [
+                    Icon(Icons.error_outline,color: Colors.white),
+                    SizedBox(width: 5),
+                    SizedBox(
+                      width : 200,
+                      child: Text("Downloading audio...",style: TextStyle(color: Colors.white, overflow: TextOverflow.ellipsis)),
+                    ),
+                  ],
+                ),
+              );
+            }
+          return Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(onPressed: () async{
+                PlayerState res = playerController.playerState;
+                if(res==PlayerState.playing) {
+                  await playerController.pausePlayer();
+                } else {
+                  await playerController.startPlayer(finishMode: FinishMode.pause);
+                }
+              }, icon: Icon(playerState == PlayerState.playing ? PhosphorIcons.pause_fill:PhosphorIcons.play_fill,color: Colors.white)),
+              AudioFileWaveforms(
+                size: Size(MediaQuery.of(context).size.width/2, 40.0),
+                playerController: playerController,
+                enableSeekGesture: true,
+                waveformType: WaveformType.long,
+                waveformData: playerController.waveformData,
+                playerWaveStyle: const PlayerWaveStyle(
+                  fixedWaveColor: Colors.white54,
+                  liveWaveColor: Colors.red,
+                  spacing: 6,
+                ),
+              )
+            ],
+          );
+        },);
+      },);
+    },);
   }
 }
