@@ -144,19 +144,26 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
         AwesomeStringUtils.isNullOrEmpty(imageUrl) ? 'Default' : 'BigPicture',
         NOTIFICATION_BIG_PICTURE: imageUrl,
       },
-      NOTIFICATION_ACTION_BUTTONS : [
-        {
-          NOTIFICATION_BUTTON_KEY : "ACCEPT",
-          NOTIFICATION_BUTTON_LABEL : "Accept",
-          NOTIFICATION_ENABLED : true,
-        },
-        {
-          NOTIFICATION_BUTTON_KEY : "REJECT",
-          NOTIFICATION_BUTTON_LABEL : "Reject",
-          NOTIFICATION_ENABLED : true,
-        }
-      ]
+      NOTIFICATION_PAYLOAD : {
+        "type" : message.data['type']
+      },
     };
+    if(message.data['type'] == "voicecall" || message.data['type'] == "videocall"){
+      notificationAdapter.addAll({
+        NOTIFICATION_ACTION_BUTTONS : [
+          {
+            NOTIFICATION_BUTTON_KEY : "ACCEPT",
+            NOTIFICATION_BUTTON_LABEL : "Accept",
+            NOTIFICATION_ENABLED : true,
+          },
+          {
+            NOTIFICATION_BUTTON_KEY : "REJECT",
+            NOTIFICATION_BUTTON_LABEL : "Reject",
+            NOTIFICATION_ENABLED : true,
+          }
+        ]
+      });
+    }
 
     AwesomeNotifications().createNotificationFromJsonData(notificationAdapter);
   // } else {

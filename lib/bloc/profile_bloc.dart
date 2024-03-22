@@ -536,6 +536,9 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
     Map<String,dynamic> data = {
       "to": user['fcm_token'].toString(),
       "notification": notificationData,
+      "payload" : {
+        "type" : "text"
+      }
     };
     print("the main data is : ${data}");
     try{
@@ -551,7 +554,7 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
     }
   }
 
-  sendCallNotification(Map<String,dynamic> user,)async{
+  sendCallNotification(Map<String,dynamic> user,String type)async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Map<String,dynamic> notificationData = {
       "body": prefs.getString("name"),
@@ -570,6 +573,20 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
       "to": user['fcm_token'].toString(),
       "notification": notificationData,
     };
+    if(type == "videocall"){
+      data.addAll({
+        "payload" : {
+          "type" : "videocall"
+        }
+      });
+    }
+    if(type == "voicecall"){
+      data.addAll({
+        "payload" : {
+          "type" : "videocall"
+        }
+      });
+    }
     print("the main data is : ${data}");
     try{
       var result = await _repo.sendNotificationApi(data);
