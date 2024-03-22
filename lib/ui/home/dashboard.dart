@@ -453,13 +453,94 @@ class _DashBoardState extends State<DashBoard> {
                                         valueListenable: bloc.allDoingTaskData,
                                         builder: (context, allDoingTaskData, child) {
                                           if(allDoingTaskData == null){
-                                            return SizedBox(
+                                            return const SizedBox(
                                                 height: 120,
                                                 child: Center(child: CircularProgressIndicator()),
                                             );
+                                          }else if(allDoingTaskData.isEmpty){
+                                            return Container(
+                                              margin: EdgeInsets.all(5),
+                                              padding: const EdgeInsets.symmetric(
+                                                  horizontal: 15, vertical: 10),
+                                              decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                  color: Colors.white,
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                        spreadRadius: 0,
+                                                        blurRadius: 3,
+                                                        color: Colors.black.withOpacity(0.2))
+                                                  ]),
+                                              child:  Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  const Row(
+                                                    children: [
+                                                      Icon(Icons.computer),
+                                                      SizedBox(
+                                                        width: 10,
+                                                      ),
+                                                      Flexible(
+                                                        child: Text(
+                                                          "No task available",
+                                                          style: TextStyle(
+                                                              fontSize: 14,
+                                                              color: Colors.black,
+                                                              fontWeight: FontWeight.w500),
+                                                        ),
+                                                      ),
+                                                      Spacer(),
+                                                      // const DashedCircularProgressBar.square(
+                                                      //   dimensions: 50,
+                                                      //   progress: 60,
+                                                      //   startAngle: 0,
+                                                      //   sweepAngle: 360,
+                                                      //   foregroundColor: Color(0xff4BCD36),
+                                                      //   backgroundColor: Color(0xffeeeeee),
+                                                      //   foregroundStrokeWidth: 5,
+                                                      //   backgroundStrokeWidth: 5,
+                                                      //   animation: true,
+                                                      //   seekSize: 4,
+                                                      //   seekColor: Colors.white,
+                                                      //   child: Center(
+                                                      //       child: Text(
+                                                      //         '65%',
+                                                      //         style: TextStyle(
+                                                      //             fontSize: 12,
+                                                      //             fontWeight: FontWeight.w600),
+                                                      //       )),
+                                                      // ),
+                                                    ],
+                                                  ),
+                                                  Container(
+                                                    child: Html(
+                                                      data:
+                                                      "",
+                                                      style: {
+                                                        "body": Style(
+                                                            color: Colors.black,
+                                                            fontWeight:
+                                                            FontWeight.w600,
+
+                                                            display: Display.inline,
+                                                            fontSize: FontSize(10),
+                                                            textAlign:
+                                                            TextAlign.start),
+                                                        "p": Style(
+                                                            color: Colors.black,
+
+                                                            display: Display.inline,
+                                                            fontSize: FontSize(10),
+                                                            textAlign:
+                                                            TextAlign.start),
+                                                      },
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
                                           }
                                         return CarouselSlider.builder(
-
                                             itemCount: allDoingTaskData.length,
                                             itemBuilder: (context,index, realindex){
                                                 return GestureDetector(

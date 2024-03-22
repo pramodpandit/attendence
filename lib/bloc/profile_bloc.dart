@@ -551,6 +551,39 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
     }
   }
 
+  sendCallNotification(Map<String,dynamic> user,)async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Map<String,dynamic> notificationData = {
+      "body": prefs.getString("name"),
+      "OrganizationId": "2",
+      "content_available": true,
+      "priority": "high",
+      "title":  'Incoming Call',
+    };
+    // if(image!=null){
+    //   notificationData.addAll({
+    //     "image" : await MultipartFile.fromFile(image.path,
+    //         filename: image.path.split('/').last),
+    //   });
+    // }
+    Map<String,dynamic> data = {
+      "to": user['fcm_token'].toString(),
+      "notification": notificationData,
+    };
+    print("the main data is : ${data}");
+    try{
+      var result = await _repo.sendNotificationApi(data);
+      if(result['success'].toString() == "1"){
+        showMessage(MessageType.success("done"));
+      }else{
+        showMessage(MessageType.error("some error ${result['results'][0]}"));
+      }
+    }catch(e){
+      showMessage(MessageType.error("catch error : ${e.toString()}"));
+      print(e);
+    }
+  }
+
   ValueNotifier<bool> createGroupLoading = ValueNotifier(false);
   ValueNotifier<File?> groupLogo = ValueNotifier(null);
   TextEditingController groupName = TextEditingController();

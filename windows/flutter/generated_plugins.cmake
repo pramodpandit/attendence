@@ -3,6 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  audioplayers_windows
   awesome_notifications
   connectivity_plus
   file_selector_windows
@@ -15,6 +16,8 @@ list(APPEND FLUTTER_PLUGIN_LIST
   share_plus
   syncfusion_pdfviewer_windows
   url_launcher_windows
+  zego_express_engine
+  zego_zim
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST

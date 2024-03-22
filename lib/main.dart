@@ -89,7 +89,21 @@ void main() async {
           enableVibration: true,
           onlyAlertOnce: true,
         ),
+        NotificationChannel(
+          channelKey: 'call',
+          channelName: 'Alarms',
+          channelDescription: 'Scheduled Notification Channel',
+          defaultColor: K.themeColorPrimary,
+          ledColor: K.themeColorPrimary,
+          channelShowBadge: true,
+          importance: NotificationImportance.High,
+          playSound: true,
+          enableVibration: true,
+          onlyAlertOnce: true,
+        ),
+
       ]);
+
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   final sharedPreferences = await SharedPreferences.getInstance();
