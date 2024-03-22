@@ -41,7 +41,7 @@ class _CallPageState extends State<CallPage> {
       userName: "user$userId",
       callID: callId!,
       // You can also use groupVideo/groupVoice/oneOnOneVoice to make more types of calls.
-      config: ZegoUIKitPrebuiltCallConfig.oneOnOneVoiceCall()
+      config: widget.type == "videocall" ? ZegoUIKitPrebuiltCallConfig.oneOnOneVideoCall() : ZegoUIKitPrebuiltCallConfig.oneOnOneVideoCall(),
     );
   }
 }
