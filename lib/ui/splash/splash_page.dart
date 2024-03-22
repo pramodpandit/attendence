@@ -8,6 +8,7 @@ import 'package:office/data/repository/profile_repo.dart';
 import 'package:office/ui/auth/loginScreen.dart';
 import 'package:office/ui/chat/call.dart';
 import 'package:office/ui/chat/chatScreen.dart';
+import 'package:office/ui/chat/imageAnimation.dart';
 import 'package:office/ui/home/home_bar.dart';
 import 'package:office/ui/splash/introduction.dart';
 import 'package:office/utils/constants.dart';
