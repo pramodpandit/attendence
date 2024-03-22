@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:office/bloc/profile_bloc.dart';
 import 'package:office/data/repository/profile_repo.dart';
 import 'package:office/ui/auth/loginScreen.dart';
@@ -114,12 +115,14 @@ class _SplashPageState extends State<SplashPage> {
                 NOTIFICATION_BUTTON_KEY : "ACCEPT",
                 NOTIFICATION_BUTTON_LABEL : "Accept",
                 NOTIFICATION_ACTION_TYPE : 1,
+                NOTIFICATION_ENABLED : true,
                 NOTIFICATION_REQUIRE_INPUT_TEXT : false,
               },
               {
                 NOTIFICATION_BUTTON_KEY : "REJECT",
-                NOTIFICATION_ACTION_TYPE : 1,
                 NOTIFICATION_BUTTON_LABEL : "Reject",
+                NOTIFICATION_ACTION_TYPE : 1,
+                NOTIFICATION_ENABLED : true,
                 NOTIFICATION_REQUIRE_INPUT_TEXT : false,
               }
             ]
@@ -129,6 +132,7 @@ class _SplashPageState extends State<SplashPage> {
         AwesomeNotifications().setListeners(onActionReceivedMethod: (receivedAction) async{
           print("the actions are : ${receivedAction}");
           if(receivedAction.buttonKeyPressed == "ACCEPT"){
+            print("accept triggered ${message.data['callId']}");
             Navigator.push(context, MaterialPageRoute(builder: (context) => CallPage(type: message.data['type'],callId: message.data['callId'],),));
           }
         },);
