@@ -5,10 +5,11 @@ import '../../bloc/profile_bloc.dart';
 import '../../data/repository/profile_repo.dart';
 
 class CallPage extends StatefulWidget {
+  final String type;
   final fcm;
   final username;
   final user;
-  const CallPage({Key? key, this.fcm, this.username, this.user}) : super(key: key);
+  const CallPage({Key? key, this.fcm, this.username, this.user, required this.type}) : super(key: key);
   @override
   State<CallPage> createState() => _CallPageState();
 }
@@ -23,7 +24,7 @@ class _CallPageState extends State<CallPage> {
     super.initState();
     // shared();
     profileBloc = ProfileBloc(context.read<ProfileRepository>());
-    profileBloc.sendCallNotification(widget.user);
+    profileBloc.sendCallNotification(widget.user,widget.type);
  }
  // shared()async{
  //   pref  = await SharedPreferences.getInstance();
