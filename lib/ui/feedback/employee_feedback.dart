@@ -83,6 +83,9 @@ class _EmployeeFeedbackState extends State<EmployeeFeedback> {
                         child: CircularProgressIndicator(),
                       );
                     }
+                    if(bloc.feedbackData.isEmpty){
+                      return Center(child: Text('Data does not exist',style: TextStyle(fontWeight: FontWeight.w500),));
+                    }
                     return ListView.builder(
                         padding:const  EdgeInsets.only(top:10,bottom: 20),
                         itemCount: bloc.feedbackData.length,
