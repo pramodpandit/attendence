@@ -554,7 +554,7 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
     }
   }
 
-  sendCallNotification(Map<String,dynamic> user,String type)async{
+  sendCallNotification(Map<String,dynamic> user,String type,String callId)async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Map<String,dynamic> notificationData = {
       "body": prefs.getString("name"),
@@ -576,14 +576,16 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
     if(type == "videocall"){
       data.addAll({
         "data" : {
-          "type" : "videocall"
+          "type" : "videocall",
+          "callId" : callId,
         }
       });
     }
     if(type == "voicecall"){
       data.addAll({
         "data" : {
-          "type" : "videocall"
+          "type" : "videocall",
+          "callId" : callId,
         }
       });
     }
