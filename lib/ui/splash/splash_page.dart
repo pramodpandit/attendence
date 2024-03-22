@@ -5,6 +5,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:office/bloc/profile_bloc.dart';
 import 'package:office/data/repository/profile_repo.dart';
 import 'package:office/ui/auth/loginScreen.dart';
+import 'package:office/ui/chat/call.dart';
 import 'package:office/ui/chat/chatScreen.dart';
 import 'package:office/ui/home/home_bar.dart';
 import 'package:office/ui/splash/introduction.dart';
@@ -112,17 +113,25 @@ class _SplashPageState extends State<SplashPage> {
               {
                 NOTIFICATION_BUTTON_KEY : "ACCEPT",
                 NOTIFICATION_BUTTON_LABEL : "Accept",
-                NOTIFICATION_ENABLED : true,
+                NOTIFICATION_ACTION_TYPE : 1,
+                NOTIFICATION_REQUIRE_INPUT_TEXT : false,
               },
               {
                 NOTIFICATION_BUTTON_KEY : "REJECT",
+                NOTIFICATION_ACTION_TYPE : 1,
                 NOTIFICATION_BUTTON_LABEL : "Reject",
-                NOTIFICATION_ENABLED : true,
+                NOTIFICATION_REQUIRE_INPUT_TEXT : false,
               }
             ]
           });
         }
         AwesomeNotifications().createNotificationFromJsonData(notificationAdapter);
+        AwesomeNotifications().setListeners(onActionReceivedMethod: (receivedAction) async{
+          print("the actions are : ${receivedAction}");
+          if(receivedAction.buttonKeyPressed == "ACCEPT"){
+            Navigator.push(context, MaterialPageRoute(builder: (context) => CallPage(type: message.data['type'],callId: message.data['callId'],),));
+          }
+        },);
       // } else {
       //   AwesomeNotifications().createNotificationFromJsonData(message.data);
       // }

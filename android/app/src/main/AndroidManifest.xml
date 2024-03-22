@@ -17,6 +17,7 @@
         android:label="Aarvy Office"
         android:name="${applicationName}"
         android:requestLegacyExternalStorage="true"
+
         android:icon="@mipmap/ic_launcher">
         <meta-data android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyA0r0oRC03tITR0FNYVfKT-SlXEvf_FDp0"/>
@@ -50,6 +51,10 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths"/>
         </provider>
+        <service
+            android:name=".IncomingCallService"
+            android:enabled="true"
+            android:exported="true" />
         <!-- End FlutterDownloader customization -->
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
