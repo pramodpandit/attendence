@@ -91,10 +91,6 @@ void main() async {
         ),
       ]);
 
-
-
-
-
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   final sharedPreferences = await SharedPreferences.getInstance();
   // FirebaseMessaging.instance.getToken().then((value) {

@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
@@ -36,21 +37,15 @@ class _CallPageState extends State<CallPage> {
       appSign: 'ca80a415440612ae706f13661f48eb56d30cb3cbd58b0c7c3d55f967093dd102', // Fill in the appSign that you get from ZEGOCLOUD Admin Console.
       userID: '${widget.fcm}',
       userName: widget.username,
-      callID: '109112',
+      callID: Random().nextInt(2147483647).toString(),
       // You can also use groupVideo/groupVoice/oneOnOneVoice to make more types of calls.
       config: ZegoUIKitPrebuiltCallConfig.oneOnOneVoiceCall()
         ..topMenuBarConfig.isVisible = true
         ..topMenuBarConfig.buttons = [
-      ZegoMenuBarButtonName.minimizingButton,
-      ZegoMenuBarButtonName.showMemberListButton,
+        ZegoMenuBarButtonName.minimizingButton,
+         ZegoMenuBarButtonName.showMemberListButton,
         ]
     );
   }
-  Future<void> sendPushNotification()async{
-    try{
 
-    }catch(e){
-
-    }
-  }
 }
