@@ -536,7 +536,7 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
     Map<String,dynamic> data = {
       "to": user['fcm_token'].toString(),
       "notification": notificationData,
-      "payload" : {
+      "data" : {
         "type" : "text"
       }
     };
@@ -575,14 +575,14 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
     };
     if(type == "videocall"){
       data.addAll({
-        "payload" : {
+        "data" : {
           "type" : "videocall"
         }
       });
     }
     if(type == "voicecall"){
       data.addAll({
-        "payload" : {
+        "data" : {
           "type" : "videocall"
         }
       });
