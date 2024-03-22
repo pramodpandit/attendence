@@ -17,12 +17,12 @@ class CallPage extends StatefulWidget {
 class _CallPageState extends State<CallPage> {
   late ProfileBloc profileBloc;
   String? callId;
+  String userId = DateTime.now().millisecondsSinceEpoch.toString();
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    // shared();
     profileBloc = ProfileBloc(context.read<ProfileRepository>());
     if(widget.user != null){
       callId = DateTime.now().millisecondsSinceEpoch.toString();
@@ -32,20 +32,17 @@ class _CallPageState extends State<CallPage> {
       callId = widget.callId;
     }
  }
- // shared()async{
- //   pref  = await SharedPreferences.getInstance();
- // }
 
   @override
   Widget build(BuildContext context) {
     return ZegoUIKitPrebuiltCall(
       appID: 414043237, // Fill in the appID that you get from ZEGOCLOUD Admin Console.
       appSign: 'ca80a415440612ae706f13661f48eb56d30cb3cbd58b0c7c3d55f967093dd102', // Fill in the appSign that you get from ZEGOCLOUD Admin Console.
-      userID: "calling",
-      userName: "calling",
+      userID: userId,
+      userName: "user$userId",
       callID: callId!,
       // You can also use groupVideo/groupVoice/oneOnOneVoice to make more types of calls.
-      config: ZegoUIKitPrebuiltCallConfig.oneOnOneVoiceCall()
+      config: ZegoUIKitPrebuiltCallConfig.oneOnOneVideoCall()
     );
   }
 }

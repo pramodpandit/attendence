@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -129,6 +130,7 @@ class _SplashPageState extends State<SplashPage> {
           });
         }
         AwesomeNotifications().createNotificationFromJsonData(notificationAdapter);
+
         AwesomeNotifications().setListeners(onActionReceivedMethod: (receivedAction) async{
           print("the actions are : ${receivedAction}");
           if(receivedAction.buttonKeyPressed == "ACCEPT"){
