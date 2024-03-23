@@ -94,6 +94,9 @@ class _FeedbackListScreenState extends State<FeedbackListScreen> {
                       return const Center(
                         child: CircularProgressIndicator(),
                       );
+                    }else if(bloc.feedbackData.isEmpty){
+                      return const Center(
+                        child: Text('Data does not exist',style: TextStyle(fontWeight: FontWeight.w500),),);
                     }
                     return ListView.builder(
                         padding:const  EdgeInsets.only(top:10,bottom: 20),

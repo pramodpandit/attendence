@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -27,10 +28,8 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
-
   late ProfileBloc profileBloc;
   FirebaseMessaging messaging = FirebaseMessaging.instance;
-
   late String token;
 
   @override
@@ -40,7 +39,7 @@ class _SplashPageState extends State<SplashPage> {
     profileBloc.msgController?.stream.listen((event) {
       AppMessageHandler().showSnackBar(context, event);
     });
-    initializeFirebase();
+    initializeFirebase(context);
     notificationPermission();
     initApp();
   }
@@ -73,7 +72,7 @@ class _SplashPageState extends State<SplashPage> {
   //   );
   // }
 
-  initializeFirebase() async{
+  initializeFirebase(BuildContext context) async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     print('initializeFirebase getting called');
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -130,6 +129,7 @@ class _SplashPageState extends State<SplashPage> {
           });
         }
         AwesomeNotifications().createNotificationFromJsonData(notificationAdapter);
+
         AwesomeNotifications().setListeners(onActionReceivedMethod: (receivedAction) async{
           print("the actions are : ${receivedAction}");
           if(receivedAction.buttonKeyPressed == "ACCEPT"){

@@ -23,6 +23,7 @@ import 'package:office/data/repository/profile_repo.dart';
 import 'package:office/data/repository/project_repo.dart';
 import 'package:office/data/repository/water_repo.dart';
 import 'package:office/data/repository/work_from_home_repository.dart';
+import 'package:office/ui/chat/call.dart';
 import 'package:office/ui/splash/splash_page.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -91,10 +92,6 @@ void main() async {
         ),
       ]);
 
-
-
-
-
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   final sharedPreferences = await SharedPreferences.getInstance();
   // FirebaseMessaging.instance.getToken().then((value) {
@@ -152,24 +149,37 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
         "type" : message.data['type']
       },
     };
+
     if(message.data['type'] == "voicecall" || message.data['type'] == "videocall"){
-      notificationAdapter.addAll({
-        NOTIFICATION_ACTION_BUTTONS : [
-          {
-            NOTIFICATION_BUTTON_KEY : "ACCEPT",
-            NOTIFICATION_BUTTON_LABEL : "Accept",
-            NOTIFICATION_ENABLED : true,
-          },
-          {
-            NOTIFICATION_BUTTON_KEY : "REJECT",
-            NOTIFICATION_BUTTON_LABEL : "Reject",
-            NOTIFICATION_ENABLED : true,
-          }
-        ]
-      });
-    }
+    notificationAdapter.addAll({
+      NOTIFICATION_ACTION_BUTTONS : [
+        {
+          NOTIFICATION_BUTTON_KEY : "ACCEPT",
+          NOTIFICATION_BUTTON_LABEL : "Accept",
+          NOTIFICATION_ACTION_TYPE : 1,
+          NOTIFICATION_ENABLED : true,
+          NOTIFICATION_REQUIRE_INPUT_TEXT : false,
+        },
+        {
+          NOTIFICATION_BUTTON_KEY : "REJECT",
+          NOTIFICATION_BUTTON_LABEL : "Reject",
+          NOTIFICATION_ACTION_TYPE : 1,
+          NOTIFICATION_ENABLED : true,
+          NOTIFICATION_REQUIRE_INPUT_TEXT : false,
+        }
+      ]
+    });
+  }
 
     AwesomeNotifications().createNotificationFromJsonData(notificationAdapter);
+
+    AwesomeNotifications().setListeners(onActionReceivedMethod: (receivedAction) async{
+      print("the actions are : ${receivedAction}");
+      if(receivedAction.buttonKeyPressed == "ACCEPT"){
+        print("accept triggered ${message.data['callId']}");
+       // Navigator.push(context, MaterialPageRoute(builder: (context) => CallPage(type: message.data['type'],callId: message.data['callId'],),));
+      }
+    },);
   // } else {
   //   AwesomeNotifications().createNotificationFromJsonData(message.data);
   // }
