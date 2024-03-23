@@ -177,7 +177,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       print("the actions are : ${receivedAction}");
       if(receivedAction.buttonKeyPressed == "ACCEPT"){
         print("accept triggered ${message.data['callId']}");
-       // Navigator.push(context, MaterialPageRoute(builder: (context) => CallPage(type: message.data['type'],callId: message.data['callId'],),));
+        Navigator.push(message.data['context'], MaterialPageRoute(builder: (context) => CallPage(type: message.data['type'],callId: message.data['callId'],),));
       }
     },);
   // } else {

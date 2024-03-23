@@ -26,7 +26,7 @@ class _CallPageState extends State<CallPage> {
     profileBloc = ProfileBloc(context.read<ProfileRepository>());
     if(widget.user != null){
       callId = DateTime.now().millisecondsSinceEpoch.toString();
-      profileBloc.sendCallNotification(widget.user!,widget.type,callId!);
+      profileBloc.sendCallNotification(widget.user!,widget.type,callId!,context);
     }
     else{
       callId = widget.callId;
