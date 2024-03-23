@@ -42,6 +42,7 @@ class _SplashPageState extends State<SplashPage> {
     });
     initializeFirebase();
     notificationPermission();
+    initApp();
   }
 
   notificationPermission()async{
@@ -75,7 +76,6 @@ class _SplashPageState extends State<SplashPage> {
   initializeFirebase() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     print('initializeFirebase getting called');
-    initApp();
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       print('Got a message whilst in the foreground!');
       print('Message data: ${message.data}');
