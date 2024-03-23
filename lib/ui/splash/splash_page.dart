@@ -28,10 +28,8 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
-
   late ProfileBloc profileBloc;
   FirebaseMessaging messaging = FirebaseMessaging.instance;
-
   late String token;
 
   @override
@@ -43,7 +41,6 @@ class _SplashPageState extends State<SplashPage> {
     });
     initializeFirebase(context);
     notificationPermission();
-    initApp();
   }
 
   notificationPermission()async{
@@ -77,7 +74,7 @@ class _SplashPageState extends State<SplashPage> {
   initializeFirebase(BuildContext context) async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     print('initializeFirebase getting called');
-
+    initApp();
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       print('Got a message whilst in the foreground!');
       print('Message data: ${message.data}');
@@ -138,8 +135,6 @@ class _SplashPageState extends State<SplashPage> {
           if(receivedAction.buttonKeyPressed == "ACCEPT"){
             print("accept triggered ${message.data['callId']}");
             Navigator.push(context, MaterialPageRoute(builder: (context) => CallPage(type: message.data['type'],callId: message.data['callId'],),));
-          }else{
-            Navigator.pop(context);
           }
         },);
       // } else {

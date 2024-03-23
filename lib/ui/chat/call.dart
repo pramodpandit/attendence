@@ -32,8 +32,7 @@ class _CallPageState extends State<CallPage> {
       callId = widget.callId;
     }
  }
-
-  @override
+ @override
   Widget build(BuildContext context) {
     return ZegoUIKitPrebuiltCall(
       appID: 414043237, // Fill in the appID that you get from ZEGOCLOUD Admin Console.
@@ -42,7 +41,7 @@ class _CallPageState extends State<CallPage> {
       userName: "user$userId",
       callID: callId!,
       // You can also use groupVideo/groupVoice/oneOnOneVoice to make more types of calls.
-      config: ZegoUIKitPrebuiltCallConfig.oneOnOneVideoCall()
+      config:  ZegoUIKitPrebuiltCallConfig.oneOnOneVideoCall()
     );
   }
 }
