@@ -578,7 +578,7 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
         "data" : {
           "type" : "videocall",
           "callId" : callId,
-          "context" : context
+          "context" : "$context"
         }
       });
     }
@@ -587,6 +587,7 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
         "data" : {
           "type" : "videocall",
           "callId" : callId,
+          "context" : "$context"
         }
       });
     }

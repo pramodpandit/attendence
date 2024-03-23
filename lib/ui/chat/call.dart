@@ -42,7 +42,7 @@ class _CallPageState extends State<CallPage> {
       callID: callId!,
       config: widget.type == "videocall" ? ZegoUIKitPrebuiltCallConfig.oneOnOneVideoCall() : ZegoUIKitPrebuiltCallConfig.oneOnOneVoiceCall(),
       onDispose: () {
-        Navigator.pop(context);
+        dispose();
       },
     );
   }
