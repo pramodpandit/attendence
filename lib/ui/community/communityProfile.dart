@@ -483,20 +483,36 @@ class _PostDataState extends State<PostData> {
                             const SizedBox(
                               height: 10,
                             ),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.of(context)
-                                    .push(MaterialPageRoute(builder: (context) => PostDetail(data: data,)));
-                              },
-                              child: ClipRRect(
-                                borderRadius: const BorderRadius.only(
-                                  topRight: Radius.circular(30),
-                                  bottomLeft: Radius.circular(30),
-                                ),
-                                child:data.image ==null?Container(height: 0,width: 0,):Image.network(
-                                  "https://freeze.talocare.co.in/${data.image}",
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
+                            Container(height: 200,
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context)
+                                      .push(MaterialPageRoute(builder: (context) => PostDetail(data: data,)));
+                                },
+                                child: ClipRRect(
+                                  borderRadius: const BorderRadius.only(
+                                    topRight: Radius.circular(30),
+                                    bottomLeft: Radius.circular(30),
+                                  ),
+                                  child:data.image ==null?Container(height: 0,width: 0,):Image.network(
+                                    "https://freeze.talocare.co.in/${data.image}",
+                                    width: double.infinity,
+                                    loadingBuilder: (context, child, loadingProgress) {
+                                      if(loadingProgress == null){
+                                        return child;
+                                      }
+                                      return Center(
+                                        child: CircularProgressIndicator(
+                                          value: loadingProgress.expectedTotalBytes == null?
+                                          loadingProgress.cumulativeBytesLoaded
+                                              /loadingProgress.expectedTotalBytes!
+                                              :null
+                                          ,
+                                        ),
+                                      );
+                                    },
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               ),
                             ),

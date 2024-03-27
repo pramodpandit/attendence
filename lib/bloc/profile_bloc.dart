@@ -438,7 +438,6 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
       "from_user" : userId,
       "permission" : permission
     };
-
     try{
       addMemberLoading.value = true;
       var result = await _repo.makeRemoveAdminInGroupApi(data);

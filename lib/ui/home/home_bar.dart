@@ -106,7 +106,6 @@ class _HomeBarState extends State<HomeBar> {
         print("the actions are : ${receivedAction}");
         if(receivedAction.buttonKeyPressed == "ACCEPT"){
           print("accept triggered ${message.data}");
-          // navigatorKey.currentState?.push(MaterialPageRoute(builder: (context) => CallPage(type: message.data['type'],callId: message.data['callId'])));
           Navigator.push(context, MaterialPageRoute(builder: (context) => CallPage(type: message.data['type'],callId: message.data['callId'], prefs:prefs),));
         }
       },);

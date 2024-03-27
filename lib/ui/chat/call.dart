@@ -26,7 +26,6 @@ class _CallPageState extends State<CallPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-
     userId = widget.prefs.getString('uid');
     profileBloc = ProfileBloc(context.read<ProfileRepository>());
     if(widget.user != null){
