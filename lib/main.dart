@@ -114,12 +114,12 @@ void main() async {
 // Declared as global, outside of any class
 @pragma("vm:entry-point")
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  SharedPreferences pref = await SharedPreferences.getInstance();
   // If you're going to use other Firebase services in the background, such as Firestore,
   // make sure you call `initializeApp` before using other Firebase services.
   await Firebase.initializeApp();
 
   print("Handling a background message: ${message.messageId}");
-
     print('message also contained a notification: ${message.notification}');
 
     String? imageUrl;
@@ -147,6 +147,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       },
     };
 
+
     if(message.data['type'] == "voicecall" || message.data['type'] == "videocall"){
     notificationAdapter.addAll({
       NOTIFICATION_ACTION_BUTTONS : [
@@ -167,14 +168,13 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       ]
     });
   }
-
     AwesomeNotifications().createNotificationFromJsonData(notificationAdapter);
 
     AwesomeNotifications().setListeners(onActionReceivedMethod: (receivedAction) async{
       print("the actions are : ${receivedAction}");
       if(receivedAction.buttonKeyPressed == "ACCEPT"){
         print("accept triggered ${message.data['callId']}");
-        // navigatorKey.currentState?.push(MaterialPageRoute(builder: (context) => CallPage(type: message.data['type'],callId: message.data['callId'])));
+        navigatorKey.currentState?.push(MaterialPageRoute(builder: (context) => CallPage(type: message.data['type'],callId: message.data['callId'], prefs: pref)));
         // Navigator.push(context, MaterialPageRoute(builder: (context) => CallPage(typ
       }
     },);
@@ -182,7 +182,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 class MyApp extends StatelessWidget {
   const MyApp(this.prefs, this.apiService, {Key? key}) : super(key: key);
-
   final SharedPreferences prefs;
   final ApiService apiService;
 
@@ -278,7 +277,8 @@ class MyApp extends StatelessWidget {
                 pageTransitionsTheme: const PageTransitionsTheme(builders: {
                   TargetPlatform.android: OpenUpwardsPageTransitionsBuilder(),
                   TargetPlatform.iOS: CupertinoPageTransitionsBuilder()
-                }),
+                 }
+                ),
                 fontFamily: "Poppins", //'Gilroy', //'Lato', //'Poppins',
               ),
               initialRoute: SplashPage.route,

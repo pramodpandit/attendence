@@ -554,7 +554,7 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
     }
   }
 
-  sendCallNotification(Map<String,dynamic> user,String type,String callId, BuildContext context)async{
+  sendCallNotification(Map<String,dynamic> user,String type,String callId)async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Map<String,dynamic> notificationData = {
       "body": prefs.getString("name"),
@@ -578,7 +578,6 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
         "data" : {
           "type" : "videocall",
           "callId" : callId,
-          "context" : "$context"
         }
       });
     }
@@ -587,7 +586,6 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
         "data" : {
           "type" : "voicecall",
           "callId" : callId,
-          "context" : "$context"
         }
       });
     }

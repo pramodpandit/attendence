@@ -379,9 +379,11 @@ class _ChatScreenState extends State<ChatScreen> {
           alignment: Alignment.topRight,
           child: IconButton(
               onPressed: () {
-                recordController.refresh();
-                recordController.reset();
-                setState(() {
+
+              recordController.stop();
+              recordController.refresh();
+              recordController.reset();
+              setState(() {
                   recorder = false;
                 });
               },
@@ -558,7 +560,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           ),
                           GestureDetector(
                               onTap: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>CallPage(user:widget.user ,type: "videocall",)));
+                                Navigator.push(context, MaterialPageRoute(builder: (context)=>CallPage(user:widget.user ,type: "videocall", prefs: widget.prefs)));
                               },
                               child: Icon(
                                 Icons.videocam,
@@ -569,7 +571,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           ),
                           GestureDetector(
                               onTap: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>CallPage(user:widget.user ,type: "voicecall",)));
+                                Navigator.push(context, MaterialPageRoute(builder: (context)=>CallPage(user:widget.user ,type: "voicecall", prefs: widget.prefs)));
                               },
                               child: Icon(
                                 Icons.call,
