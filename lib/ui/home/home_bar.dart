@@ -1,9 +1,14 @@
 import 'dart:io';
+import 'dart:math';
+import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:office/ui/attendance/attendance_punching.dart';
+import 'package:office/ui/chat/call.dart';
 import 'package:office/ui/chat/chatListScreen.dart';
 import 'package:office/ui/community/communityHomepage.dart';
 import 'package:office/ui/profile/profileScreen.dart';
@@ -37,6 +42,78 @@ class _HomeBarState extends State<HomeBar> {
     //   AppMessageHandler().showSnackBar(context, event);
     // });
     // bloc.init();
+    initializeFirebase(context);
+  }
+  initializeFirebase(BuildContext context) async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    print('initializeFirebase getting called');
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('Got a message whilst in the foreground!');
+      print('Message data: ${message.data}');
+      // initLocalNotifications(message);
+      // showNotifications(message);
+      // This step (if condition) is only necessary if you pretend to use the
+      // test page inside console.firebase.google.com
+      // if (
+      // !AwesomeStringUtils.isNullOrEmpty(message.notification?.title,
+      //     considerWhiteSpaceAsEmpty: true) ||
+      //     !AwesomeStringUtils.isNullOrEmpty(message.notification?.body,
+      //         considerWhiteSpaceAsEmpty: true)) {
+      print('Message also contained a notification: ${message.notification}');
+
+      String? imageUrl;
+      imageUrl ??= message.notification!.android?.imageUrl;
+      imageUrl ??= message.notification!.apple?.imageUrl;
+
+      // https://pub.dev/packages/awesome_notifications#notification-types-values-and-defaults
+      Map<String, dynamic> notificationAdapter = {
+        NOTIFICATION_CONTENT: {
+          NOTIFICATION_ID: Random().nextInt(2147483647),
+          NOTIFICATION_CHANNEL_KEY: 'basic_channel',
+          NOTIFICATION_TITLE: message.notification!.title,
+          NOTIFICATION_BODY: message.notification!.body,
+          NOTIFICATION_LAYOUT:
+          AwesomeStringUtils.isNullOrEmpty(imageUrl) ? 'Default' : 'BigPicture',
+          NOTIFICATION_BIG_PICTURE: imageUrl,
+        },
+        NOTIFICATION_PAYLOAD : {
+          "type" : message.data['type']
+        },
+      };
+      if(message.data['type'] == "voicecall" || message.data['type'] == "videocall"){
+        notificationAdapter.addAll({
+          NOTIFICATION_ACTION_BUTTONS : [
+            {
+              NOTIFICATION_BUTTON_KEY : "ACCEPT",
+              NOTIFICATION_BUTTON_LABEL : "Accept",
+              NOTIFICATION_ACTION_TYPE : 1,
+              NOTIFICATION_ENABLED : true,
+              NOTIFICATION_REQUIRE_INPUT_TEXT : false,
+            },
+            {
+              NOTIFICATION_BUTTON_KEY : "REJECT",
+              NOTIFICATION_BUTTON_LABEL : "Reject",
+              NOTIFICATION_ACTION_TYPE : 1,
+              NOTIFICATION_ENABLED : true,
+              NOTIFICATION_REQUIRE_INPUT_TEXT : false,
+            }
+          ]
+        });
+      }
+      AwesomeNotifications().createNotificationFromJsonData(notificationAdapter);
+
+      AwesomeNotifications().setListeners(onActionReceivedMethod: (receivedAction) async{
+        print("the actions are : ${receivedAction}");
+        if(receivedAction.buttonKeyPressed == "ACCEPT"){
+          print("accept triggered ${message.data}");
+          // navigatorKey.currentState?.push(MaterialPageRoute(builder: (context) => CallPage(type: message.data['type'],callId: message.data['callId'])));
+          Navigator.push(context, MaterialPageRoute(builder: (context) => CallPage(type: message.data['type'],callId: message.data['callId'],),));
+        }
+      },);
+      // } else {
+      //   AwesomeNotifications().createNotificationFromJsonData(message.data);
+      // }
+    });
   }
 
   @override

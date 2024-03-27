@@ -419,7 +419,7 @@ class _PostDataState extends State<PostData> {
                                               var result= bloc.DeletePost(data.postId!);
                                               if(result !=null){
                                                 print(result.toString());
-                                                bloc.feedbackData.remove(data);
+                                                bloc.feedbackData.value!.remove(data);
                                               }
                                             },
                                             icons: [

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:intl/intl.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:office/bloc/profile_bloc.dart';
+import 'package:office/data/model/community_list.dart';
 import 'package:office/data/repository/post_repo.dart';
 import 'package:office/ui/community/addPost.dart';
 import 'package:office/ui/community/communityProfile.dart';
@@ -23,7 +25,7 @@ class CommunityHomePage extends StatefulWidget {
 
 class _CommunityHomePageState extends State<CommunityHomePage> {
   ScrollController _scrollController = ScrollController();
-  List<int> _data = List.generate(10, (index) => index); // Initial data
+  // List<int> _data = List.generate(10, (index) => index); // Initial data
 
   bool _isFirstLoadRunning = false;
   bool _hasNextPage = true;
@@ -57,21 +59,22 @@ class _CommunityHomePageState extends State<CommunityHomePage> {
         _scrollController.position.maxScrollExtent) {
       // User has reached the end of the list
       // Load more data or trigger pagination in flutter
-      setState(() {
-        _data.addAll(List.generate(10, (index) => _data.length + index));
-      });
+      // setState(() {
+      //   _data.addAll(List.generate(10, (index) => _data.length + index));
+      // });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-      displacement: 200,
+      displacement: 100,
       backgroundColor: Colors.white,
       color: K.themeColorPrimary,
       strokeWidth: 3,
       triggerMode: RefreshIndicatorTriggerMode.onEdge,
       onRefresh: () async {
+        bloc.fetchPostData();
         await Future.delayed(Duration(milliseconds: 1500));
       },
       child: Scaffold(
@@ -159,14 +162,40 @@ class _CommunityHomePageState extends State<CommunityHomePage> {
                   child: CircularProgressIndicator(),
                  );
                 }
-                return ListView.builder(
-                  controller: _scrollController,
-                  padding: EdgeInsets.only(top: 10),
-                  itemCount: _data.length,
-                  itemBuilder: (context, index) {
-                    return const PostList();
-                  },
-                );
+                return ValueListenableBuilder(
+                    valueListenable: bloc.feedbackData,
+                    builder: (BuildContext context,feedbackData,Widget? child){
+                      if(feedbackData == null){
+                        return const Center(
+                          child: Text("No post available"),
+                        );
+                      }
+                      return Container(
+                        height: MediaQuery.of(context).size.height,
+                        child: Column(
+                          children: [
+                            feedbackData.isEmpty?
+                            Column(
+                              children: [
+                                200.height,
+                                Text("No posts yet"),
+                              ],
+                            ):
+                            Expanded(
+                              child:
+                              ListView.builder(
+                                  scrollDirection: Axis.vertical,
+                                  itemCount: feedbackData.length,
+                                  itemBuilder: (context, index){
+                                    Community data  = feedbackData[index];
+                                    return PostData(bloc : bloc,data: data);
+                                  }),
+                            ),
+                            // SizedBox(height: 120,)
+                          ],
+                        ),
+                      );
+                    });
                   }
               ),
             ),
@@ -180,335 +209,304 @@ class _CommunityHomePageState extends State<CommunityHomePage> {
   }
 }
 
-class PostList extends StatefulWidget {
+class PostData extends StatefulWidget {
+  final PostBloc bloc;
+  final Community data;
 
-  const PostList({super.key});
+  const PostData({super.key,required this.data, required this.bloc});
 
   @override
-  State<PostList> createState() => _PostListState();
+  State<PostData> createState() => _PostDataState();
 }
 
-class _PostListState extends State<PostList> {
-  late PostBloc bloc;
-  @override
-  void initState() {
-    // TODO: implement initState
-    bloc = PostBloc(context.read<PostRepository>(), context.read<CommunityRepositary>()  );
-    super.initState();
-    bloc.deleteStream.stream.listen((event) {
-      if (event == 'Post') {
-        setState(() {
-        });
-      }
-    });
-
-    bloc.fetchPostData();
-  }
+class _PostDataState extends State<PostData> {
 
   @override
   Widget build(BuildContext context) {
     ValueNotifier<bool> isLike = ValueNotifier(false);
-    return  ValueListenableBuilder(
-        valueListenable: bloc.isUserDetailLoad,
-        builder: (BuildContext context,bool isLoading,Widget? child){
-          if(isLoading){
-            return const Center(
-              //child: CircularProgressIndicator(),
-            );
-          }
-          return Container(
-            height: MediaQuery.of(context).size.height,
-            child: Column(
-              children: [
-                bloc.feedbackData.isEmpty?
-                    Column(
-                      children: [
-                        200.height,
-                        Text("No posts yet"),
-                      ],
-                    ):
-                Expanded(
-                  child:
-                  ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      itemCount: bloc.feedbackData.length,
-                      itemBuilder: (context, index){
-                        var data  = bloc.feedbackData[index];
-                        var date = data.dateTime!.split(' ');
-                        var date1 = date[0] ;
-                        return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                          margin: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
-                              color: Colors.white,
-                              boxShadow: [
-                                BoxShadow(
-                                  spreadRadius: 0,
-                                  blurRadius: 3,
-                                  color: Colors.black.withOpacity(0.2),
-                                ),
-                              ]),
-                          child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      Navigator.of(context).push(MaterialPageRoute(
-                                          builder: (context) => CommunityProfile(userid: data.userId.toInt(),)));
-                                    },
-                                    child:  CircleAvatar(
-                                      backgroundImage: data.userDetails!.image!=null?NetworkImage('https://freeze.talocare.co.in/public/${data.userDetails!.image}'):null,
-                                      child:data.userDetails!.image==null? Icon(Icons.person):null,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "${data.userDetails!.name}",
-                                        style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),maxLines: 1,
-                                      ),
-                                      Text(
-                                        DateFormat.yMMMd().format(DateTime.parse(date1)),
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 14,
-                                            color: Colors.grey),
-                                      ),
-                                    ],
-                                  ),
-                                  Spacer(),
-                                  GestureDetector(
-                                    onTap: () async{
-                                      final SharedPreferences prefs =await SharedPreferences.getInstance();
-                                      showModalBottomSheet(
-                                        context: context,
-                                        isDismissible: true,
-                                        // isScrollControlled: false,
-                                        //backgroundColor: Colors.white,
-                                        shape: const RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.vertical(
-                                            top: Radius.circular(20),
-                                          ),
-                                        ),
-                                        // clipBehavior: Clip.antiAliasWithSaveLayer,
-                                        builder: (BuildContext context) {
-                                          return Container(
-                                            // padding: EdgeInsets.only(top: 150),
-                                            child: MoreSheet(
-                                              ctx: context,
-                                              deleteOnTap: () {
-                                                Navigator.pop(context);
-                                                var result= bloc.DeletePost(data.postId!);
-                                                if(result !=null){
-                                                  print(result.toString());
-                                                  bloc.feedbackData.remove(data);
-                                                }
-                                              },
-                                              icons: [
-                                                Icon(PhosphorIcons.flag),
-                                                Icon(PhosphorIcons.prohibit),
-                                                Icon(Icons.cancel_outlined),
-                                                Icon(PhosphorIcons.share),
-                                                prefs.getString('uid')==data.userId?Icon(Icons.delete):Icon(Icons.border_all,color: Colors.white,)
-                                              ],
-                                              items: [
-                                                'Report',
-                                                "Don't recommend Post",
-                                                'Not interested',
-                                                'Share',
-                                                prefs.getString('uid')==data.userId?'Delete':''
-                                              ],
-                                            ),
-                                          );
-                                        },
-                                      );
-                                    },
-                                    child: Icon(
-                                      Icons.more_horiz,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                  // Expanded(
-                                  //   child: DropdownButtonFormField(
-                                  //     // underline: const SizedBox(),
-                                  //     icon: const Icon(
-                                  //       Icons.more_horiz,
-                                  //       color: Colors.grey,
-                                  //     ),
-                                  //     items: items.map((String items) {
-                                  //       return DropdownMenuItem(
-                                  //         value: items,
-                                  //         child: Text(""),
-                                  //       );
-                                  //     }).toList(),
-                                  //     onChanged: (String? newValue) {},
-                                  //   ),
-                                  // ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              //text Post
-                              RichText(
-                                text: TextSpan(
-                                  text:data.text,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 12,
-                                      height: 1.3,
-                                      color: Color.fromRGBO(74, 74, 74, 1)),
-                                ),
-                                textAlign: TextAlign.start,
-                                maxLines: 4,
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context)
-                                      .push(MaterialPageRoute(builder: (context) => PostDetail(data: data,)));
-                                },
-                                child: ClipRRect(
-                                  borderRadius: const BorderRadius.only(
-                                    topRight: Radius.circular(30),
-                                    bottomLeft: Radius.circular(30),
-                                  ),
-                                  child:data.image ==null?Container(height: 0,width: 0,):Image.network(
-                                    "https://freeze.talocare.co.in/${data.image}",
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              LikeShareComment(data: data,bloc: bloc)
-                              // Row(
-                              //   children: [
-                              //     ValueListenableBuilder(
-                              //       valueListenable: isLike,
-                              //       builder: (BuildContext context, bool liked, Widget? child) {
-                              //         return GestureDetector(
-                              //           onTap: () {
-                              //             isLike.value = !isLike.value;
-                              //           },
-                              //           child: Icon(
-                              //             liked ? Icons.favorite : Icons.favorite_border,
-                              //             color: Colors.red,
-                              //             size: 18,
-                              //           ),
-                              //         );
-                              //       },
-                              //     ),
-                              //     const SizedBox(
-                              //       width: 5,
-                              //     ),
-                              //     GestureDetector(
-                              //       onTap: () {
-                              //         showModalBottomSheet(
-                              //           context: context,
-                              //           isScrollControlled: true,
-                              //           shape: const RoundedRectangleBorder(
-                              //             borderRadius: BorderRadius.vertical(
-                              //               top: Radius.circular(20),
-                              //             ),
-                              //           ),
-                              //           clipBehavior: Clip.antiAliasWithSaveLayer,
-                              //           builder: (BuildContext context) {
-                              //             return LikeSheet(ctx: context);
-                              //           },
-                              //         );
-                              //       },
-                              //       child: const Text(
-                              //         "1.1K",
-                              //         style: TextStyle(fontWeight: FontWeight.w600),
-                              //       ),
-                              //     ),
-                              //     const SizedBox(
-                              //       width: 15,
-                              //     ),
-                              //     GestureDetector(
-                              //       onTap: () {
-                              //         showModalBottomSheet(
-                              //           context: context,
-                              //           isScrollControlled: true,
-                              //           shape: const RoundedRectangleBorder(
-                              //             borderRadius: BorderRadius.vertical(
-                              //               top: Radius.circular(20),
-                              //             ),
-                              //           ),
-                              //           clipBehavior: Clip.antiAliasWithSaveLayer,
-                              //           builder: (BuildContext context) {
-                              //             return CommentSheet(ctx: context);
-                              //           },
-                              //         );
-                              //       },
-                              //       child: Row(
-                              //         children: [
-                              //           Icon(
-                              //             Icons.comment,
-                              //             color: Colors.yellow.shade700,
-                              //             size: 18,
-                              //           ),
-                              //           const SizedBox(
-                              //             width: 5,
-                              //           ),
-                              //           const Text(
-                              //             "59 comments",
-                              //             style: TextStyle(fontWeight: FontWeight.w600),
-                              //           ),
-                              //         ],
-                              //       ),
-                              //     ),
-                              //     const SizedBox(
-                              //       width: 15,
-                              //     ),
-                              //     const Icon(
-                              //       Icons.remove_red_eye,
-                              //       color: Colors.black,
-                              //       size: 18,
-                              //     ),
-                              //     const SizedBox(
-                              //       width: 5,
-                              //     ),
-                              //     const Text(
-                              //       "33,456",
-                              //       style: TextStyle(fontWeight: FontWeight.w600),
-                              //     ),
-                              //     // Spacer(),
-                              //     // Container(
-                              //     //   padding: EdgeInsets.symmetric(horizontal: 8,vertical: 5),
-                              //     //   decoration: BoxDecoration(
-                              //     //     borderRadius: BorderRadius.only(
-                              //     //       topRight: Radius.circular(10),
-                              //     //       bottomLeft: Radius.circular(10),
-                              //     //     ),
-                              //     //     color: Colors.blue,
-                              //     //   ),
-                              //     //   child: Text("View Post",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w500),),
-                              //     // ),
-                              //   ],
-                              // ),
-                            ],
-                          ),
-                        );
-                      }),
-                ),
-                SizedBox(height: 120,)
-              ],
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      margin: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              spreadRadius: 0,
+              blurRadius: 3,
+              color: Colors.black.withOpacity(0.2),
             ),
-          );
-        });
+          ]),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => CommunityProfile(userid: widget.data.userId.toInt(),)));
+                },
+                child:  CircleAvatar(
+                  backgroundImage: widget.data.userDetails!.image!=null?NetworkImage('https://freeze.talocare.co.in/public/${widget.data.userDetails!.image}'):null,
+                  child:widget.data.userDetails!.image==null? Icon(Icons.person):null,
+                ),
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "${widget.data.userDetails!.name}",
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),maxLines: 1,
+                  ),
+                  Text(
+                    DateFormat.yMMMd().format(DateTime.parse(widget.data.dateTime!.split(" ").first)),
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: Colors.grey),
+                  ),
+                ],
+              ),
+              Spacer(),
+              GestureDetector(
+                onTap: () async{
+                  final SharedPreferences prefs =await SharedPreferences.getInstance();
+                  showModalBottomSheet(
+                    context: context,
+                    isDismissible: true,
+                    // isScrollControlled: false,
+                    //backgroundColor: Colors.white,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(20),
+                      ),
+                    ),
+                    // clipBehavior: Clip.antiAliasWithSaveLayer,
+                    builder: (BuildContext context) {
+                      return Container(
+                        // padding: EdgeInsets.only(top: 150),
+                        child: MoreSheet(
+                          ctx: context,
+                          deleteOnTap: () {
+                            Navigator.pop(context);
+                            var result= widget.bloc.DeletePost(widget.data.postId!);
+                            if(result !=null){
+                              print(result.toString());
+                              widget.bloc.feedbackData.value!.remove(widget.data);
+                            }
+                          },
+                          icons: [
+                            Icon(PhosphorIcons.flag),
+                            Icon(PhosphorIcons.prohibit),
+                            Icon(Icons.cancel_outlined),
+                            Icon(PhosphorIcons.share),
+                            prefs.getString('uid')==widget.data.userId?Icon(Icons.delete):Icon(Icons.border_all,color: Colors.white,)
+                          ],
+                          items: [
+                            'Report',
+                            "Don't recommend Post",
+                            'Not interested',
+                            'Share',
+                            prefs.getString('uid')==widget.data.userId?'Delete':''
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+                child: Icon(
+                  Icons.more_horiz,
+                  color: Colors.grey,
+                ),
+              ),
+              // Expanded(
+              //   child: DropdownButtonFormField(
+              //     // underline: const SizedBox(),
+              //     icon: const Icon(
+              //       Icons.more_horiz,
+              //       color: Colors.grey,
+              //     ),
+              //     items: items.map((String items) {
+              //       return DropdownMenuItem(
+              //         value: items,
+              //         child: Text(""),
+              //       );
+              //     }).toList(),
+              //     onChanged: (String? newValue) {},
+              //   ),
+              // ),
+            ],
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          //text Post
+          RichText(
+            text: TextSpan(
+              text:widget.data.text,
+              style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                  height: 1.3,
+                  color: Color.fromRGBO(74, 74, 74, 1)),
+            ),
+            textAlign: TextAlign.start,
+            maxLines: 4,
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          GestureDetector(
+            onTap: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) => PostDetail(data: widget.data)));
+            },
+            child: ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topRight: Radius.circular(30),
+                bottomLeft: Radius.circular(30),
+              ),
+              child:Container(
+                height: 200,
+                child: Image.network(
+                  "https://freeze.talocare.co.in/${widget.data.image}",
+                  width: double.infinity,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if(loadingProgress == null){
+                      return child;
+                    }
+                    return Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes == null?
+                            loadingProgress.cumulativeBytesLoaded
+                              /loadingProgress.expectedTotalBytes!
+                        :null
+                          ,
+                      ),
+                    );
+                  },
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          LikeShareComment(data: widget.data,bloc: widget.bloc)
+          // Row(
+          //   children: [
+          //     ValueListenableBuilder(
+          //       valueListenable: isLike,
+          //       builder: (BuildContext context, bool liked, Widget? child) {
+          //         return GestureDetector(
+          //           onTap: () {
+          //             isLike.value = !isLike.value;
+          //           },
+          //           child: Icon(
+          //             liked ? Icons.favorite : Icons.favorite_border,
+          //             color: Colors.red,
+          //             size: 18,
+          //           ),
+          //         );
+          //       },
+          //     ),
+          //     const SizedBox(
+          //       width: 5,
+          //     ),
+          //     GestureDetector(
+          //       onTap: () {
+          //         showModalBottomSheet(
+          //           context: context,
+          //           isScrollControlled: true,
+          //           shape: const RoundedRectangleBorder(
+          //             borderRadius: BorderRadius.vertical(
+          //               top: Radius.circular(20),
+          //             ),
+          //           ),
+          //           clipBehavior: Clip.antiAliasWithSaveLayer,
+          //           builder: (BuildContext context) {
+          //             return LikeSheet(ctx: context);
+          //           },
+          //         );
+          //       },
+          //       child: const Text(
+          //         "1.1K",
+          //         style: TextStyle(fontWeight: FontWeight.w600),
+          //       ),
+          //     ),
+          //     const SizedBox(
+          //       width: 15,
+          //     ),
+          //     GestureDetector(
+          //       onTap: () {
+          //         showModalBottomSheet(
+          //           context: context,
+          //           isScrollControlled: true,
+          //           shape: const RoundedRectangleBorder(
+          //             borderRadius: BorderRadius.vertical(
+          //               top: Radius.circular(20),
+          //             ),
+          //           ),
+          //           clipBehavior: Clip.antiAliasWithSaveLayer,
+          //           builder: (BuildContext context) {
+          //             return CommentSheet(ctx: context);
+          //           },
+          //         );
+          //       },
+          //       child: Row(
+          //         children: [
+          //           Icon(
+          //             Icons.comment,
+          //             color: Colors.yellow.shade700,
+          //             size: 18,
+          //           ),
+          //           const SizedBox(
+          //             width: 5,
+          //           ),
+          //           const Text(
+          //             "59 comments",
+          //             style: TextStyle(fontWeight: FontWeight.w600),
+          //           ),
+          //         ],
+          //       ),
+          //     ),
+          //     const SizedBox(
+          //       width: 15,
+          //     ),
+          //     const Icon(
+          //       Icons.remove_red_eye,
+          //       color: Colors.black,
+          //       size: 18,
+          //     ),
+          //     const SizedBox(
+          //       width: 5,
+          //     ),
+          //     const Text(
+          //       "33,456",
+          //       style: TextStyle(fontWeight: FontWeight.w600),
+          //     ),
+          //     // Spacer(),
+          //     // Container(
+          //     //   padding: EdgeInsets.symmetric(horizontal: 8,vertical: 5),
+          //     //   decoration: BoxDecoration(
+          //     //     borderRadius: BorderRadius.only(
+          //     //       topRight: Radius.circular(10),
+          //     //       bottomLeft: Radius.circular(10),
+          //     //     ),
+          //     //     color: Colors.blue,
+          //     //   ),
+          //     //   child: Text("View Post",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w500),),
+          //     // ),
+          //   ],
+          // ),
+        ],
+      ),
+    );
 
   }
 }

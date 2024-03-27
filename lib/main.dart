@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:office/data/repository/attendance_repo.dart';
 import 'package:office/data/repository/auth_repo.dart';
 import 'package:office/data/repository/complaint_repo.dart';
@@ -37,6 +38,7 @@ import 'utils/constants.dart';
 import 'utils/routes.dart';
 
 void main() async {
+  // final navigatorKey = GlobalKey<NavigatorState>();
   bool inProduction = true;
   if (inProduction) {
     // debugPrint = (message, {wrapWidth}) {};
@@ -91,7 +93,6 @@ void main() async {
           onlyAlertOnce: true,
         ),
       ]);
-
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   final sharedPreferences = await SharedPreferences.getInstance();
   // FirebaseMessaging.instance.getToken().then((value) {
@@ -119,10 +120,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
   print("Handling a background message: ${message.messageId}");
 
-  // if (!AwesomeStringUtils.isNullOrEmpty(message.notification?.title,
-  //         considerWhiteSpaceAsEmpty: true) ||
-  //     !AwesomeStringUtils.isNullOrEmpty(message.notification?.body,
-  //         considerWhiteSpaceAsEmpty: true)) {
     print('message also contained a notification: ${message.notification}');
 
     String? imageUrl;
@@ -177,12 +174,10 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       print("the actions are : ${receivedAction}");
       if(receivedAction.buttonKeyPressed == "ACCEPT"){
         print("accept triggered ${message.data['callId']}");
-        Navigator.push(message.data['context'], MaterialPageRoute(builder: (context) => CallPage(type: message.data['type'],callId: message.data['callId'],),));
+        // navigatorKey.currentState?.push(MaterialPageRoute(builder: (context) => CallPage(type: message.data['type'],callId: message.data['callId'])));
+        // Navigator.push(context, MaterialPageRoute(builder: (context) => CallPage(typ
       }
     },);
-  // } else {
-  //   AwesomeNotifications().createNotificationFromJsonData(message.data);
-  // }
 }
 
 class MyApp extends StatelessWidget {

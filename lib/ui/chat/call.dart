@@ -44,6 +44,16 @@ class _CallPageState extends State<CallPage> {
       onDispose: () {
         dispose();
       },
+      events: ZegoUIKitPrebuiltCallEvents(
+        onCallEnd: (event, defaultAction) {
+          Navigator.pop(context);
+          dispose();
+        },
+        onHangUpConfirmation: (event, defaultAction) async{
+          dispose();
+          return true;
+        },
+      ),
     );
   }
 }

@@ -379,6 +379,7 @@ class _ChatScreenState extends State<ChatScreen> {
           alignment: Alignment.topRight,
           child: IconButton(
               onPressed: () {
+                recordController.refresh();
                 recordController.reset();
                 setState(() {
                   recorder = false;
@@ -432,6 +433,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 onTap: () async{
                   // if(isRecording.value){
                     String? path = await recordController.stop();
+                    recordController.refresh();
                     recordController.reset();
                   // }
                     profileBloc.sendMessage(widget.user['user_id'].toString(),"one_to_one","audio",audioPath: path).then((value){

@@ -585,7 +585,7 @@ ValueNotifier<List?> searchData = ValueNotifier([]);
     if(type == "voicecall"){
       data.addAll({
         "data" : {
-          "type" : "videocall",
+          "type" : "voicecall",
           "callId" : callId,
           "context" : "$context"
         }

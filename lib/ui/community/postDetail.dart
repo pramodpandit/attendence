@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_phosphor_icons/flutter_phosphor_icons.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
@@ -24,55 +26,55 @@ class _PostDetailState extends State<PostDetail> {
     var date1 = date[0] ;
     var time = date[1].split(':');
     return Scaffold(
-      body: Column(
-        children: [
-          Stack(
-            children: [
-              Container(
-                height: 100,
-                width: 1.sw,
-                decoration: const BoxDecoration(
-                    color: Color(0xFF009FE3),
-                    borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(20),
-                        bottomRight: Radius.circular(20))
-                ),
-                child: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SizedBox(height: 56,),
-                    Text(
-                      "Post Detail",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Stack(
+              children: [
+                Container(
+                  height: 100,
+                  width: 1.sw,
+                  decoration: const BoxDecoration(
+                      color: Color(0xFF009FE3),
+                      borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(20),
+                          bottomRight: Radius.circular(20))
+                  ),
+                  child: const Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(height: 56,),
+                      Text(
+                        "Post Detail",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              Positioned(
-                top: 56,
-                left: 10,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: const CircleAvatar(
-                    backgroundColor: Colors.white,
-                    radius: 15,
-                    child: Icon(Icons.arrow_back, size: 18,),
+                    ],
                   ),
                 ),
-              ),
-            ],
-          ),
-          Container(
-            margin: EdgeInsets.only(top: 15),
-            padding: EdgeInsets.only(left: 13, right: 13),
-            child: SingleChildScrollView(
+                Positioned(
+                  top: 56,
+                  left: 10,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: const CircleAvatar(
+                      backgroundColor: Colors.white,
+                      radius: 15,
+                      child: Icon(Icons.arrow_back, size: 18,),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              margin: EdgeInsets.only(top: 15),
+              padding: EdgeInsets.only(left: 13, right: 13),
               child: Column(
                 children: [
                   //Brief of post
@@ -244,8 +246,8 @@ class _PostDetailState extends State<PostDetail> {
                 ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:office/bloc/bloc.dart';
@@ -61,7 +62,7 @@ class PostBloc extends Bloc {
       isUserDetailLoad.value = false;
     }
   }
-  List<Community> feedbackData = [];
+  ValueNotifier<List<Community>?> feedbackData = ValueNotifier([]);
   ValueNotifier<List?> userPost = ValueNotifier([]);
 
   fetchPost(int id) async{
@@ -83,9 +84,12 @@ class PostBloc extends Bloc {
       isUserDetailLoad.value = true;
       var result = await repo.getPostRecords();
       if(result.status && result.data != null){
-        feedbackData = result.data!.reversed.toList();
+        feedbackData.value = result.data!.reversed.toList();
+      }else{
+        feedbackData.value = null;
       }
     }catch (e, s) {
+      feedbackData.value = null;
       print(e);
       print(s);
     }finally{
