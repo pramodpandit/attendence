@@ -119,13 +119,12 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // make sure you call `initializeApp` before using other Firebase services.
   await Firebase.initializeApp();
 
-  print("Handling a background message: ${message.messageId}");
+    print("Handling a background message: ${message.messageId}");
     print('message also contained a notification: ${message.notification}');
 
     String? imageUrl;
     imageUrl ??= message.notification!.android?.imageUrl;
     imageUrl ??= message.notification!.apple?.imageUrl;
-
     Map<String, dynamic> notificationAdapter = {
       NOTIFICATION_CONTENT : {
         NOTIFICATION_CHANNEL_KEY: 'basic_channel',
@@ -174,10 +173,10 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       print("the actions are : ${receivedAction}");
       if(receivedAction.buttonKeyPressed == "ACCEPT"){
         print("accept triggered ${message.data['callId']}");
-        navigatorKey.currentState?.push(MaterialPageRoute(builder: (context) => CallPage(type: message.data['type'],callId: message.data['callId'], prefs: pref, name: '',)));
-        // Navigator.push(context, MaterialPageRoute(builder: (context) => CallPage(typ
+        navigatorKey.currentState?.push(MaterialPageRoute(builder: (context) => CallPage(type: message.data['type'],callId: message.data['callId'], prefs: pref,)));
       }
-    },);
+    },
+    );
 }
 
 class MyApp extends StatelessWidget {

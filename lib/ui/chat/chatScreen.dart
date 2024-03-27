@@ -560,7 +560,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           ),
                           GestureDetector(
                               onTap: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>CallPage(user:widget.user ,type: "videocall", prefs: widget.prefs, name: "${widget.user!['first_name']??''} ${widget.user!['middle_name']??''} ${widget.user!['last_name']??''}",)));
+                                Navigator.push(context, MaterialPageRoute(builder: (context)=>CallPage(user:widget.user ,type: "videocall", prefs: widget.prefs,)));
                               },
                               child: Icon(
                                 Icons.videocam,
@@ -571,7 +571,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           ),
                           GestureDetector(
                               onTap: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>CallPage(user:widget.user ,type: "voicecall", prefs: widget.prefs, name: "${widget.user!['first_name']??''} ${widget.user!['middle_name']??''} ${widget.user!['last_name']??''}",)));
+                                Navigator.push(context, MaterialPageRoute(builder: (context)=>CallPage(user:widget.user ,type: "voicecall", prefs: widget.prefs, )));
                               },
                               child: Icon(
                                 Icons.call,
