@@ -384,8 +384,8 @@ class _PostDataState extends State<PostData> {
                         value: loadingProgress.expectedTotalBytes == null?
                             loadingProgress.cumulativeBytesLoaded
                               /loadingProgress.expectedTotalBytes!
-                        :null
-                          ,
+                        :null,
+                        strokeWidth: 2,
                       ),
                     );
                   },

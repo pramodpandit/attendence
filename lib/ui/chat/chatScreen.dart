@@ -194,7 +194,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   }
                   return InkWell(
                     onTap: () {
-                      profileBloc.sendMessage(widget.user['user_id'].toString(),"one_to_one","image",image: imageFile).then((value){
+                      profileBloc.sendMessage(widget.user['user_id'].toString(),"one_to_one","image",image: imageFile).then((value)async{
                         setState(() {
                           imageFile = null;
                         });

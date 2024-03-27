@@ -17,7 +17,7 @@ class CallPage extends StatefulWidget {
 class _CallPageState extends State<CallPage> {
   late ProfileBloc profileBloc;
   String? callId;
-  String userId = DateTime.now().millisecondsSinceEpoch.toString();
+  String? userId;
 
   @override
   void initState() {
@@ -32,28 +32,16 @@ class _CallPageState extends State<CallPage> {
       callId = widget.callId;
     }
  }
+
  @override
   Widget build(BuildContext context) {
     return ZegoUIKitPrebuiltCall(
       appID: 414043237, // Fill in the appID that you get from ZEGOCLOUD Admin Console.
       appSign: 'ca80a415440612ae706f13661f48eb56d30cb3cbd58b0c7c3d55f967093dd102', // Fill in the appSign that you get from ZEGOCLOUD Admin Console.
-      userID: userId,
+      userID: userId!,
       userName: "user$userId",
       callID: callId!,
       config: widget.type == "videocall" ? ZegoUIKitPrebuiltCallConfig.oneOnOneVideoCall() : ZegoUIKitPrebuiltCallConfig.oneOnOneVoiceCall(),
-      onDispose: () {
-        dispose();
-      },
-      events: ZegoUIKitPrebuiltCallEvents(
-        onCallEnd: (event, defaultAction) {
-          Navigator.pop(context);
-          dispose();
-        },
-        onHangUpConfirmation: (event, defaultAction) async{
-          dispose();
-          return true;
-        },
-      ),
     );
   }
 }
