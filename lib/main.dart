@@ -168,7 +168,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     });
   }
     AwesomeNotifications().createNotificationFromJsonData(notificationAdapter);
-
     AwesomeNotifications().setListeners(onActionReceivedMethod: (receivedAction) async{
       print("the actions are : ${receivedAction}");
       if(receivedAction.buttonKeyPressed == "ACCEPT"){
@@ -183,7 +182,6 @@ class MyApp extends StatelessWidget {
   const MyApp(this.prefs, this.apiService, {Key? key}) : super(key: key);
   final SharedPreferences prefs;
   final ApiService apiService;
-
   @override
   Widget build(BuildContext context) {
     return MultiProvider(

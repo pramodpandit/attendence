@@ -45,7 +45,10 @@ class _CallPageState extends State<CallPage> {
       userID: userId!,
       userName: widget.prefs.getString("name")!,
       callID: callId!,
-      config: widget.type == "videocall" ? ZegoUIKitPrebuiltCallConfig.oneOnOneVideoCall() : ZegoUIKitPrebuiltCallConfig.oneOnOneVoiceCall(),
+      config: widget.type == "videocall" ? ZegoUIKitPrebuiltCallConfig.oneOnOneVideoCall() : ZegoUIKitPrebuiltCallConfig.oneOnOneVoiceCall()
+      ..audioEffect
+      ..background
+      ..topMenuBar,
       events: ZegoUIKitPrebuiltCallEvents(
         onCallEnd: (event, defaultAction) {
           Navigator.pop(context);

@@ -75,7 +75,7 @@ class _DashBoardState extends State<DashBoard> {
                           height: MediaQuery.of(context).size.width * 1,
                         ),
                         const Center(
-                          child: Text("User Details Not Found!"),
+                          child: CircularProgressIndicator(),
                         ),
                       ],
                     );
